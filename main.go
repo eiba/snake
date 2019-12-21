@@ -10,14 +10,14 @@ import (
 )
 
 const delta = 1
-var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 var (
 	views   = []string{}
 	snekViews = []string{}
 	curView = -1
 	idxView = 0
-	gameView = "game"
+	gameView,boxView,snekView = "game","box","snek"
+	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
 func main() {
@@ -73,7 +73,7 @@ func layout(g *gocui.Gui) error {
 		if _, err := g.SetViewOnBottom(gameView); err != nil{
 			return err
 		}
-		if err := newView(g,true); err != nil {
+		if err := setViewAtRandom(g,snekView,true); err != nil {
 			log.Panicln(err)
 		}
 		v.Title = "Snek"
@@ -85,7 +85,7 @@ func layout(g *gocui.Gui) error {
 func initKeybindings(g *gocui.Gui) error {
 	job := func() {
 		g.Update(func(g *gocui.Gui) error {
-			err := newView(g,false)
+			err := setViewAtRandom(g,boxView,false)
 			if err != nil {
 				return err
 			}
@@ -101,7 +101,7 @@ func initKeybindings(g *gocui.Gui) error {
 	}
 	if err := g.SetKeybinding("", gocui.KeySpace, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			return newView(g,false)
+			return setViewAtRandom(g,boxView,false)
 		}); err != nil {
 		return err
 	}
@@ -163,7 +163,7 @@ func initKeybindings(g *gocui.Gui) error {
 
 
 
-func newView(g *gocui.Gui, setCurrent bool) error {
+func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
 	x0, y0, x1, y1, err := g.ViewPosition(gameView)
 	if err != nil {
 		return err
@@ -175,7 +175,7 @@ func newView(g *gocui.Gui, setCurrent bool) error {
 
 	lenX := 2
 	lenY := 1
-	name := fmt.Sprintf("v%v", idxView)
+	//name := fmt.Sprintf("v%v", idxView)
 	_, err = g.SetView(name, positionX, positionY, positionX+lenX, positionY+lenY, 0)
 	if err != nil {
 		if !gocui.IsUnknownView(err) {
