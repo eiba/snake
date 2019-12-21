@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
-	"github.com/carlescere/scheduler"
 	"log"
 	"math/rand"
 	"time"
@@ -76,6 +75,9 @@ func layout(g *gocui.Gui) error {
 		if err := setViewAtRandom(g,snekView,true); err != nil {
 			log.Panicln(err)
 		}
+		if err := setViewAtRandom(g,boxView,false); err != nil {
+			log.Panicln(err)
+		}
 		v.Title = "Snek"
 	}
 
@@ -83,7 +85,7 @@ func layout(g *gocui.Gui) error {
 }
 
 func initKeybindings(g *gocui.Gui) error {
-	job := func() {
+	/*job := func() {
 		g.Update(func(g *gocui.Gui) error {
 			err := setViewAtRandom(g,boxView,false)
 			if err != nil {
@@ -91,7 +93,7 @@ func initKeybindings(g *gocui.Gui) error {
 			}
 			return nil
 		})
-	}
+	}*/
 
 	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
@@ -156,7 +158,7 @@ func initKeybindings(g *gocui.Gui) error {
 		return err
 	}
 
-	scheduler.Every(1).Seconds().NotImmediately().Run(job)
+	//scheduler.Every(1).Seconds().NotImmediately().Run(job)
 
 	return nil
 }
@@ -251,8 +253,22 @@ func nextView(g *gocui.Gui, disableCurrent bool) error {
 	return nil
 }
 
-func checkCollision(g *gocui.Gui, v *gocui.View)  {
+func checkCollision(g *gocui.Gui, view1 string, view2 string) (bool,error)  {
+	x10, y10, x11, y11, err := g.ViewPosition(view1)
+	if err != nil {
+		return false,err
+	}
 
+	x20, y20, x21, y21, err := g.ViewPosition(view2)
+	if err != nil {
+		return false,err
+	}
+
+	if x10 < x21 && x11 > x20 && y10 < y21 && y11 > y20 {
+		return true,nil
+	}
+
+	return false,nil
 }
 
 func moveView(g *gocui.Gui, v *gocui.View, dx, dy int) error {
@@ -271,6 +287,15 @@ func moveView(g *gocui.Gui, v *gocui.View, dx, dy int) error {
 	if newX0 >= minX && newY0 >= minY && newX1 <= maxX && newY1 <= maxY {
 		if _, err := g.SetView(name, newX0, newY0, newX1, newY1, 0); err != nil {
 			return err
+		}
+
+		collision, err := checkCollision(g,snekView,boxView)
+		if err != nil{
+			return err
+		}
+
+		if collision {
+			return setViewAtRandom(g,boxView,false)
 		}
 	}
 
