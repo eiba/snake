@@ -16,6 +16,7 @@ var (
 	direction                   = 0
 	idxView                     = 0
 	gameView, boxView, snekView = "game", "box", "snek"
+	running                     = true
 	r                           = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
@@ -80,6 +81,9 @@ func layout(g *gocui.Gui) error {
 func updateMovement(g *gocui.Gui, viewName string, duration time.Duration) {
 	for {
 		time.Sleep(duration)
+		if !running {
+			continue
+		}
 		g.Update(func(g *gocui.Gui) error {
 			var err error
 			switch direction {
@@ -99,6 +103,7 @@ func updateMovement(g *gocui.Gui, viewName string, duration time.Duration) {
 
 func reset(g *gocui.Gui) error {
 	direction = 0
+	running = true
 	if err := setViewAtRandom(g, snekView, true); err != nil {
 		return err
 	}
@@ -113,6 +118,7 @@ func reset(g *gocui.Gui) error {
 }
 
 func gameOver(g *gocui.Gui) error {
+	running = false
 	x0, y0, x1, y1, err := g.ViewPosition(gameView)
 	if err != nil {
 		return err
@@ -158,6 +164,9 @@ func initKeybindings(g *gocui.Gui) error {
 	}
 	if err := g.SetKeybinding("", gocui.KeyArrowLeft, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
+			if direction == 1 {
+				return nil
+			}
 			direction = 3
 			return nil
 		}); err != nil {
@@ -165,6 +174,9 @@ func initKeybindings(g *gocui.Gui) error {
 	}
 	if err := g.SetKeybinding("", gocui.KeyArrowRight, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
+			if direction == 3 {
+				return nil
+			}
 			direction = 1
 			return nil
 		}); err != nil {
@@ -172,6 +184,9 @@ func initKeybindings(g *gocui.Gui) error {
 	}
 	if err := g.SetKeybinding("", gocui.KeyArrowDown, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
+			if direction == 0 {
+				return nil
+			}
 			direction = 2
 			return nil
 		}); err != nil {
@@ -179,6 +194,9 @@ func initKeybindings(g *gocui.Gui) error {
 	}
 	if err := g.SetKeybinding("", gocui.KeyArrowUp, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
+			if direction == 2 {
+				return nil
+			}
 			direction = 0
 			return nil
 		}); err != nil {
