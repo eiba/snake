@@ -17,6 +17,7 @@ var (
 	idxView                     = 0
 	gameView, boxView, snekView = "game", "box", "snek"
 	running                     = true
+	tickInterval                = 100 * time.Millisecond
 	r                           = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
@@ -48,13 +49,15 @@ func run() {
 func layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
 
-	if v, err := g.SetView("help", maxX-25, 0, maxX-1, 4, 0); err != nil {
+	if v, err := g.SetView("help", maxX-25, 0, maxX-1, 6, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}
 		v.Title = "Keybindings"
 		fmt.Fprintln(v, "Space: Restart")
 		fmt.Fprintln(v, "← ↑ → ↓: Move thing")
+		fmt.Fprintln(v, "Ctrl+W: Speed up")
+		fmt.Fprintln(v, "Ctrl+S: Slow down")
 		fmt.Fprintln(v, "^C: Exit")
 	}
 
@@ -68,7 +71,7 @@ func layout(g *gocui.Gui) error {
 		if err := setViewAtRandom(g, snekView, true); err != nil {
 			log.Panicln(err)
 		}
-		go updateMovement(g, snekView, 100*time.Millisecond)
+		go updateMovement(g, snekView)
 		if err := setViewAtRandom(g, boxView, false); err != nil {
 			log.Panicln(err)
 		}
@@ -78,9 +81,9 @@ func layout(g *gocui.Gui) error {
 	return nil
 }
 
-func updateMovement(g *gocui.Gui, viewName string, duration time.Duration) {
+func updateMovement(g *gocui.Gui, viewName string) {
 	for {
-		time.Sleep(duration)
+		time.Sleep(tickInterval)
 		if !running {
 			continue
 		}
@@ -104,6 +107,7 @@ func updateMovement(g *gocui.Gui, viewName string, duration time.Duration) {
 func reset(g *gocui.Gui) error {
 	direction = 0
 	running = true
+	tickInterval = 100 * time.Millisecond
 	if err := setViewAtRandom(g, snekView, true); err != nil {
 		return err
 	}
@@ -198,6 +202,20 @@ func initKeybindings(g *gocui.Gui) error {
 				return nil
 			}
 			direction = 0
+			return nil
+		}); err != nil {
+		return err
+	}
+	if err := g.SetKeybinding("", gocui.KeyCtrlW, gocui.ModNone,
+		func(g *gocui.Gui, v *gocui.View) error {
+			tickInterval -= 10 * time.Millisecond
+			return nil
+		}); err != nil {
+		return err
+	}
+	if err := g.SetKeybinding("",  gocui.KeyCtrlS, gocui.ModNone,
+		func(g *gocui.Gui, v *gocui.View) error {
+			tickInterval += 10 * time.Millisecond
 			return nil
 		}); err != nil {
 		return err
