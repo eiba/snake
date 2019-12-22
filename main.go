@@ -11,22 +11,19 @@ import (
 const delta = 1
 
 var (
-	views   = []string{}
 	snekViews = []string{}
-	curView = -1
-	idxView = 0
-	gameView,boxView,snekView = "game","box","snek"
-	r = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	direction                   = 0
+	idxView                     = 0
+	gameView, boxView, snekView = "game", "box", "snek"
+	r                           = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
 func main() {
-
-
 	run()
-
 }
 
-func run()  {
+func run() {
 	g, err := gocui.NewGui(gocui.OutputNormal, true)
 	if err != nil {
 		log.Panicln(err)
@@ -42,7 +39,6 @@ func run()  {
 		log.Panicln(err)
 	}
 
-
 	if err := g.MainLoop(); err != nil && !gocui.IsQuit(err) {
 		log.Panicln(err)
 	}
@@ -51,17 +47,13 @@ func run()  {
 func layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
 
-	if v, err := g.SetView("help", maxX-25, 0, maxX-1, 8, 0); err != nil{
+	if v, err := g.SetView("help", maxX-25, 0, maxX-1, 4, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}
 		v.Title = "Keybindings"
-		fmt.Fprintln(v, "Space: New thing")
-		fmt.Fprintln(v, "Tab: Next thing")
+		fmt.Fprintln(v, "Space: Restart")
 		fmt.Fprintln(v, "← ↑ → ↓: Move thing")
-		fmt.Fprintln(v, "Backspace: Delete thing")
-		fmt.Fprintln(v, "t: Set thing on top")
-		fmt.Fprintln(v, "b: Set thing on bottom")
 		fmt.Fprintln(v, "^C: Exit")
 	}
 
@@ -69,13 +61,14 @@ func layout(g *gocui.Gui) error {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}
-		if _, err := g.SetViewOnBottom(gameView); err != nil{
+		if _, err := g.SetViewOnBottom(gameView); err != nil {
 			return err
 		}
-		if err := setViewAtRandom(g,snekView,true); err != nil {
+		if err := setViewAtRandom(g, snekView, true); err != nil {
 			log.Panicln(err)
 		}
-		if err := setViewAtRandom(g,boxView,false); err != nil {
+		go updateMovement(g, snekView, 100*time.Millisecond)
+		if err := setViewAtRandom(g, boxView, false); err != nil {
 			log.Panicln(err)
 		}
 		v.Title = "Snek"
@@ -84,16 +77,72 @@ func layout(g *gocui.Gui) error {
 	return nil
 }
 
-func initKeybindings(g *gocui.Gui) error {
-	/*job := func() {
+func updateMovement(g *gocui.Gui, viewName string, duration time.Duration) {
+	for {
+		time.Sleep(duration)
 		g.Update(func(g *gocui.Gui) error {
-			err := setViewAtRandom(g,boxView,false)
-			if err != nil {
-				return err
+			var err error
+			switch direction {
+			case 0: //up
+				err = moveView(g, viewName, 0, -delta)
+			case 1: //right
+				err = moveView(g, viewName, delta+1, 0)
+			case 2: //down
+				err = moveView(g, viewName, 0, delta)
+			case 3: //left
+				err = moveView(g, viewName, -delta-1, 0)
 			}
-			return nil
+			return err
 		})
-	}*/
+	}
+}
+
+func reset(g *gocui.Gui) error {
+	direction = 0
+	if err := setViewAtRandom(g, snekView, true); err != nil {
+		return err
+	}
+	if err := setViewAtRandom(g, boxView, false); err != nil {
+		return err
+	}
+	if err := g.DeleteView("gameOver"); err != nil && !gocui.IsUnknownView(err) {
+		return err
+	}
+
+	return nil
+}
+
+func gameOver(g *gocui.Gui) error {
+	x0, y0, x1, y1, err := g.ViewPosition(gameView)
+	if err != nil {
+		return err
+	}
+	maxX, maxY := x1-x0, y1-y0
+
+	positionX, positionY := (maxX/2)-5, (maxY/2)-2
+
+	lenX := 12
+	lenY := 4
+	name := "gameOver"
+	if v, err := g.SetView(name, positionX, positionY, positionX+lenX, positionY+lenY, 0); err != nil {
+		if !gocui.IsUnknownView(err) {
+			return err
+		}
+
+		v.Title = "Game over"
+		fmt.Fprintln(v, "\n  u lose")
+
+		if _, err := g.SetCurrentView(name); err != nil {
+			return err
+		}
+		if _, err := g.SetViewOnTop(name); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func initKeybindings(g *gocui.Gui) error {
 
 	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
@@ -103,67 +152,41 @@ func initKeybindings(g *gocui.Gui) error {
 	}
 	if err := g.SetKeybinding("", gocui.KeySpace, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			return setViewAtRandom(g,boxView,false)
-		}); err != nil {
-		return err
-	}
-	if err := g.SetKeybinding("", gocui.KeyBackspace2, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			return delView(g)
-		}); err != nil {
-		return err
-	}
-	if err := g.SetKeybinding("", gocui.KeyTab, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			return nextView(g, true)
+			return reset(g)
 		}); err != nil {
 		return err
 	}
 	if err := g.SetKeybinding("", gocui.KeyArrowLeft, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			return moveView(g, v, -delta, 0)
+			direction = 3
+			return nil
 		}); err != nil {
 		return err
 	}
 	if err := g.SetKeybinding("", gocui.KeyArrowRight, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			return moveView(g, v, delta, 0)
+			direction = 1
+			return nil
 		}); err != nil {
 		return err
 	}
 	if err := g.SetKeybinding("", gocui.KeyArrowDown, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			return moveView(g, v, 0, delta)
+			direction = 2
+			return nil
 		}); err != nil {
 		return err
 	}
 	if err := g.SetKeybinding("", gocui.KeyArrowUp, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			return moveView(g, v, 0, -delta)
+			direction = 0
+			return nil
 		}); err != nil {
 		return err
 	}
-	if err := g.SetKeybinding("", 't', gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			_, err := g.SetViewOnTop(views[curView])
-			return err
-		}); err != nil {
-		return err
-	}
-	if err := g.SetKeybinding("", 'b', gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			_, err := g.SetViewOnBottom(views[curView])
-			return err
-		}); err != nil {
-		return err
-	}
-
-	//scheduler.Every(1).Seconds().NotImmediately().Run(job)
 
 	return nil
 }
-
-
 
 func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
 	x0, y0, x1, y1, err := g.ViewPosition(gameView)
@@ -171,13 +194,12 @@ func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
 		return err
 	}
 
-	maxX, maxY := x1-x0-3,y1-y0-2
+	maxX, maxY := x1-x0-3, y1-y0-2
 
-	positionX, positionY := r.Intn(maxX)+1,r.Intn(maxY)+1
+	positionX, positionY := r.Intn(maxX)+1, r.Intn(maxY)+1
 
 	lenX := 2
 	lenY := 1
-	//name := fmt.Sprintf("v%v", idxView)
 	_, err = g.SetView(name, positionX, positionY, positionX+lenX, positionY+lenY, 0)
 	if err != nil {
 		if !gocui.IsUnknownView(err) {
@@ -185,20 +207,15 @@ func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
 		}
 	}
 
-	views = append(views, name)
-
 	if setCurrent {
 		if _, err := g.SetCurrentView(name); err != nil {
 			log.Panicln(err)
 		}
-		curView = len(views) - 1
-
 	}
-	idxView += 1
 	return nil
 }
 
-func addView(g *gocui.Gui,v *gocui.View) error  {
+func addView(g *gocui.Gui, v *gocui.View) error {
 
 	name := v.Name()
 	x0, y0, x1, y1, err := g.ViewPosition(name)
@@ -217,63 +234,41 @@ func addView(g *gocui.Gui,v *gocui.View) error  {
 			return err
 		}
 		v.Wrap = true
-		fmt.Fprintln(v, "",idxView+1)
+		fmt.Fprintln(v, "", idxView+1)
 	}
 
-	views = append(views, name)
 	idxView += 1
 
 	return nil
 }
 
-func delView(g *gocui.Gui) error {
-	if len(views) <= 1 {
-		return nil
-	}
-
-	if err := g.DeleteView(views[curView]); err != nil {
-		return err
-	}
-	views = append(views[:curView], views[curView+1:]...)
-
-	return nextView(g, false)
-}
-
-func nextView(g *gocui.Gui, disableCurrent bool) error {
-	next := curView + 1
-	if next > len(views)-1 {
-		next = 0
-	}
-
-	if _, err := g.SetCurrentView(views[next]); err != nil {
-		return err
-	}
-
-	curView = next
-	return nil
-}
-
-func checkCollision(g *gocui.Gui, view1 string, view2 string) (bool,error)  {
+func checkCollision(g *gocui.Gui, view1 string, view2 string) (bool, error) {
 	x10, y10, x11, y11, err := g.ViewPosition(view1)
 	if err != nil {
-		return false,err
+		return false, err
 	}
 
 	x20, y20, x21, y21, err := g.ViewPosition(view2)
 	if err != nil {
-		return false,err
+		return false, err
 	}
 
-	if x10 < x21 && x11 > x20 && y10 < y21 && y11 > y20 {
-		return true,nil
+	Ax, Ay, Aw, Ah := x10, y10, x11-x10, y11-y10
+	Bx, By, Bw, Bh := x20, y20, x21-x20, y21-y20
+
+	if Bx+Bw > Ax &&
+		By+Bh > Ay &&
+		Ax+Aw > Bx &&
+		Ay+Ah > By {
+		return true, nil
+
 	}
 
-	return false,nil
+	return false, nil
 }
 
-func moveView(g *gocui.Gui, v *gocui.View, dx, dy int) error {
-	name := v.Name()
-	x0, y0, x1, y1, err := g.ViewPosition(name)
+func moveView(g *gocui.Gui, viewName string, dx, dy int) error {
+	x0, y0, x1, y1, err := g.ViewPosition(viewName)
 	if err != nil {
 		return err
 	}
@@ -282,21 +277,23 @@ func moveView(g *gocui.Gui, v *gocui.View, dx, dy int) error {
 		return err
 	}
 
-	maxX, maxY, minX, minY := xg1-xg0,yg1-yg0,0,0
-	newX0,newY0,newX1,newY1 := x0+dx,y0+dy,x1+dx,y1+dy
+	maxX, maxY, minX, minY := xg1-xg0, yg1-yg0, 0, 0
+	newX0, newY0, newX1, newY1 := x0+dx, y0+dy, x1+dx, y1+dy
 	if newX0 >= minX && newY0 >= minY && newX1 <= maxX && newY1 <= maxY {
-		if _, err := g.SetView(name, newX0, newY0, newX1, newY1, 0); err != nil {
+		if _, err := g.SetView(viewName, newX0, newY0, newX1, newY1, 0); err != nil {
 			return err
 		}
 
-		collision, err := checkCollision(g,snekView,boxView)
-		if err != nil{
+		collision, err := checkCollision(g, snekView, boxView)
+		if err != nil {
 			return err
 		}
 
 		if collision {
-			return setViewAtRandom(g,boxView,false)
+			return setViewAtRandom(g, boxView, false)
 		}
+	} else {
+		return gameOver(g)
 	}
 
 	return nil
