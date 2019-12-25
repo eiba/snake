@@ -10,15 +10,18 @@ import (
 
 const delta = 1
 
+type direction struct {
+	currentDirection int
+	previousDirection int
+}
 var (
-	snekViews = []string{}
+	snekViews      = []string{"s0"}
+	snekDirections = []direction{{0,0}}
 
-	direction                   = 0
-	idxView                     = 0
-	gameView, boxView, snekView = "game", "box", "snek"
-	running                     = true
-	tickInterval                = 100 * time.Millisecond
-	r                           = rand.New(rand.NewSource(time.Now().UnixNano()))
+	gameView, boxView = "game", "box"
+	running           = true
+	tickInterval      = 100 * time.Millisecond
+	r                 = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
 func main() {
@@ -68,10 +71,10 @@ func layout(g *gocui.Gui) error {
 		if _, err := g.SetViewOnBottom(gameView); err != nil {
 			return err
 		}
-		if err := setViewAtRandom(g, snekView, true); err != nil {
+		if err := setViewAtRandom(g, snekViews[0], true); err != nil {
 			log.Panicln(err)
 		}
-		go updateMovement(g, snekView)
+		go updateMovement(g, snekViews[0])
 		if err := setViewAtRandom(g, boxView, false); err != nil {
 			log.Panicln(err)
 		}
@@ -81,34 +84,53 @@ func layout(g *gocui.Gui) error {
 	return nil
 }
 
-func updateMovement(g *gocui.Gui, viewName string) {
+func updateMovement(g *gocui.Gui, viewName string) error {
 	for {
 		time.Sleep(tickInterval)
 		if !running {
 			continue
 		}
-		g.Update(func(g *gocui.Gui) error {
-			var err error
-			switch direction {
-			case 0: //up
-				err = moveView(g, viewName, 0, -delta)
-			case 1: //right
-				err = moveView(g, viewName, delta+1, 0)
-			case 2: //down
-				err = moveView(g, viewName, 0, delta)
-			case 3: //left
-				err = moveView(g, viewName, -delta-1, 0)
-			}
+		err := moveViewInDirection(g,snekViews[0],snekDirections[0].currentDirection)
+		if err != nil {
 			return err
-		})
+		}
+		for i:=1;i<len(snekViews);i++{
+			snekView := snekViews[i]
+			snekDirection := snekDirections[i-1].previousDirection
+			err = moveViewInDirection(g,snekView,snekDirection)
+			if err != nil {
+				return err
+			}
+			snekDirections[i].previousDirection = snekDirections[i].currentDirection
+			snekDirections[i].currentDirection = snekDirection
+		}
 	}
 }
 
+func moveViewInDirection(g *gocui.Gui, viewName string, direction int) error  {
+	g.Update(func(g *gocui.Gui) error {
+		var err error
+		switch direction {
+		case 0: //up
+			err = moveView(g, viewName, 0, -delta)
+		case 1: //right
+			err = moveView(g, viewName, delta+1, 0)
+		case 2: //down
+			err = moveView(g, viewName, 0, delta)
+		case 3: //left
+			err = moveView(g, viewName, -delta-1, 0)
+		}
+		return err
+	})
+	return nil
+}
+
+
 func reset(g *gocui.Gui) error {
-	direction = 0
+	snekDirections[0].currentDirection, snekDirections[0].previousDirection = 0, 0
 	running = true
 	tickInterval = 100 * time.Millisecond
-	if err := setViewAtRandom(g, snekView, true); err != nil {
+	if err := setViewAtRandom(g, snekViews[0], true); err != nil {
 		return err
 	}
 	if err := setViewAtRandom(g, boxView, false); err != nil {
@@ -168,40 +190,40 @@ func initKeybindings(g *gocui.Gui) error {
 	}
 	if err := g.SetKeybinding("", gocui.KeyArrowLeft, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			if direction == 1 {
+			if snekDirections[0].currentDirection == 1 {
 				return nil
 			}
-			direction = 3
+			snekDirections[0].currentDirection, snekDirections[0].previousDirection  = 3, 1
 			return nil
 		}); err != nil {
 		return err
 	}
 	if err := g.SetKeybinding("", gocui.KeyArrowRight, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			if direction == 3 {
+			if snekDirections[0].currentDirection == 3 {
 				return nil
 			}
-			direction = 1
+			snekDirections[0].currentDirection, snekDirections[0].previousDirection = 1, 3
 			return nil
 		}); err != nil {
 		return err
 	}
 	if err := g.SetKeybinding("", gocui.KeyArrowDown, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			if direction == 0 {
+			if snekDirections[0].currentDirection == 0 {
 				return nil
 			}
-			direction = 2
+			snekDirections[0].currentDirection, snekDirections[0].previousDirection = 2, 0
 			return nil
 		}); err != nil {
 		return err
 	}
 	if err := g.SetKeybinding("", gocui.KeyArrowUp, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			if direction == 2 {
+			if snekDirections[0].currentDirection == 2 {
 				return nil
 			}
-			direction = 0
+			snekDirections[0].currentDirection, snekDirections[0].previousDirection = 0, 2
 			return nil
 		}); err != nil {
 		return err
@@ -213,7 +235,7 @@ func initKeybindings(g *gocui.Gui) error {
 		}); err != nil {
 		return err
 	}
-	if err := g.SetKeybinding("",  gocui.KeyCtrlS, gocui.ModNone,
+	if err := g.SetKeybinding("", gocui.KeyCtrlS, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
 			tickInterval += 10 * time.Millisecond
 			return nil
@@ -251,29 +273,25 @@ func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
 	return nil
 }
 
-func addView(g *gocui.Gui, v *gocui.View) error {
+func addView(g *gocui.Gui, viewName string) error {
 
-	name := v.Name()
-	x0, y0, x1, y1, err := g.ViewPosition(name)
+	x0, y0, x1, y1, err := g.ViewPosition(viewName)
 	if err != nil {
 		return err
 	}
-	name = fmt.Sprintf("v%v", idxView)
-	lenX := 4
-	lenY := 2
-	if idxView >= 9 {
-		lenX++
-	}
-	v, err = g.SetView(name, x0, y0+lenY, x1, y1+lenY, 0)
+	name := fmt.Sprintf("s%v", len(snekViews))
+
+	//lenX := 2
+	lenY := 1
+
+	_, err = g.SetView(name, x0, y0+lenY, x1, y1+lenY, 0)
 	if err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}
-		v.Wrap = true
-		fmt.Fprintln(v, "", idxView+1)
 	}
-
-	idxView += 1
+	snekViews = append(snekViews, name)
+	snekDirections = append(snekDirections,snekDirections[len(snekViews)-2])
 
 	return nil
 }
@@ -320,7 +338,7 @@ func moveView(g *gocui.Gui, viewName string, dx, dy int) error {
 			return err
 		}
 
-		collision, err := checkCollision(g, snekView, boxView)
+		collision, err := checkCollision(g, viewName, boxView)
 		if err != nil {
 			return err
 		}
