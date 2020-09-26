@@ -110,10 +110,8 @@ func updateMovement(g *gocui.Gui) error {
 			}
 
 			for i := 1; i < len(snekBodyParts); i++ {
-				//previousSnekBodyPart := snekBodyParts[i-1]
 				currentSnekBodyPart := snekBodyParts[i]
 				previousSnekBodyPartPreviousDirection := snekBodyParts[i-1].previousDirection
-				//err := moveBodyPart2(g, previousSnekBodyPart, currentSnekBodyPart)
 				err := moveViewInDirection(g, currentSnekBodyPart.viewName, previousSnekBodyPartPreviousDirection, false)
 				if err != nil {
 					return err
@@ -127,21 +125,21 @@ func updateMovement(g *gocui.Gui) error {
 }
 
 func moveViewInDirection(g *gocui.Gui, viewName string, direction direction, headView bool) error {
-		var err error
-		switch direction {
-		case directions.up:
-			err = moveView(g, viewName, 0, -delta, headView)
-		case directions.right:
-			err = moveView(g, viewName, delta+1, 0, headView)
-		case directions.down:
-			err = moveView(g, viewName, 0, delta, headView)
-		case directions.left:
-			err = moveView(g, viewName, -delta-1, 0, headView)
-		}
-		if err != nil {
-			return err
-		}
-		return nil
+	var err error
+	switch direction {
+	case directions.up:
+		err = moveView(g, viewName, 0, -delta, headView)
+	case directions.right:
+		err = moveView(g, viewName, delta+1, 0, headView)
+	case directions.down:
+		err = moveView(g, viewName, 0, delta, headView)
+	case directions.left:
+		err = moveView(g, viewName, -delta-1, 0, headView)
+	}
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func reset(g *gocui.Gui) error {
@@ -298,9 +296,15 @@ func moveView(g *gocui.Gui, viewName string, dx, dy int, headView bool) error {
 }
 
 func moveHead(g *gocui.Gui, viewName string, dx, dy int) error {
-	newX0, newY0, newX1, newY1, err := getNewViewCoordinates(g, viewName, dx, dy); if err != nil {return err}
+	newX0, newY0, newX1, newY1, err := getNewViewCoordinates(g, viewName, dx, dy)
+	if err != nil {
+		return err
+	}
 
-	headToMainViewCollision, err := checkHeadToMainViewCollision(g,newX0,newY0,newX1,newY1); if err != nil {return err}
+	headToMainViewCollision, err := checkHeadToMainViewCollision(g, newX0, newY0, newX1, newY1)
+	if err != nil {
+		return err
+	}
 	if !headToMainViewCollision {
 		_, err := g.SetView(viewName, newX0, newY0, newX1, newY1, 0)
 		if err != nil {
@@ -310,14 +314,23 @@ func moveHead(g *gocui.Gui, viewName string, dx, dy int) error {
 		return gameOver(g)
 	}
 
-	headToBodyCollision, err := checkHeadToBodyCollision(g);if err != nil { return err}
+	headToBodyCollision, err := checkHeadToBodyCollision(g)
+	if err != nil {
+		return err
+	}
 	if headToBodyCollision {
 		return gameOver(g)
 	}
 
-	headToBoxCollision, err := checkViewCollision(g, snekBodyParts[0].viewName, boxView); if err != nil {return err}
+	headToBoxCollision, err := checkViewCollision(g, snekBodyParts[0].viewName, boxView)
+	if err != nil {
+		return err
+	}
 	if headToBoxCollision {
-		err := addBodyPartToEnd(g, snekBodyParts[len(snekBodyParts)-1]); if err != nil {return err}
+		err := addBodyPartToEnd(g, snekBodyParts[len(snekBodyParts)-1])
+		if err != nil {
+			return err
+		}
 		return setViewAtRandom(g, boxView, false)
 	}
 
@@ -328,7 +341,7 @@ func checkHeadToBodyCollision(g *gocui.Gui) (bool, error) {
 	for i := 1; i < len(snekBodyParts); i++ {
 		collision, err := checkViewCollision(g, snekBodyParts[0].viewName, snekBodyParts[i].viewName)
 		if err != nil {
-			return false,err
+			return false, err
 		}
 		if collision {
 			return true, nil
@@ -359,27 +372,6 @@ func moveBodyPart(g *gocui.Gui, viewName string, dx, dy int) error {
 	if err != nil {
 		return err
 	}
-	return nil
-}
-
-func moveBodyPart2(g *gocui.Gui, previousSnekBodyPart snekBodyPart, currentSnekBodyPart snekBodyPart) error {
-	pX0, pY0, pX1, pY1, err := g.ViewPosition(previousSnekBodyPart.viewName); if err != nil {return err}
-
-	offsetX := 0
-	offsetY := 1
-	switch previousSnekBodyPart.previousDirection {
-	case directions.right:
-		offsetX = -2
-		offsetY = 0
-	case directions.down:
-		offsetX = 0
-		offsetY = -1
-	case directions.left:
-		offsetX = 2
-		offsetY = 0
-	}
-
-	_, err = g.SetView(currentSnekBodyPart.viewName, pX0+offsetX, pY0+offsetY, pX1+offsetX, pY1+offsetY, 0); if err != nil {return err}
 	return nil
 }
 
