@@ -35,10 +35,10 @@ func initMovementKeys(g *gocui.Gui) error {
 func initMovementKey(g *gocui.Gui, key gocui.Key, keyDirection direction) error {
 	if err := g.SetKeybinding("", key, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			if snekBodyParts[0].currentDirection == (keyDirection + 2) % 4 {
+			if snekBodyParts[0].currentDirection == getOppositeDirection(keyDirection) {
 				return nil
 			}
-			currentDirection = keyDirection
+			headDirection = keyDirection
 			return nil
 		}); err != nil {
 		return err
