@@ -71,12 +71,12 @@ func initSpaceKey(g *gocui.Gui) error{
 }
 
 func initSpeedKeys(g *gocui.Gui) error{
-	if err := initSpeedKey(g, gocui.KeyCtrlW, -10); err != nil {return err}
-	if err := initSpeedKey(g, gocui.KeyCtrlS, 10); err != nil {return err}
+	if err := initSpeedKey(g, 'w', -10); err != nil {return err}
+	if err := initSpeedKey(g, 's', 10); err != nil {return err}
 	return nil
 }
 
-func initSpeedKey(g *gocui.Gui, key gocui.Key, speedChange time.Duration) error{
+func initSpeedKey(g *gocui.Gui, key rune, speedChange time.Duration) error{
 	if err := g.SetKeybinding("", key, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
 			tickInterval +=  speedChange * time.Millisecond

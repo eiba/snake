@@ -70,8 +70,8 @@ func layout(g *gocui.Gui) error {
 		v.Title = "Keybindings"
 		fmt.Fprintln(v, "Space: Restart")
 		fmt.Fprintln(v, "← ↑ → ↓: Move thing")
-		fmt.Fprintln(v, "Ctrl+W: Speed up")
-		fmt.Fprintln(v, "Ctrl+S: Slow down")
+		fmt.Fprintln(v, "W: Speed up")
+		fmt.Fprintln(v, "S: Slow down")
 		fmt.Fprintln(v, "Esc: Exit")
 	}
 
