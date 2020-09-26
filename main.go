@@ -85,7 +85,7 @@ func layout(g *gocui.Gui) error {
 		if err := setViewAtRandom(g, snekViews[0], true); err != nil {
 			log.Panicln(err)
 		}
-		go updateMovement(g, snekViews[0])
+		go updateMovement(g)
 		if err := setViewAtRandom(g, boxView, false); err != nil {
 			log.Panicln(err)
 		}
@@ -95,7 +95,7 @@ func layout(g *gocui.Gui) error {
 	return nil
 }
 
-func updateMovement(g *gocui.Gui, viewName string) error {
+func updateMovement(g *gocui.Gui) error {
 	for {
 		time.Sleep(tickInterval)
 		if !running {
@@ -196,118 +196,6 @@ func gameOver(g *gocui.Gui) error {
 		if _, err := g.SetViewOnTop(name); err != nil {
 			return err
 		}
-	}
-	return nil
-}
-
-func initKeybindings(g *gocui.Gui) error {
-
-	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			return gocui.ErrQuit
-		}); err != nil {
-		return err
-	}
-	if err := g.SetKeybinding("", gocui.KeySpace, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			return reset(g)
-		}); err != nil {
-		return err
-	}
-	if err := g.SetKeybinding("", gocui.KeyArrowLeft, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			if snekDirections[0].currentDirection == 1 {
-				return nil
-			}
-			currentDirection = 3
-			return nil
-		}); err != nil {
-		return err
-	}
-	if err := g.SetKeybinding("", gocui.KeyArrowRight, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			if snekDirections[0].currentDirection == 3 {
-				return nil
-			}
-			currentDirection = 1
-			return nil
-		}); err != nil {
-		return err
-	}
-	if err := g.SetKeybinding("", gocui.KeyArrowDown, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			if snekDirections[0].currentDirection == 0 {
-				return nil
-			}
-			currentDirection = 2
-			return nil
-		}); err != nil {
-		return err
-	}
-	if err := g.SetKeybinding("", gocui.KeyArrowUp, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			if snekDirections[0].currentDirection == 2 {
-				return nil
-			}
-			currentDirection = 0
-			return nil
-		}); err != nil {
-		return err
-	}
-	if err := g.SetKeybinding("", gocui.KeyTab, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			//addNewView = true
-			err := addView(g, snekViews[len(snekViews)-1], snekDirections[len(snekDirections)-1].currentDirection)
-			if err != nil {
-				return err
-			}
-			return nil
-		}); err != nil {
-		return err
-	}
-	if err := g.SetKeybinding("", gocui.KeyCtrlW, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			tickInterval -= 10 * time.Millisecond
-			return nil
-		}); err != nil {
-		return err
-	}
-	if err := g.SetKeybinding("", gocui.KeyCtrlS, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			tickInterval += 10 * time.Millisecond
-			return nil
-		}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func initMovementKeys(g *gocui.Gui) error {
-	if err := g.SetKeybinding("", gocui.KeyArrowLeft, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			if snekDirections[0].currentDirection == 1 {
-				return nil
-			}
-			currentDirection = 3
-			return nil
-		}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func initMovementKey(g *gocui.Gui, key gocui.Key, keyDirection direction) error {
-	if err := g.SetKeybinding("", key, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			if snekDirections[0].currentDirection == 1 {
-				return nil
-			}
-			currentDirection = keyDirection
-			return nil
-		}); err != nil {
-		return err
 	}
 	return nil
 }
