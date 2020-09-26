@@ -30,7 +30,7 @@ var (
 	headDirection     = directions.up
 	gameView, boxView = "game", "box"
 	running           = true
-	tickInterval      = 100 * time.Millisecond
+	tickInterval      = 50 * time.Millisecond
 	r                 = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
@@ -101,31 +101,32 @@ func updateMovement(g *gocui.Gui) error {
 		if !running {
 			continue
 		}
-
-		snekBodyParts[0].previousDirection = snekBodyParts[0].currentDirection
-		snekBodyParts[0].currentDirection = headDirection
-		err := moveViewInDirection(g, snekBodyParts[0].viewName, snekBodyParts[0].currentDirection, true)
-		if err != nil {
-			return err
-		}
-
-		for i := 1; i < len(snekBodyParts); i++ {
-			previousSnekBodyPart := snekBodyParts[i-1]
-			currentSnekBodyPart := snekBodyParts[i]
-			previousSnekBodyPartPreviousDirection := snekBodyParts[i-1].previousDirection
-			err := moveBodyPart2(g,previousSnekBodyPart,currentSnekBodyPart)
-			//err := moveViewInDirection(g, currentSnekBodyPart.viewName, previousSnekBodyPartPreviousDirection, false)
+		g.UpdateAsync(func(g *gocui.Gui) error {
+			snekBodyParts[0].previousDirection = snekBodyParts[0].currentDirection
+			snekBodyParts[0].currentDirection = headDirection
+			err := moveViewInDirection(g, snekBodyParts[0].viewName, snekBodyParts[0].currentDirection, true)
 			if err != nil {
 				return err
 			}
-			snekBodyParts[i].previousDirection = snekBodyParts[i].currentDirection
-			snekBodyParts[i].currentDirection = previousSnekBodyPartPreviousDirection
-		}
-		}
+
+			for i := 1; i < len(snekBodyParts); i++ {
+				//previousSnekBodyPart := snekBodyParts[i-1]
+				currentSnekBodyPart := snekBodyParts[i]
+				previousSnekBodyPartPreviousDirection := snekBodyParts[i-1].previousDirection
+				//err := moveBodyPart2(g, previousSnekBodyPart, currentSnekBodyPart)
+				err := moveViewInDirection(g, currentSnekBodyPart.viewName, previousSnekBodyPartPreviousDirection, false)
+				if err != nil {
+					return err
+				}
+				snekBodyParts[i].previousDirection = snekBodyParts[i].currentDirection
+				snekBodyParts[i].currentDirection = previousSnekBodyPartPreviousDirection
+			}
+			return nil
+		})
+	}
 }
 
 func moveViewInDirection(g *gocui.Gui, viewName string, direction direction, headView bool) error {
-	g.Update(func(g *gocui.Gui) error {
 		var err error
 		switch direction {
 		case directions.up:
@@ -137,9 +138,10 @@ func moveViewInDirection(g *gocui.Gui, viewName string, direction direction, hea
 		case directions.left:
 			err = moveView(g, viewName, -delta-1, 0, headView)
 		}
-		return err
-	})
-	return nil
+		if err != nil {
+			return err
+		}
+		return nil
 }
 
 func reset(g *gocui.Gui) error {
@@ -377,7 +379,7 @@ func moveBodyPart2(g *gocui.Gui, previousSnekBodyPart snekBodyPart, currentSnekB
 		offsetY = 0
 	}
 
-	_, err = g.SetView(currentSnekBodyPart.viewName, pX0+offsetX, pY0+offsetY, pX1+offsetX, pY1+offsetY, 0)
+	_, err = g.SetView(currentSnekBodyPart.viewName, pX0+offsetX, pY0+offsetY, pX1+offsetX, pY1+offsetY, 0); if err != nil {return err}
 	return nil
 }
 
