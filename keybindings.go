@@ -49,7 +49,7 @@ func initMovementKey(g *gocui.Gui, key gocui.Key, keyDirection direction) error 
 func initTabKey(g *gocui.Gui) error{
 	if err := g.SetKeybinding("", gocui.KeyTab, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			err := addView(g, snekBodyParts[len(snekBodyParts)-1].viewName, snekBodyParts[len(snekBodyParts)-1].currentDirection)
+			err := addBodyPartToEnd(g, snekBodyParts[len(snekBodyParts)-1])
 			if err != nil {
 				return err
 			}
