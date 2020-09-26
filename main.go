@@ -10,9 +10,10 @@ import (
 
 const delta = 1
 
-type snekDirection struct {
+type snekBodyPart struct {
 	currentDirection  direction
 	previousDirection direction
+	viewName string
 }
 
 type direction int
@@ -24,9 +25,9 @@ type movementDirections struct {
 }
 
 var (
-	snekViews         = []string{"s0"}
+	//snekViews         = []string{"s0"}
 	directions        = movementDirections{0, 1, 2, 3}
-	snekDirections    = []snekDirection{{directions.up, directions.up}}
+	snekBodyParts     = []snekBodyPart{{directions.up, directions.up, "s0"}}
 	currentDirection  = directions.up
 	gameView, boxView = "game", "box"
 	running           = true
@@ -45,16 +46,13 @@ func run() {
 		log.Panicln(err)
 	}
 	defer g.Close()
-
 	g.Highlight = true
 	g.SelFgColor = gocui.ColorRed
-
 	g.SetManagerFunc(layout)
 
 	if err := initKeybindings(g); err != nil {
 		log.Panicln(err)
 	}
-
 	if err := g.MainLoop(); err != nil && !gocui.IsQuit(err) {
 		log.Panicln(err)
 	}
@@ -82,7 +80,7 @@ func layout(g *gocui.Gui) error {
 		if _, err := g.SetViewOnBottom(gameView); err != nil {
 			return err
 		}
-		if err := setViewAtRandom(g, snekViews[0], true); err != nil {
+		if err := setViewAtRandom(g, snekBodyParts[0].viewName, true); err != nil {
 			log.Panicln(err)
 		}
 		go updateMovement(g)
@@ -101,24 +99,27 @@ func updateMovement(g *gocui.Gui) error {
 		if !running {
 			continue
 		}
-		snekDirections[0].previousDirection = snekDirections[0].currentDirection
-		snekDirections[0].currentDirection = currentDirection
-		err := moveViewInDirection(g, snekViews[0], snekDirections[0].currentDirection)
+
+		//snekHead.previousDirection = snekHead.currentDirection
+		//snekHead.currentDirection = currentDirection
+		snekBodyParts[0].previousDirection = snekBodyParts[0].currentDirection
+		snekBodyParts[0].currentDirection = currentDirection
+		err := moveViewInDirection(g, snekBodyParts[0].viewName, snekBodyParts[0].currentDirection)
 		if err != nil {
 			return err
 		}
-		for i := 1; i < len(snekViews); i++ {
-			snekView := snekViews[i]
-			snekDirection := snekDirections[i-1].previousDirection
-			err = moveViewInDirection(g, snekView, snekDirection)
+		for i := 1; i < len(snekBodyParts); i++ {
+			snekBodyPart := snekBodyParts[i]
+			snekDirection := snekBodyParts[i-1].previousDirection
+			err = moveViewInDirection(g, snekBodyPart.viewName, snekDirection)
 			if err != nil {
 				return err
 			}
-			snekDirections[i].previousDirection = snekDirections[i].currentDirection
-			snekDirections[i].currentDirection = snekDirection
+			snekBodyParts[i].previousDirection = snekBodyParts[i].currentDirection
+			snekBodyParts[i].currentDirection = snekDirection
 		}
 		if addNewView {
-			if err = addView(g, snekViews[len(snekViews)-1], snekDirections[len(snekDirections)-1].currentDirection); err != nil {
+			if err = addView(g, snekBodyParts[len(snekBodyParts)-1].viewName, snekBodyParts[len(snekBodyParts)-1].currentDirection); err != nil {
 				return err
 			}
 			addNewView = false
@@ -148,15 +149,16 @@ func reset(g *gocui.Gui) error {
 	currentDirection = 0
 	running = true
 	tickInterval = 100 * time.Millisecond
-	for i := 1; i < len(snekViews); i++ {
-		if err := g.DeleteView(snekViews[i]); err != nil && !gocui.IsUnknownView(err) {
+	for i := 1; i < len(snekBodyParts); i++ {
+		if err := g.DeleteView(snekBodyParts[i].viewName); err != nil && !gocui.IsUnknownView(err) {
 			return err
 		}
 	}
-	snekViews = []string{"s0"}
-	snekDirections = []snekDirection{{0, 0}}
+	//snekViews = []string{"s0"}
+	snekBodyParts = []snekBodyPart{{0, 0, "s0"}}
+	//snekHead = &snekBodyParts[0]
 
-	if err := setViewAtRandom(g, snekViews[0], true); err != nil {
+	if err := setViewAtRandom(g, snekBodyParts[0].viewName, true); err != nil {
 		return err
 	}
 	if err := setViewAtRandom(g, boxView, false); err != nil {
@@ -233,7 +235,7 @@ func addView(g *gocui.Gui, viewName string, direction direction) error {
 	if err != nil {
 		return err
 	}
-	name := fmt.Sprintf("s%v", len(snekViews))
+	name := fmt.Sprintf("s%v", len(snekBodyParts))
 
 	offsetX := 0
 	offsetY := 1
@@ -255,9 +257,8 @@ func addView(g *gocui.Gui, viewName string, direction direction) error {
 			return err
 		}
 	}
-	snekViews = append(snekViews, name)
-	currentDirection := snekDirections[len(snekViews)-2]
-	snekDirections = append(snekDirections, snekDirection{currentDirection.currentDirection, currentDirection.currentDirection})
+	currentLastSnekBodyPart := snekBodyParts[len(snekBodyParts)-1]
+	snekBodyParts = append(snekBodyParts, snekBodyPart{currentLastSnekBodyPart.currentDirection, currentLastSnekBodyPart.currentDirection,name})
 
 	return nil
 }
@@ -305,13 +306,13 @@ func moveView(g *gocui.Gui, viewName string, dx, dy int) error {
 			return err
 		}
 
-		collision, err := checkCollision(g, snekViews[0], boxView)
+		collision, err := checkCollision(g, snekBodyParts[0].viewName, boxView)
 		if err != nil {
 			return err
 		}
 
 		if collision {
-			if err = addView(g, snekViews[len(snekViews)-1], snekDirections[len(snekDirections)-1].currentDirection); err != nil {
+			if err = addView(g, snekBodyParts[len(snekBodyParts)-1].viewName, snekBodyParts[len(snekBodyParts)-1].currentDirection); err != nil {
 				return err
 			}
 			return setViewAtRandom(g, boxView, false)
