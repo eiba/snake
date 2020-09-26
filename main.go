@@ -101,14 +101,14 @@ func updateMovement(g *gocui.Gui) error {
 		if !running {
 			continue
 		}
-		g.UpdateAsync(func(g *gocui.Gui) error {
+		g.Update(func(g *gocui.Gui) error {
+
 			snekBodyParts[0].previousDirection = snekBodyParts[0].currentDirection
 			snekBodyParts[0].currentDirection = headDirection
 			err := moveViewInDirection(g, snekBodyParts[0].viewName, snekBodyParts[0].currentDirection, true)
 			if err != nil {
 				return err
 			}
-
 			for i := 1; i < len(snekBodyParts); i++ {
 				currentSnekBodyPart := snekBodyParts[i]
 				previousSnekBodyPartPreviousDirection := snekBodyParts[i-1].previousDirection
@@ -145,7 +145,7 @@ func moveViewInDirection(g *gocui.Gui, viewName string, direction direction, hea
 func reset(g *gocui.Gui) error {
 	headDirection = 0
 	running = true
-	tickInterval = 100 * time.Millisecond
+	tickInterval = 50 * time.Millisecond
 	for i := 1; i < len(snekBodyParts); i++ {
 		if err := g.DeleteView(snekBodyParts[i].viewName); err != nil && !gocui.IsUnknownView(err) {
 			return err
