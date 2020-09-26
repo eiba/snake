@@ -72,7 +72,7 @@ func layout(g *gocui.Gui) error {
 		fmt.Fprintln(v, "← ↑ → ↓: Move thing")
 		fmt.Fprintln(v, "Ctrl+W: Speed up")
 		fmt.Fprintln(v, "Ctrl+S: Slow down")
-		fmt.Fprintln(v, "^C: Exit")
+		fmt.Fprintln(v, "Esc: Exit")
 	}
 
 	if v, err := g.SetView(gameView, 0, 0, maxX-26, maxY-1, 0); err != nil {
