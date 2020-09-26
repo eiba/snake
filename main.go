@@ -211,8 +211,6 @@ func initKeybindings(g *gocui.Gui) error {
 				return nil
 			}
 			currentDirection = 3
-			//snekDirections[0].previousDirection = snekDirections[0].currentDirection
-			//snekDirections[0].currentDirection  = 3
 			return nil
 		}); err != nil {
 		return err
@@ -223,9 +221,6 @@ func initKeybindings(g *gocui.Gui) error {
 				return nil
 			}
 			currentDirection = 1
-
-			//snekDirections[0].previousDirection = snekDirections[0].currentDirection
-			//snekDirections[0].currentDirection = 1
 			return nil
 		}); err != nil {
 		return err
@@ -236,9 +231,6 @@ func initKeybindings(g *gocui.Gui) error {
 				return nil
 			}
 			currentDirection = 2
-
-			//snekDirections[0].previousDirection = snekDirections[0].currentDirection
-			//snekDirections[0].currentDirection = 2
 			return nil
 		}); err != nil {
 		return err
@@ -249,9 +241,6 @@ func initKeybindings(g *gocui.Gui) error {
 				return nil
 			}
 			currentDirection = 0
-
-			//snekDirections[0].previousDirection = snekDirections[0].currentDirection
-			//snekDirections[0].currentDirection= 0
 			return nil
 		}); err != nil {
 		return err
@@ -320,13 +309,9 @@ func addView(g *gocui.Gui, viewName string, direction int) error {
 	}
 	name := fmt.Sprintf("s%v", len(snekViews))
 
-
 	offsetX := 0
 	offsetY := 1
 	switch direction {
-	/*case 0: //up
-	lenX = 0
-	lenY = 1*/
 	case 1: //right
 		offsetX = -2
 		offsetY = 0
@@ -351,6 +336,7 @@ func addView(g *gocui.Gui, viewName string, direction int) error {
 	return nil
 }
 
+/*Checks collision between view1 and view2, returning true for collision and false otherwise.*/
 func checkCollision(g *gocui.Gui, view1 string, view2 string) (bool, error) {
 	x10, y10, x11, y11, err := g.ViewPosition(view1)
 	if err != nil {
@@ -399,7 +385,6 @@ func moveView(g *gocui.Gui, viewName string, dx, dy int) error {
 		}
 
 		if collision {
-			//addNewView = true
 			if err = addView(g, snekViews[len(snekViews)-1], snekDirections[len(snekDirections)-1].currentDirection); err != nil {
 				return err
 			}
