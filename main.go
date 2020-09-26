@@ -11,14 +11,23 @@ import (
 const delta = 1
 
 type snekDirection struct {
-	currentDirection  int
-	previousDirection int
+	currentDirection  direction
+	previousDirection direction
+}
+
+type direction int
+type movementDirections struct {
+	up    direction
+	right direction
+	down  direction
+	left  direction
 }
 
 var (
 	snekViews         = []string{"s0"}
-	snekDirections    = []snekDirection{{0, 0}}
-	currentDirection  = 0
+	directions        = movementDirections{0, 1, 2, 3}
+	snekDirections    = []snekDirection{{directions.up, directions.up}}
+	currentDirection  = directions.up
 	gameView, boxView = "game", "box"
 	running           = true
 	addNewView        = false
@@ -109,7 +118,7 @@ func updateMovement(g *gocui.Gui, viewName string) error {
 			snekDirections[i].currentDirection = snekDirection
 		}
 		if addNewView {
-			if err = addView(g,snekViews[len(snekViews)-1],snekDirections[len(snekDirections)-1].currentDirection); err != nil{
+			if err = addView(g, snekViews[len(snekViews)-1], snekDirections[len(snekDirections)-1].currentDirection); err != nil {
 				return err
 			}
 			addNewView = false
@@ -117,17 +126,17 @@ func updateMovement(g *gocui.Gui, viewName string) error {
 	}
 }
 
-func moveViewInDirection(g *gocui.Gui, viewName string, direction int) error {
+func moveViewInDirection(g *gocui.Gui, viewName string, direction direction) error {
 	g.Update(func(g *gocui.Gui) error {
 		var err error
 		switch direction {
-		case 0: //up
+		case directions.up: //up
 			err = moveView(g, viewName, 0, -delta)
-		case 1: //right
+		case directions.right: //right
 			err = moveView(g, viewName, delta+1, 0)
-		case 2: //down
+		case directions.down: //down
 			err = moveView(g, viewName, 0, delta)
-		case 3: //left
+		case directions.left: //left
 			err = moveView(g, viewName, -delta-1, 0)
 		}
 		return err
@@ -139,13 +148,13 @@ func reset(g *gocui.Gui) error {
 	currentDirection = 0
 	running = true
 	tickInterval = 100 * time.Millisecond
-	for i:=1;i<len(snekViews);i++{
+	for i := 1; i < len(snekViews); i++ {
 		if err := g.DeleteView(snekViews[i]); err != nil && !gocui.IsUnknownView(err) {
 			return err
 		}
 	}
-	snekViews         = []string{"s0"}
-	snekDirections    = []snekDirection{{0, 0}}
+	snekViews = []string{"s0"}
+	snekDirections = []snekDirection{{0, 0}}
 
 	if err := setViewAtRandom(g, snekViews[0], true); err != nil {
 		return err
@@ -274,6 +283,35 @@ func initKeybindings(g *gocui.Gui) error {
 	return nil
 }
 
+func initMovementKeys(g *gocui.Gui) error {
+	if err := g.SetKeybinding("", gocui.KeyArrowLeft, gocui.ModNone,
+		func(g *gocui.Gui, v *gocui.View) error {
+			if snekDirections[0].currentDirection == 1 {
+				return nil
+			}
+			currentDirection = 3
+			return nil
+		}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func initMovementKey(g *gocui.Gui, key gocui.Key, keyDirection direction) error {
+	if err := g.SetKeybinding("", key, gocui.ModNone,
+		func(g *gocui.Gui, v *gocui.View) error {
+			if snekDirections[0].currentDirection == 1 {
+				return nil
+			}
+			currentDirection = keyDirection
+			return nil
+		}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
 	x0, y0, x1, y1, err := g.ViewPosition(gameView)
 	if err != nil {
@@ -301,7 +339,7 @@ func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
 	return nil
 }
 
-func addView(g *gocui.Gui, viewName string, direction int) error {
+func addView(g *gocui.Gui, viewName string, direction direction) error {
 
 	x0, y0, x1, y1, err := g.ViewPosition(viewName)
 	if err != nil {
@@ -312,13 +350,13 @@ func addView(g *gocui.Gui, viewName string, direction int) error {
 	offsetX := 0
 	offsetY := 1
 	switch direction {
-	case 1: //right
+	case directions.right: //right
 		offsetX = -2
 		offsetY = 0
-	case 2: //down
+	case directions.down: //down
 		offsetX = 0
 		offsetY = -1
-	case 3: //left
+	case directions.left: //left
 		offsetX = 2
 		offsetY = 0
 	}
@@ -336,7 +374,7 @@ func addView(g *gocui.Gui, viewName string, direction int) error {
 	return nil
 }
 
-/*Checks collision between view1 and view2, returning true for collision and false otherwise.*/
+//Checks collision between view1 and view2, returning true for collision and false otherwise.
 func checkCollision(g *gocui.Gui, view1 string, view2 string) (bool, error) {
 	x10, y10, x11, y11, err := g.ViewPosition(view1)
 	if err != nil {
