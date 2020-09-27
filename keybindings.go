@@ -11,6 +11,7 @@ func initKeybindings(g *gocui.Gui) error {
 	if err := initMovementKeys(g); err != nil {return err}
 	if err := initTabKey(g); err != nil {return err}
 	if err := initSpeedKeys(g); err != nil {return err}
+	if err := initPauseKey(g); err != nil {return err}
 	return nil
 }
 
@@ -81,6 +82,16 @@ func initSpeedKey(g *gocui.Gui, key rune, speedChange time.Duration) error{
 		func(g *gocui.Gui, v *gocui.View) error {
 			tickInterval +=  speedChange * time.Millisecond
 			return nil
+		}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func initPauseKey(g *gocui.Gui) error {
+	if err := g.SetKeybinding("", 'p', gocui.ModNone,
+		func(g *gocui.Gui, v *gocui.View) error {
+			return pause(g)
 		}); err != nil {
 		return err
 	}
