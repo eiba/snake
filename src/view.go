@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
+	"log"
 )
 
 type view struct {
@@ -37,6 +38,33 @@ func createView(g *gocui.Gui, view view) error {
 		}
 		if _, err := g.SetViewOnTop(view.name); err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
+	x0, y0, x1, y1, err := g.ViewPosition(gameViewName)
+	if err != nil {
+		return err
+	}
+
+	maxX, maxY := x1-x0-3, y1-y0-2
+
+	positionX, positionY := r.Intn(maxX)+1, r.Intn(maxY)+1
+
+	lenX := 2
+	lenY := 1
+	_, err = g.SetView(name, positionX, positionY, positionX+lenX, positionY+lenY, 0)
+	if err != nil {
+		if !gocui.IsUnknownView(err) {
+			return err
+		}
+	}
+
+	if setCurrent {
+		if _, err := g.SetCurrentView(name); err != nil {
+			log.Panicln(err)
 		}
 	}
 	return nil

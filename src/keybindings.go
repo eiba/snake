@@ -6,16 +6,6 @@ import (
 	"time"
 )
 
-func initKeybindings(g *gocui.Gui) error {
-	if err := initQuitKey(g); err != nil {return err}
-	if err := initSpaceKey(g); err != nil {return err}
-	if err := initMovementKeys(g); err != nil {return err}
-	if err := initTabKey(g); err != nil {return err}
-	if err := initSpeedKeys(g); err != nil {return err}
-	if err := initPauseKey(g); err != nil {return err}
-	return nil
-}
-
 func initKeybindingsView(g *gocui.Gui) error {
 	maxX, _ := g.Size()
 	if v, err := g.SetView("keybindings", maxX-25, 0, maxX-1, 7, 0); err != nil {
@@ -30,6 +20,16 @@ func initKeybindingsView(g *gocui.Gui) error {
 		fmt.Fprintln(v, "P: Pause")
 		fmt.Fprintln(v, "Esc: Exit")
 	}
+	return nil
+}
+
+func initKeybindings(g *gocui.Gui) error {
+	if err := initQuitKey(g); err != nil {return err}
+	if err := initSpaceKey(g); err != nil {return err}
+	if err := initMovementKeys(g); err != nil {return err}
+	if err := initTabKey(g); err != nil {return err}
+	if err := initSpeedKeys(g); err != nil {return err}
+	if err := initPauseKey(g); err != nil {return err}
 	return nil
 }
 
