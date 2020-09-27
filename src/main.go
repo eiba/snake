@@ -141,37 +141,6 @@ func reset(g *gocui.Gui) error {
 	return nil
 }
 
-func gameOver(g *gocui.Gui) error {
-	running = false
-	x0, y0, x1, y1, err := g.ViewPosition(gameView)
-	if err != nil {
-		return err
-	}
-	maxX, maxY := x1-x0, y1-y0
-
-	positionX, positionY := (maxX/2)-5, (maxY/2)-2
-
-	lenX := 12
-	lenY := 4
-	name := "gameOver"
-	if v, err := g.SetView(name, positionX, positionY, positionX+lenX, positionY+lenY, 0); err != nil {
-		if !gocui.IsUnknownView(err) {
-			return err
-		}
-
-		v.Title = "game over"
-		fmt.Fprintln(v, "\n  u lose")
-
-		if _, err := g.SetCurrentView(name); err != nil {
-			return err
-		}
-		if _, err := g.SetViewOnTop(name); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
 	x0, y0, x1, y1, err := g.ViewPosition(gameView)
 	if err != nil {
