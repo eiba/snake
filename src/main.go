@@ -37,14 +37,8 @@ var (
 )
 
 func main() {
-	g, err := gocui.NewGui(gocui.OutputNormal, true)
-	if err != nil {
-		log.Panicln(err)
-	}
+	g := initGameView()
 	defer g.Close()
-	g.Highlight = true
-	g.SelFgColor = gocui.ColorRed
-	g.SetManagerFunc(manageGame)
 
 	if err := initKeybindings(g); err != nil {
 		log.Panicln(err)
@@ -54,30 +48,42 @@ func main() {
 	}
 }
 
+func initGameView() *gocui.Gui {
+	g, err := gocui.NewGui(gocui.OutputNormal, true)
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	g.Highlight = true
+	g.SelFgColor = gocui.ColorRed
+	g.SetManagerFunc(manageGame)
+	return g
+}
+
 func manageGame(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
 
-	if err := initKeybindingsView(g); err != nil {return err}
+	if err := initKeybindingsView(g); err != nil {
+		return err
+	}
 
 	if v, err := g.SetView(gameViewName, 0, 0, maxX-26, maxY-1, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}
+		v.Title = "Snek"
 
 		if _, err := g.SetViewOnBottom(gameViewName); err != nil {
 			return err
 		}
-
 		if err := setViewAtRandom(g, snekBodyParts[0].viewName, true); err != nil {
+			log.Panicln(err)
+		}
+		if err := setViewAtRandom(g, boxViewName, false); err != nil {
 			log.Panicln(err)
 		}
 
 		go updateMovement(g)
-
-		if err := setViewAtRandom(g, boxViewName, false); err != nil {
-			log.Panicln(err)
-		}
-		v.Title = "Snek"
 	}
 	return nil
 }
@@ -89,7 +95,8 @@ func updateMovement(g *gocui.Gui) error {
 			continue
 		}
 		g.Update(func(g *gocui.Gui) error {
-			err := moveSnekHead(g, &snekBodyParts[0]); if err != nil {
+			err := moveSnekHead(g, &snekBodyParts[0])
+			if err != nil {
 				return err
 			}
 			return moveSnekBodyParts(g)
