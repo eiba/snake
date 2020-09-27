@@ -29,12 +29,12 @@ const (
 )
 
 var (
+	r             = rand.New(rand.NewSource(time.Now().UnixNano()))
 	directions    = movementDirections{0, 1, 2, 3}
-	snekBodyParts = []snekBodyPart{{directions.up, directions.up, "s0"}}
-	headDirection = directions.up
+	headDirection = direction(r.Intn(4))
+	snekBodyParts = []snekBodyPart{{headDirection, headDirection, "s0"}}
 	running       = true
 	tickInterval  = 50 * time.Millisecond
-	r             = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
 func main() {
@@ -128,15 +128,16 @@ func updateMovement(g *gocui.Gui) error {
 }
 
 func reset(g *gocui.Gui) error {
-	headDirection = 0
+	headDirection = direction(r.Intn(4))
+	snekBodyParts = []snekBodyPart{{headDirection, headDirection, "s0"}}
 	running = true
 	tickInterval = 50 * time.Millisecond
+
 	for i := 1; i < len(snekBodyParts); i++ {
 		if err := g.DeleteView(snekBodyParts[i].viewName); err != nil && !gocui.IsUnknownView(err) {
 			return err
 		}
 	}
-	snekBodyParts = []snekBodyPart{{0, 0, "s0"}}
 
 	if err := setViewAtRandom(g, snekBodyParts[0].viewName, true); err != nil {
 		return err
