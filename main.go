@@ -62,17 +62,7 @@ func getOppositeDirection(direction direction) direction {
 func layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
 
-	if v, err := g.SetView("help", maxX-25, 0, maxX-1, 6, 0); err != nil {
-		if !gocui.IsUnknownView(err) {
-			return err
-		}
-		v.Title = "Keybindings"
-		fmt.Fprintln(v, "Space: Restart")
-		fmt.Fprintln(v, "← ↑ → ↓: Move thing")
-		fmt.Fprintln(v, "W: Speed up")
-		fmt.Fprintln(v, "S: Slow down")
-		fmt.Fprintln(v, "Esc: Exit")
-	}
+	if err := initKeybindingsView(g); err != nil {return err}
 
 	if v, err := g.SetView(gameView, 0, 0, maxX-26, maxY-1, 0); err != nil {
 		if !gocui.IsUnknownView(err) {

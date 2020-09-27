@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/awesome-gocui/gocui"
 	"time"
 )
@@ -12,6 +13,23 @@ func initKeybindings(g *gocui.Gui) error {
 	if err := initTabKey(g); err != nil {return err}
 	if err := initSpeedKeys(g); err != nil {return err}
 	if err := initPauseKey(g); err != nil {return err}
+	return nil
+}
+
+func initKeybindingsView(g *gocui.Gui) error {
+	maxX, _ := g.Size()
+	if v, err := g.SetView("keybindings", maxX-25, 0, maxX-1, 7, 0); err != nil {
+		if !gocui.IsUnknownView(err) {
+			return err
+		}
+		v.Title = "Keybindings"
+		fmt.Fprintln(v, "Space: Restart")
+		fmt.Fprintln(v, "← ↑ → ↓: Move thing")
+		fmt.Fprintln(v, "W: Speed up")
+		fmt.Fprintln(v, "S: Slow down")
+		fmt.Fprintln(v, "P: Pause")
+		fmt.Fprintln(v, "Esc: Exit")
+	}
 	return nil
 }
 
