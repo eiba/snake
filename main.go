@@ -129,7 +129,6 @@ func updateMovement(g *gocui.Gui) error {
 
 func reset(g *gocui.Gui) error {
 	headDirection = direction(r.Intn(4))
-	snekBodyParts = []snekBodyPart{{headDirection, headDirection, "s0"}}
 	running = true
 	tickInterval = 50 * time.Millisecond
 
@@ -138,6 +137,7 @@ func reset(g *gocui.Gui) error {
 			return err
 		}
 	}
+	snekBodyParts = []snekBodyPart{{headDirection, headDirection, "s0"}}
 
 	if err := setViewAtRandom(g, snekBodyParts[0].viewName, true); err != nil {
 		return err
@@ -179,6 +179,10 @@ func gameOver(g *gocui.Gui) error {
 			return err
 		}
 	}
+	return nil
+}
+
+func pause(g *gocui.Gui) error {
 	return nil
 }
 
