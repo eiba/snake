@@ -6,11 +6,11 @@ that runs in your terminal.
 **Requires go version >= 1.13.x**
 
 ```
-go get -d <project-directory>
+go get -d <src-directory>
 ```
 
 ```
-go run <project-directory>
+go run <src-directory>
 ```
 
 
