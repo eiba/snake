@@ -16,7 +16,7 @@ func pause(g *gocui.Gui) error {
 func pauseGame(g *gocui.Gui) error {
 	running = false
 
-	maxX, maxY, err := getMaxXY(g, gameView)
+	maxX, maxY, err := getMaxXY(g, gameViewName)
 	if err != nil {
 		return err
 	}

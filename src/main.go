@@ -23,9 +23,9 @@ type movementDirections struct {
 }
 
 const (
-	deltaX            = 2
-	deltaY            = 1
-	gameView, boxView = "game", "box"
+	deltaX                    = 2
+	deltaY                    = 1
+	gameViewName, boxViewName = "game", "box"
 )
 
 var (
@@ -45,7 +45,7 @@ func main() {
 	defer g.Close()
 	g.Highlight = true
 	g.SelFgColor = gocui.ColorRed
-	g.SetManagerFunc(layout)
+	g.SetManagerFunc(manageGame)
 
 	if err := initKeybindings(g); err != nil {
 		log.Panicln(err)
@@ -55,21 +55,17 @@ func main() {
 	}
 }
 
-func getOppositeDirection(direction direction) direction {
-	return (direction + 2) % 4
-}
-
-func layout(g *gocui.Gui) error {
+func manageGame(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
 
 	if err := initKeybindingsView(g); err != nil {return err}
 
-	if v, err := g.SetView(gameView, 0, 0, maxX-26, maxY-1, 0); err != nil {
+	if v, err := g.SetView(gameViewName, 0, 0, maxX-26, maxY-1, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}
 
-		if _, err := g.SetViewOnBottom(gameView); err != nil {
+		if _, err := g.SetViewOnBottom(gameViewName); err != nil {
 			return err
 		}
 
@@ -79,7 +75,7 @@ func layout(g *gocui.Gui) error {
 
 		go updateMovement(g)
 
-		if err := setViewAtRandom(g, boxView, false); err != nil {
+		if err := setViewAtRandom(g, boxViewName, false); err != nil {
 			log.Panicln(err)
 		}
 		v.Title = "Snek"
@@ -93,8 +89,8 @@ func updateMovement(g *gocui.Gui) error {
 		if !running {
 			continue
 		}
-		g.Update(func(g *gocui.Gui) error {
 
+		g.Update(func(g *gocui.Gui) error {
 			snekBodyParts[0].previousDirection = snekBodyParts[0].currentDirection
 			snekBodyParts[0].currentDirection = headDirection
 			err := moveSnekHead(g, snekBodyParts[0])
@@ -117,32 +113,8 @@ func updateMovement(g *gocui.Gui) error {
 	}
 }
 
-func reset(g *gocui.Gui) error {
-	headDirection = direction(r.Intn(4))
-	running = true
-	tickInterval = 50 * time.Millisecond
-
-	for i := 1; i < len(snekBodyParts); i++ {
-		if err := g.DeleteView(snekBodyParts[i].viewName); err != nil && !gocui.IsUnknownView(err) {
-			return err
-		}
-	}
-	snekBodyParts = []snekBodyPart{{headDirection, headDirection, "s0"}}
-
-	if err := setViewAtRandom(g, snekBodyParts[0].viewName, true); err != nil {
-		return err
-	}
-	if err := setViewAtRandom(g, boxView, false); err != nil {
-		return err
-	}
-	if err := g.DeleteView("gameOver"); err != nil && !gocui.IsUnknownView(err) {
-		return err
-	}
-	return nil
-}
-
 func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
-	x0, y0, x1, y1, err := g.ViewPosition(gameView)
+	x0, y0, x1, y1, err := g.ViewPosition(gameViewName)
 	if err != nil {
 		return err
 	}
@@ -217,7 +189,7 @@ func moveSnekHead(g *gocui.Gui, snekBodyPart snekBodyPart) error {
 		return gameOver(g)
 	}
 
-	headToBoxCollision, err := checkViewCollision(g, snekBodyParts[0].viewName, boxView); if err != nil {return err}
+	headToBoxCollision, err := checkViewCollision(g, snekBodyParts[0].viewName, boxViewName); if err != nil {return err}
 	if headToBoxCollision {
 		return collideWithBox(g)
 	}
@@ -226,7 +198,7 @@ func moveSnekHead(g *gocui.Gui, snekBodyPart snekBodyPart) error {
 
 func collideWithBox(g *gocui.Gui) error {
 	err := addBodyPartToEnd(g, snekBodyParts[len(snekBodyParts)-1]); if err != nil {return err}
-	return setViewAtRandom(g, boxView, false)
+	return setViewAtRandom(g, boxViewName, false)
 }
 
 func checkHeadToBodyCollision(g *gocui.Gui) (bool, error) {
@@ -243,7 +215,7 @@ func checkHeadToBodyCollision(g *gocui.Gui) (bool, error) {
 }
 
 func checkHeadToMainViewCollision(g *gocui.Gui, snekHead snekBodyPart) (bool, error) {
-	xG0, yG0, xG1, yG1, err := g.ViewPosition(gameView)
+	xG0, yG0, xG1, yG1, err := g.ViewPosition(gameViewName)
 	if err != nil {
 		return false, err
 	}
@@ -292,4 +264,8 @@ func calculateOffsets(snekBodyPart snekBodyPart) (int, int) {
 		offsetY = 0
 	}
 	return offsetX, offsetY
+}
+
+func getOppositeDirection(direction direction) direction {
+	return (direction + 2) % 4
 }
