@@ -10,9 +10,9 @@ import (
 const gameViewName = "game"
 
 var (
-	r             = rand.New(rand.NewSource(time.Now().UnixNano()))
-	running       = true
-	tickInterval  = 50 * time.Millisecond
+	r            = rand.New(rand.NewSource(time.Now().UnixNano()))
+	running      = true
+	tickInterval = 50 * time.Millisecond
 )
 
 func main() {
@@ -48,12 +48,12 @@ func manageGame(g *gocui.Gui) error {
 
 	if v, err := g.SetView(gameViewName, 0, 0, maxX-26, maxY-1, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
-			return err
+			log.Panicln(err)
 		}
 		v.Title = "Snek"
 
 		if _, err := g.SetViewOnBottom(gameViewName); err != nil {
-			return err
+			log.Panicln(err)
 		}
 		if err := setViewAtRandom(g, snekBodyParts[0].viewName, true); err != nil {
 			log.Panicln(err)
@@ -74,8 +74,12 @@ func updateMovement(g *gocui.Gui) {
 			continue
 		}
 		g.Update(func(g *gocui.Gui) error {
-			if err := moveSnekHead(g, &snekBodyParts[0]); err != nil { log.Panicln(err) }
-			if err := moveSnekBodyParts(g); err != nil { log.Panicln(err) }
+			if err := moveSnekHead(g, &snekBodyParts[0]); err != nil {
+				log.Panicln(err)
+			}
+			if err := moveSnekBodyParts(g); err != nil {
+				log.Panicln(err)
+			}
 			return nil
 		})
 	}
