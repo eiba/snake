@@ -26,6 +26,12 @@ func reset(g *gocui.Gui) error {
 	if err := g.DeleteView(gameOverViewName); err != nil && !gocui.IsUnknownView(err) {
 		return err
 	}
+	if err := updateStat(g, &restartStat, restartStat.value+1); err != nil {
+		return err
+	}
+	if err := updateStat(g, &lengthStat, 1); err != nil {
+		return err
+	}
 	return nil
 }
 

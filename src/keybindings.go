@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+var test = 1
+
 func initKeybindingsView(g *gocui.Gui) error {
 	maxX, _ := g.Size()
 	if v, err := g.SetView("keybindings", maxX-25, 0, maxX-1, 7, 0); err != nil {

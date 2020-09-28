@@ -22,6 +22,9 @@ func main() {
 	if err := initKeybindings(g); err != nil {
 		log.Panicln(err)
 	}
+	if err := initStatsView(g); err != nil {
+		log.Panicln(err)
+	}
 	if err := g.MainLoop(); err != nil && !gocui.IsQuit(err) {
 		log.Panicln(err)
 	}
