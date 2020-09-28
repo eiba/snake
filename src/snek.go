@@ -28,7 +28,8 @@ const (
 var(
 	directions    = movementDirections{0, 1, 2, 3}
 	headDirection = direction(r.Intn(4))
-	snekBodyParts = []snekBodyPart{{headDirection, headDirection, "s0"}}
+	snekHead = &snekBodyPart{headDirection, headDirection, "s0"}
+	snekBodyParts = []*snekBodyPart{snekHead}
 )
 
 func addBodyPartToEnd(g *gocui.Gui, currentLastSnekBodyPart snekBodyPart) error {
@@ -43,7 +44,7 @@ func addBodyPartToEnd(g *gocui.Gui, currentLastSnekBodyPart snekBodyPart) error 
 
 	snekBodyParts = append(
 		snekBodyParts,
-		snekBodyPart{
+		&snekBodyPart{
 			currentLastSnekBodyPart.currentDirection,
 			currentLastSnekBodyPart.previousDirection,
 			name})
@@ -89,13 +90,13 @@ func moveSnekHead(g *gocui.Gui, snekBodyPart *snekBodyPart) error {
 }
 
 func collideWithBox(g *gocui.Gui) error {
-	err := addBodyPartToEnd(g, snekBodyParts[len(snekBodyParts)-1]); if err != nil {return err}
+	err := addBodyPartToEnd(g, *snekBodyParts[len(snekBodyParts)-1]); if err != nil {return err}
 	return setViewAtRandom(g, boxViewName, false)
 }
 
 func checkHeadToBodyCollision(g *gocui.Gui) (bool, error) {
 	for i := 1; i < len(snekBodyParts); i++ {
-		collision, err := checkViewCollision(g, snekBodyParts[0].viewName, snekBodyParts[i].viewName)
+		collision, err := checkViewCollision(g, snekHead.viewName, snekBodyParts[i].viewName)
 		if err != nil {
 			return false, err
 		}
@@ -126,7 +127,7 @@ func checkHeadToMainViewCollision(g *gocui.Gui, snekHead snekBodyPart) (bool, er
 
 func moveSnekBodyParts(g *gocui.Gui) error  {
 	for i := 1; i < len(snekBodyParts); i++ {
-		err := moveSnekBodyPart(g,  &snekBodyParts[i-1],  &snekBodyParts[i])
+		err := moveSnekBodyPart(g,  snekBodyParts[i-1],  snekBodyParts[i])
 		if err != nil {
 			return err
 		}

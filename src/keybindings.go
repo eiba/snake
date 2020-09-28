@@ -54,7 +54,7 @@ func initMovementKeys(g *gocui.Gui) error {
 func initMovementKey(g *gocui.Gui, key gocui.Key, keyDirection direction) error {
 	if err := g.SetKeybinding("", key, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			if snekBodyParts[0].currentDirection == getOppositeDirection(keyDirection) {
+			if snekHead.currentDirection == getOppositeDirection(keyDirection) {
 				return nil
 			}
 			headDirection = keyDirection
@@ -68,7 +68,7 @@ func initMovementKey(g *gocui.Gui, key gocui.Key, keyDirection direction) error 
 func initTabKey(g *gocui.Gui) error{
 	if err := g.SetKeybinding("", gocui.KeyTab, gocui.ModNone,
 		func(g *gocui.Gui, v *gocui.View) error {
-			err := addBodyPartToEnd(g, snekBodyParts[len(snekBodyParts)-1])
+			err := addBodyPartToEnd(g, *snekBodyParts[len(snekBodyParts)-1])
 			if err != nil {
 				return err
 			}

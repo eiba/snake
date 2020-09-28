@@ -55,7 +55,7 @@ func manageGame(g *gocui.Gui) error {
 		if _, err := g.SetViewOnBottom(gameViewName); err != nil {
 			log.Panicln(err)
 		}
-		if err := setViewAtRandom(g, snekBodyParts[0].viewName, true); err != nil {
+		if err := setViewAtRandom(g, snekHead.viewName, true); err != nil {
 			log.Panicln(err)
 		}
 		if err := setViewAtRandom(g, boxViewName, false); err != nil {
@@ -74,7 +74,7 @@ func updateMovement(g *gocui.Gui) {
 			continue
 		}
 		g.Update(func(g *gocui.Gui) error {
-			if err := moveSnekHead(g, &snekBodyParts[0]); err != nil {
+			if err := moveSnekHead(g, snekHead); err != nil {
 				log.Panicln(err)
 			}
 			if err := moveSnekBodyParts(g); err != nil {

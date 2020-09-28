@@ -7,15 +7,17 @@ import (
 
 func reset(g *gocui.Gui) error {
 	running = true
-	headDirection = direction(r.Intn(4))
 	tickInterval = 50 * time.Millisecond
 
 	if err := deleteSnekBody(g); err != nil {
 		return err
 	}
-	snekBodyParts = []snekBodyPart{{headDirection, headDirection, "s0"}}
 
-	if err := setViewAtRandom(g, snekBodyParts[0].viewName, true); err != nil {
+	headDirection = direction(r.Intn(4))
+	snekHead = &snekBodyPart{headDirection, headDirection, "s0"}
+	snekBodyParts = []*snekBodyPart{snekHead}
+
+	if err := setViewAtRandom(g, snekHead.viewName, true); err != nil {
 		return err
 	}
 	if err := setViewAtRandom(g, boxViewName, false); err != nil {
