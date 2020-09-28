@@ -43,7 +43,7 @@ func manageGame(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
 
 	if err := initKeybindingsView(g); err != nil {
-		return err
+		log.Panicln(err)
 	}
 
 	if v, err := g.SetView(gameViewName, 0, 0, maxX-26, maxY-1, 0); err != nil {
@@ -67,18 +67,16 @@ func manageGame(g *gocui.Gui) error {
 	return nil
 }
 
-func updateMovement(g *gocui.Gui) error {
+func updateMovement(g *gocui.Gui) {
 	for {
 		time.Sleep(tickInterval)
 		if !running {
 			continue
 		}
 		g.Update(func(g *gocui.Gui) error {
-			err := moveSnekHead(g, &snekBodyParts[0])
-			if err != nil {
-				return err
-			}
-			return moveSnekBodyParts(g)
+			if err := moveSnekHead(g, &snekBodyParts[0]); err != nil { log.Panicln(err) }
+			if err := moveSnekBodyParts(g); err != nil { log.Panicln(err) }
+			return nil
 		})
 	}
 }
