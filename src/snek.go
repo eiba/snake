@@ -5,6 +5,32 @@ import (
 	"github.com/awesome-gocui/gocui"
 )
 
+type snekBodyPart struct {
+	currentDirection  direction
+	previousDirection direction
+	viewName          string
+}
+
+type direction int
+type movementDirections struct {
+	up    direction
+	right direction
+	down  direction
+	left  direction
+}
+
+const (
+	deltaX                    = 2
+	deltaY                    = 1
+	boxViewName               = "box"
+)
+
+var(
+	directions    = movementDirections{0, 1, 2, 3}
+	headDirection = direction(r.Intn(4))
+	snekBodyParts = []snekBodyPart{{headDirection, headDirection, "s0"}}
+)
+
 func addBodyPartToEnd(g *gocui.Gui, currentLastSnekBodyPart snekBodyPart) error {
 	x0, y0, x1, y1, err := g.ViewPosition(currentLastSnekBodyPart.viewName); if err != nil {return err}
 	offsetX, offsetY := calculateBodyPartOffsets(currentLastSnekBodyPart)

@@ -7,31 +7,10 @@ import (
 	"time"
 )
 
-type snekBodyPart struct {
-	currentDirection  direction
-	previousDirection direction
-	viewName          string
-}
-
-type direction int
-type movementDirections struct {
-	up    direction
-	right direction
-	down  direction
-	left  direction
-}
-
-const (
-	deltaX                    = 2
-	deltaY                    = 1
-	gameViewName, boxViewName = "game", "box"
-)
+const gameViewName = "game"
 
 var (
 	r             = rand.New(rand.NewSource(time.Now().UnixNano()))
-	directions    = movementDirections{0, 1, 2, 3}
-	headDirection = direction(r.Intn(4))
-	snekBodyParts = []snekBodyPart{{headDirection, headDirection, "s0"}}
 	running       = true
 	tickInterval  = 50 * time.Millisecond
 )
