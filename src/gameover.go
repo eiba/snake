@@ -18,11 +18,10 @@ func gameOver(g *gocui.Gui) error {
 	viewLenX := 12
 	viewLenY := 4
 
-	gameOverViewText := " u lose"
 	gameOverView := view{
 		gameOverViewName,
-		gameOverViewName,
-		gameOverViewText,
+		"game over",
+		" u lose",
 		viewPositionX,
 		viewPositionX + viewLenX,
 		viewPositionY,
