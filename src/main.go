@@ -22,9 +22,7 @@ func main() {
 	if err := initKeybindings(g); err != nil {
 		log.Panicln(err)
 	}
-	if err := initStatsView(g); err != nil {
-		log.Panicln(err)
-	}
+
 	if err := g.MainLoop(); err != nil && !gocui.IsQuit(err) {
 		log.Panicln(err)
 	}
@@ -48,7 +46,10 @@ func manageGame(g *gocui.Gui) error {
 	if err := initKeybindingsView(g); err != nil {
 		log.Panicln(err)
 	}
-
+	if err := initStatsView(g); err != nil {
+		log.Panicln(err)
+	}
+	
 	if v, err := g.SetView(gameViewName, 0, 0, maxX-26, maxY-1, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			log.Panicln(err)
