@@ -49,7 +49,7 @@ func manageGame(g *gocui.Gui) error {
 	if err := initStatsView(g); err != nil {
 		log.Panicln(err)
 	}
-	
+
 	if v, err := g.SetView(gameViewName, 0, 0, maxX-26, maxY-1, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			log.Panicln(err)
