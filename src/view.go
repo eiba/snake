@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-type view struct {
+type viewProperties struct {
 	name  string
 	title string
 	text  string
@@ -24,17 +24,18 @@ func getMaxXY(g *gocui.Gui, viewName string) (int, int, error) {
 	return x1 - x0, y1 - y0, nil
 }
 
-func createView(g *gocui.Gui, view view, visible bool) error {
-	if v, err := g.SetView(view.name, view.x0, view.y0, view.x1, view.y1, 0); err != nil {
+func createView(g *gocui.Gui, view viewProperties, visible bool) (*gocui.View, error) {
+	v, err := g.SetView(view.name, view.x0, view.y0, view.x1, view.y1, 0)
+	if err != nil {
 		if !gocui.IsUnknownView(err) {
-			return err
+			return nil, err
 		}
 
 		v.Title = view.title
 		v.Visible = visible
 		fmt.Fprintln(v, "\n", view.text)
 	}
-	return nil
+	return v, nil
 }
 
 func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {

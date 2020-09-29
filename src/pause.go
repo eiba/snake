@@ -5,6 +5,7 @@ import (
 )
 
 const pauseViewName = "pause"
+var pauseView *gocui.View
 
 func initPauseView(g *gocui.Gui) error {
 	maxX, maxY, err := getMaxXY(g, gameViewName)
@@ -17,7 +18,7 @@ func initPauseView(g *gocui.Gui) error {
 	viewLenY := 4
 
 	pauseViewText := "Press P to resume"
-	pauseView := view{
+	pauseViewProps := viewProperties{
 		pauseViewName,
 		"Pause",
 		pauseViewText,
@@ -25,7 +26,9 @@ func initPauseView(g *gocui.Gui) error {
 		viewPositionX + viewLenX,
 		viewPositionY,
 		viewPositionY + viewLenY}
-	return createView(g, pauseView, false)
+	v, err := createView(g, pauseViewProps, false)
+	pauseView = v
+	return err
 }
 
 func pause(g *gocui.Gui) error {
@@ -33,13 +36,8 @@ func pause(g *gocui.Gui) error {
 		return nil
 	}
 
-	v, err := g.View(pauseViewName)
-	if err != nil {
-		return err
-	}
-
 	if running {
-		v.Visible = true
+		pauseView.Visible = true
 		if _, err := g.SetCurrentView(pauseViewName); err != nil {
 			return err
 		}
@@ -47,7 +45,7 @@ func pause(g *gocui.Gui) error {
 			return err
 		}
 	} else {
-		v.Visible = false
+		pauseView.Visible = false
 	}
 	running = !running
 	return nil

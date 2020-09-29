@@ -5,6 +5,7 @@ import (
 )
 
 const gameOverViewName = "gameOver"
+var gameOverView *gocui.View
 
 func initGameOverView(g *gocui.Gui) error {
 	maxX, maxY, err := getMaxXY(g, gameViewName)
@@ -16,7 +17,7 @@ func initGameOverView(g *gocui.Gui) error {
 	viewLenX := 25
 	viewLenY := 4
 
-	gameOverView := view{
+	gameOverViewProperties := viewProperties{
 		gameOverViewName,
 		"Game over",
 		"Press space to restart",
@@ -24,15 +25,14 @@ func initGameOverView(g *gocui.Gui) error {
 		viewPositionX + viewLenX,
 		viewPositionY,
 		viewPositionY + viewLenY}
-	return createView(g, gameOverView, false)
+
+	v, err := createView(g, gameOverViewProperties, false)
+	gameOverView = v
+	return err
 }
 
 func gameOver(g *gocui.Gui) error {
-	v, err := g.View(gameOverViewName)
-	if err != nil {
-		return err
-	}
-	v.Visible = true
+	gameOverView.Visible = true
 	if _, err := g.SetCurrentView(gameOverViewName); err != nil {
 		return err
 	}
