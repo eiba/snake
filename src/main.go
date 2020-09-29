@@ -12,6 +12,7 @@ const gameViewName = "game"
 var (
 	r            = rand.New(rand.NewSource(time.Now().UnixNano()))
 	running      = true
+	gameFinished = false
 	tickInterval = 50 * time.Millisecond
 )
 
@@ -37,6 +38,7 @@ func initGameView() *gocui.Gui {
 	g.Highlight = true
 	g.SelFgColor = gocui.ColorRed
 	g.SetManagerFunc(manageGame)
+
 	return g
 }
 
@@ -59,14 +61,20 @@ func manageGame(g *gocui.Gui) error {
 		if _, err := g.SetViewOnBottom(gameViewName); err != nil {
 			log.Panicln(err)
 		}
+
 		if err := setViewAtRandom(g, snekHead.viewName, true); err != nil {
 			log.Panicln(err)
 		}
 		if err := setViewAtRandom(g, boxViewName, false); err != nil {
 			log.Panicln(err)
 		}
-
 		go updateMovement(g)
+	}
+	if err := initPauseView(g); err != nil {
+		log.Panicln(err)
+	}
+	if err := initGameOverView(g); err != nil {
+		log.Panicln(err)
 	}
 	return nil
 }

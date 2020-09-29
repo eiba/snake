@@ -6,16 +6,7 @@ import (
 
 const pauseViewName = "pause"
 
-func pause(g *gocui.Gui) error {
-	if running {
-		return pauseGame(g)
-	}
-	return resumeGame(g)
-}
-
-func pauseGame(g *gocui.Gui) error {
-	running = false
-
+func initPauseView(g *gocui.Gui) error {
 	maxX, maxY, err := getMaxXY(g, gameViewName)
 	if err != nil {
 		return err
@@ -34,13 +25,30 @@ func pauseGame(g *gocui.Gui) error {
 		viewPositionX + viewLenX,
 		viewPositionY,
 		viewPositionY + viewLenY}
-	return createView(g, pauseView)
+	return createView(g, pauseView, false)
 }
 
-func resumeGame(g *gocui.Gui) error {
-	if err := g.DeleteView(pauseViewName); err != nil && !gocui.IsUnknownView(err) {
+func pause(g *gocui.Gui) error {
+	if gameFinished {
+		return nil
+	}
+
+	v, err := g.View(pauseViewName)
+	if err != nil {
 		return err
 	}
-	running = true
+
+	if running {
+		v.Visible = true
+		if _, err := g.SetCurrentView(pauseViewName); err != nil {
+			return err
+		}
+		if _, err := g.SetViewOnTop(pauseViewName); err != nil {
+			return err
+		}
+	} else {
+		v.Visible = false
+	}
+	running = !running
 	return nil
 }

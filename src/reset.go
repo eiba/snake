@@ -23,12 +23,15 @@ func reset(g *gocui.Gui) error {
 	if err := setViewAtRandom(g, boxViewName, false); err != nil {
 		return err
 	}
-	if err := g.DeleteView(gameOverViewName); err != nil && !gocui.IsUnknownView(err) {
+	v, err := g.View(gameOverViewName); if err != nil {
 		return err
 	}
-	if err := g.DeleteView(pauseViewName); err != nil && !gocui.IsUnknownView(err) {
+	v.Visible = false
+	v, err = g.View(pauseViewName); if err != nil {
 		return err
 	}
+	v.Visible = false
+	gameFinished = false
 	if err := updateStat(g, &restartStat, restartStat.value+1); err != nil {
 		return err
 	}
