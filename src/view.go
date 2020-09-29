@@ -45,12 +45,9 @@ func setViewAtRandom(name string, setCurrent bool) error {
 	}
 
 	maxX, maxY := x1-x0-3, y1-y0-2
-
 	positionX, positionY := r.Intn(maxX)+1, r.Intn(maxY)+1
 
-	lenX := 2
-	lenY := 1
-	_, err = gui.SetView(name, positionX, positionY, positionX+lenX, positionY+lenY, 0)
+	_, err = gui.SetView(name, positionX, positionY, positionX+deltaX, positionY+deltaY, 0)
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
 	}
