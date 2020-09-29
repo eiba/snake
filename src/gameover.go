@@ -14,14 +14,14 @@ func gameOver(g *gocui.Gui) error {
 		return err
 	}
 
-	viewPositionX, viewPositionY := (maxX/2)-5, (maxY/2)-2
-	viewLenX := 12
+	viewPositionX, viewPositionY := (maxX/2)-12, (maxY/2)-2
+	viewLenX := 25
 	viewLenY := 4
 
 	gameOverView := view{
 		gameOverViewName,
-		"game over",
-		" u lose",
+		"Game over",
+		"Press space to restart",
 		viewPositionX,
 		viewPositionX + viewLenX,
 		viewPositionY,

@@ -25,10 +25,10 @@ func pauseGame(g *gocui.Gui) error {
 	viewLenX := 20
 	viewLenY := 4
 
-	pauseViewText := "press p to resume"
+	pauseViewText := "Press P to resume"
 	pauseView := view{
 		pauseViewName,
-		pauseViewName,
+		"Pause",
 		pauseViewText,
 		viewPositionX,
 		viewPositionX + viewLenX,
