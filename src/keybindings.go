@@ -8,7 +8,7 @@ import (
 
 func initKeybindingsView() error {
 	maxX, _ := gui.Size()
-	if v, err := gui.SetView("keybindings", maxX-25, 0, maxX-1, 7, 0); err != nil {
+	if v, err := gui.SetView("keybindings", maxX-25, 0, maxX-1, 8, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}
@@ -18,6 +18,7 @@ func initKeybindingsView() error {
 		fmt.Fprintln(v, "W: Speed up")
 		fmt.Fprintln(v, "S: Slow down")
 		fmt.Fprintln(v, "P: Pause")
+		fmt.Fprintln(v, "A: Toggle autopilot")
 		fmt.Fprintln(v, "Esc: Exit")
 	}
 	return nil
@@ -38,6 +39,9 @@ func initKeybindings() error {
 		return err
 	}
 	if err := initPauseKey(); err != nil {
+		return err
+	}
+	if err := initAutoPilotKey(); err != nil {
 		return err
 	}
 	return nil
@@ -132,6 +136,17 @@ func initPauseKey() error {
 	if err := gui.SetKeybinding("", 'p', gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
 			return pause()
+		}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func initAutoPilotKey() error {
+	if err := gui.SetKeybinding("", 'a', gocui.ModNone,
+		func(gui *gocui.Gui, view *gocui.View) error {
+			autoPilotEnabled = !autoPilotEnabled
+			return nil
 		}); err != nil {
 		return err
 	}
