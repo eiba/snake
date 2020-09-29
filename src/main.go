@@ -10,6 +10,7 @@ import (
 const gameViewName = "game"
 
 var (
+	game         *gocui.Gui
 	r            = rand.New(rand.NewSource(time.Now().UnixNano()))
 	running      = true
 	gameFinished = false
@@ -17,75 +18,75 @@ var (
 )
 
 func main() {
-	g := initGameView()
-	defer g.Close()
+	game = initGameView()
+	defer game.Close()
 
-	if err := initKeybindings(g); err != nil {
+	if err := initKeybindings(game); err != nil {
 		log.Panicln(err)
 	}
 
-	if err := g.MainLoop(); err != nil && !gocui.IsQuit(err) {
+	if err := game.MainLoop(); err != nil && !gocui.IsQuit(err) {
 		log.Panicln(err)
 	}
 }
 
 func initGameView() *gocui.Gui {
-	g, err := gocui.NewGui(gocui.OutputNormal, true)
+	game, err := gocui.NewGui(gocui.OutputNormal, true)
 	if err != nil {
 		log.Panicln(err)
 	}
 
-	g.Highlight = true
-	g.SelFgColor = gocui.ColorRed
-	g.SetManagerFunc(manageGame)
+	game.Highlight = true
+	game.SelFgColor = gocui.ColorRed
+	game.SetManagerFunc(manageGame)
 
-	return g
+	return game
 }
 
-func manageGame(g *gocui.Gui) error {
-	maxX, maxY := g.Size()
+func manageGame(game *gocui.Gui) error {
+	maxX, maxY := game.Size()
 
-	if err := initKeybindingsView(g); err != nil {
+	if err := initKeybindingsView(game); err != nil {
 		log.Panicln(err)
 	}
-	if err := initStatsView(g); err != nil {
+	if err := initStatsView(game); err != nil {
 		log.Panicln(err)
 	}
 
-	if v, err := g.SetView(gameViewName, 0, 0, maxX-26, maxY-1, 0); err != nil {
+	if v, err := game.SetView(gameViewName, 0, 0, maxX-26, maxY-1, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			log.Panicln(err)
 		}
 		v.Title = "Snek"
 
-		if _, err := g.SetViewOnBottom(gameViewName); err != nil {
+		if _, err := game.SetViewOnBottom(gameViewName); err != nil {
 			log.Panicln(err)
 		}
 
-		if err := setViewAtRandom(g, snekHead.viewName, true); err != nil {
+		if err := setViewAtRandom(game, snekHead.viewName, true); err != nil {
 			log.Panicln(err)
 		}
-		if err := setViewAtRandom(g, boxViewName, false); err != nil {
+		if err := setViewAtRandom(game, boxViewName, false); err != nil {
 			log.Panicln(err)
 		}
-		go updateMovement(g)
+		go updateMovement(game)
 	}
-	if err := initPauseView(g); err != nil {
+	if err := initPauseView(game); err != nil {
 		log.Panicln(err)
 	}
-	if err := initGameOverView(g); err != nil {
+	if err := initGameOverView(game); err != nil {
 		log.Panicln(err)
 	}
 	return nil
 }
 
-func updateMovement(g *gocui.Gui) {
+func updateMovement(game *gocui.Gui) {
 	for {
 		time.Sleep(tickInterval)
 		if !running {
 			continue
 		}
-		g.Update(func(g *gocui.Gui) error {
+		game.Update(func(g *gocui.Gui) error {
 			if err := moveSnekHead(g, snekHead); err != nil {
 				log.Panicln(err)
 			}
