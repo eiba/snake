@@ -51,10 +51,8 @@ func setViewAtRandom(name string, setCurrent bool) error {
 	lenX := 2
 	lenY := 1
 	_, err = gui.SetView(name, positionX, positionY, positionX+lenX, positionY+lenY, 0)
-	if err != nil {
-		if !gocui.IsUnknownView(err) {
-			return err
-		}
+	if err != nil && !gocui.IsUnknownView(err) {
+		return err
 	}
 
 	if setCurrent {
