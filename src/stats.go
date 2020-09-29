@@ -6,6 +6,7 @@ import (
 )
 
 const statsViewName = "stats"
+
 var statsView *gocui.View
 
 type stat struct {
@@ -19,18 +20,19 @@ var (
 	restartStat = stat{"Restarts", 1, 0}
 )
 
-func initStatsView(gui *gocui.Gui) error {
+func initStatsView() error {
 	maxX, _ := gui.Size()
 
 	var err error
-	statsView, err = gui.SetView(statsViewName, maxX-25, 8, maxX-1, 11, 0); if err != nil {
+	statsView, err = gui.SetView(statsViewName, maxX-25, 8, maxX-1, 11, 0)
+	if err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}
 		statsView.Title = "Stats"
 
-		fmt.Fprintln(statsView, fmt.Sprint(lengthStat.name, ":",lengthStat.value))
-		fmt.Fprintln(statsView, fmt.Sprint(restartStat.name, ":",restartStat.value))
+		fmt.Fprintln(statsView, fmt.Sprint(lengthStat.name, ":", lengthStat.value))
+		fmt.Fprintln(statsView, fmt.Sprint(restartStat.name, ":", restartStat.value))
 	}
 	return nil
 }

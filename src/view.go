@@ -16,7 +16,7 @@ type viewProperties struct {
 	y1    int
 }
 
-func getMaxXY(gui *gocui.Gui, viewName string) (int, int, error) {
+func getMaxXY(viewName string) (int, int, error) {
 	x0, y0, x1, y1, err := gui.ViewPosition(viewName)
 	if err != nil {
 		return 0, 0, err
@@ -24,7 +24,7 @@ func getMaxXY(gui *gocui.Gui, viewName string) (int, int, error) {
 	return x1 - x0, y1 - y0, nil
 }
 
-func createView(gui *gocui.Gui, viewProperties viewProperties, visible bool) (*gocui.View, error) {
+func createView(viewProperties viewProperties, visible bool) (*gocui.View, error) {
 	view, err := gui.SetView(viewProperties.name, viewProperties.x0, viewProperties.y0, viewProperties.x1, viewProperties.y1, 0)
 	if err != nil {
 		if !gocui.IsUnknownView(err) {
@@ -38,7 +38,7 @@ func createView(gui *gocui.Gui, viewProperties viewProperties, visible bool) (*g
 	return view, nil
 }
 
-func setViewAtRandom(gui *gocui.Gui, name string, setCurrent bool) error {
+func setViewAtRandom(name string, setCurrent bool) error {
 	x0, y0, x1, y1, err := gui.ViewPosition(gameViewName)
 	if err != nil {
 		return err

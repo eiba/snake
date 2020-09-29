@@ -5,10 +5,11 @@ import (
 )
 
 const pauseViewName = "pause"
+
 var pauseView *gocui.View
 
-func initPauseView(gui *gocui.Gui) error {
-	maxX, maxY, err := getMaxXY(gui, gameViewName)
+func initPauseView() error {
+	maxX, maxY, err := getMaxXY(gameViewName)
 	if err != nil {
 		return err
 	}
@@ -26,11 +27,11 @@ func initPauseView(gui *gocui.Gui) error {
 		viewPositionX + viewLenX,
 		viewPositionY,
 		viewPositionY + viewLenY}
-	pauseView, err = createView(gui, pauseViewProps, false)
+	pauseView, err = createView(pauseViewProps, false)
 	return err
 }
 
-func pause(gui *gocui.Gui) error {
+func pause() error {
 	if gameFinished {
 		return nil
 	}

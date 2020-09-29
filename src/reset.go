@@ -5,11 +5,11 @@ import (
 	"time"
 )
 
-func reset(gui *gocui.Gui) error {
+func reset() error {
 	running = true
 	tickInterval = 50 * time.Millisecond
 
-	if err := deleteSnekBody(gui); err != nil {
+	if err := deleteSnekBody(); err != nil {
 		return err
 	}
 
@@ -17,10 +17,10 @@ func reset(gui *gocui.Gui) error {
 	snekHead = &snekBodyPart{headDirection, headDirection, "s0"}
 	snekBodyParts = []*snekBodyPart{snekHead}
 
-	if err := setViewAtRandom(gui, snekHead.viewName, true); err != nil {
+	if err := setViewAtRandom(snekHead.viewName, true); err != nil {
 		return err
 	}
-	if err := setViewAtRandom(gui, boxViewName, false); err != nil {
+	if err := setViewAtRandom(boxViewName, false); err != nil {
 		return err
 	}
 
@@ -36,7 +36,7 @@ func reset(gui *gocui.Gui) error {
 	return nil
 }
 
-func deleteSnekBody(gui *gocui.Gui) error {
+func deleteSnekBody() error {
 	for i := 1; i < len(snekBodyParts); i++ {
 		if err := gui.DeleteView(snekBodyParts[i].viewName); err != nil && !gocui.IsUnknownView(err) {
 			return err
