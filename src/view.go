@@ -16,30 +16,30 @@ type viewProperties struct {
 	y1    int
 }
 
-func getMaxXY(g *gocui.Gui, viewName string) (int, int, error) {
-	x0, y0, x1, y1, err := g.ViewPosition(viewName)
+func getMaxXY(gui *gocui.Gui, viewName string) (int, int, error) {
+	x0, y0, x1, y1, err := gui.ViewPosition(viewName)
 	if err != nil {
 		return 0, 0, err
 	}
 	return x1 - x0, y1 - y0, nil
 }
 
-func createView(g *gocui.Gui, view viewProperties, visible bool) (*gocui.View, error) {
-	v, err := g.SetView(view.name, view.x0, view.y0, view.x1, view.y1, 0)
+func createView(gui *gocui.Gui, viewProperties viewProperties, visible bool) (*gocui.View, error) {
+	view, err := gui.SetView(viewProperties.name, viewProperties.x0, viewProperties.y0, viewProperties.x1, viewProperties.y1, 0)
 	if err != nil {
 		if !gocui.IsUnknownView(err) {
 			return nil, err
 		}
 
-		v.Title = view.title
-		v.Visible = visible
-		fmt.Fprintln(v, "\n", view.text)
+		view.Title = viewProperties.title
+		view.Visible = visible
+		fmt.Fprintln(view, "\n", viewProperties.text)
 	}
-	return v, nil
+	return view, nil
 }
 
-func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
-	x0, y0, x1, y1, err := g.ViewPosition(gameViewName)
+func setViewAtRandom(gui *gocui.Gui, name string, setCurrent bool) error {
+	x0, y0, x1, y1, err := gui.ViewPosition(gameViewName)
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
 
 	lenX := 2
 	lenY := 1
-	_, err = g.SetView(name, positionX, positionY, positionX+lenX, positionY+lenY, 0)
+	_, err = gui.SetView(name, positionX, positionY, positionX+lenX, positionY+lenY, 0)
 	if err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
@@ -58,7 +58,7 @@ func setViewAtRandom(g *gocui.Gui, name string, setCurrent bool) error {
 	}
 
 	if setCurrent {
-		if _, err := g.SetCurrentView(name); err != nil {
+		if _, err := gui.SetCurrentView(name); err != nil {
 			log.Panicln(err)
 		}
 	}

@@ -6,6 +6,7 @@ import (
 )
 
 const statsViewName = "stats"
+var statsView *gocui.View
 
 type stat struct {
 	name  string
@@ -18,28 +19,25 @@ var (
 	restartStat = stat{"Restarts", 1, 0}
 )
 
-func initStatsView(g *gocui.Gui) error {
-	maxX, _ := g.Size()
-	if v, err := g.SetView(statsViewName, maxX-25, 8, maxX-1, 11, 0); err != nil {
+func initStatsView(gui *gocui.Gui) error {
+	maxX, _ := gui.Size()
+
+	var err error
+	statsView, err = gui.SetView(statsViewName, maxX-25, 8, maxX-1, 11, 0); if err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}
-		v.Title = "Stats"
+		statsView.Title = "Stats"
 
-		fmt.Fprintln(v, fmt.Sprint(lengthStat.name, ":",lengthStat.value))
-		fmt.Fprintln(v, fmt.Sprint(restartStat.name, ":",restartStat.value))
+		fmt.Fprintln(statsView, fmt.Sprint(lengthStat.name, ":",lengthStat.value))
+		fmt.Fprintln(statsView, fmt.Sprint(restartStat.name, ":",restartStat.value))
 	}
 	return nil
 }
 
-func updateStat(g *gocui.Gui, stat *stat, value int) error {
-	v, err := g.View(statsViewName)
-	if err != nil {
-		return err
-	}
-
+func updateStat(stat *stat, value int) error {
 	stat.value = value
-	if err := v.SetLine(stat.line, fmt.Sprint(stat.name, ":", stat.value)); err != nil {
+	if err := statsView.SetLine(stat.line, fmt.Sprint(stat.name, ":", stat.value)); err != nil {
 		return err
 	}
 	return nil

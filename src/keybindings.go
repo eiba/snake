@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-func initKeybindingsView(g *gocui.Gui) error {
-	maxX, _ := g.Size()
-	if v, err := g.SetView("keybindings", maxX-25, 0, maxX-1, 7, 0); err != nil {
+func initKeybindingsView(gui *gocui.Gui) error {
+	maxX, _ := gui.Size()
+	if v, err := gui.SetView("keybindings", maxX-25, 0, maxX-1, 7, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}
@@ -23,19 +23,19 @@ func initKeybindingsView(g *gocui.Gui) error {
 	return nil
 }
 
-func initKeybindings(g *gocui.Gui) error {
-	if err := initQuitKey(g); err != nil {return err}
-	if err := initSpaceKey(g); err != nil {return err}
-	if err := initMovementKeys(g); err != nil {return err}
-	if err := initTabKey(g); err != nil {return err}
-	if err := initSpeedKeys(g); err != nil {return err}
-	if err := initPauseKey(g); err != nil {return err}
+func initKeybindings(gui *gocui.Gui) error {
+	if err := initQuitKey(gui); err != nil {return err}
+	if err := initSpaceKey(gui); err != nil {return err}
+	if err := initMovementKeys(gui); err != nil {return err}
+	if err := initTabKey(gui); err != nil {return err}
+	if err := initSpeedKeys(gui); err != nil {return err}
+	if err := initPauseKey(gui); err != nil {return err}
 	return nil
 }
 
-func initQuitKey(g *gocui.Gui) error{
-	if err := g.SetKeybinding("", gocui.KeyEsc, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
+func initQuitKey(gui *gocui.Gui) error{
+	if err := gui.SetKeybinding("", gocui.KeyEsc, gocui.ModNone,
+		func(gui *gocui.Gui, view *gocui.View) error {
 			return gocui.ErrQuit
 		}); err != nil {
 		return err
@@ -43,17 +43,17 @@ func initQuitKey(g *gocui.Gui) error{
 	return nil
 }
 
-func initMovementKeys(g *gocui.Gui) error {
-	if err := initMovementKey(g, gocui.KeyArrowUp, directions.up); err != nil {return err}
-	if err := initMovementKey(g, gocui.KeyArrowRight, directions.right); err != nil {return err}
-	if err := initMovementKey(g, gocui.KeyArrowDown, directions.down); err != nil {return err}
-	if err := initMovementKey(g, gocui.KeyArrowLeft, directions.left); err != nil {return err}
+func initMovementKeys(gui *gocui.Gui) error {
+	if err := initMovementKey(gui, gocui.KeyArrowUp, directions.up); err != nil {return err}
+	if err := initMovementKey(gui, gocui.KeyArrowRight, directions.right); err != nil {return err}
+	if err := initMovementKey(gui, gocui.KeyArrowDown, directions.down); err != nil {return err}
+	if err := initMovementKey(gui, gocui.KeyArrowLeft, directions.left); err != nil {return err}
 	return nil
 }
 
-func initMovementKey(g *gocui.Gui, key gocui.Key, keyDirection direction) error {
-	if err := g.SetKeybinding("", key, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
+func initMovementKey(gui *gocui.Gui, key gocui.Key, keyDirection direction) error {
+	if err := gui.SetKeybinding("", key, gocui.ModNone,
+		func(gui *gocui.Gui, view *gocui.View) error {
 			if snekHead.currentDirection == getOppositeDirection(keyDirection) {
 				return nil
 			}
@@ -65,10 +65,10 @@ func initMovementKey(g *gocui.Gui, key gocui.Key, keyDirection direction) error 
 	return nil
 }
 
-func initTabKey(g *gocui.Gui) error{
-	if err := g.SetKeybinding("", gocui.KeyTab, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			err := addBodyPartToEnd(g, *snekBodyParts[len(snekBodyParts)-1])
+func initTabKey(gui *gocui.Gui) error{
+	if err := gui.SetKeybinding("", gocui.KeyTab, gocui.ModNone,
+		func(gui *gocui.Gui, view *gocui.View) error {
+			err := addBodyPartToEnd(gui, *snekBodyParts[len(snekBodyParts)-1])
 			if err != nil {
 				return err
 			}
@@ -79,25 +79,25 @@ func initTabKey(g *gocui.Gui) error{
 	return nil
 }
 
-func initSpaceKey(g *gocui.Gui) error{
-	if err := g.SetKeybinding("", gocui.KeySpace, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			return reset(g)
+func initSpaceKey(gui *gocui.Gui) error{
+	if err := gui.SetKeybinding("", gocui.KeySpace, gocui.ModNone,
+		func(gui *gocui.Gui, view *gocui.View) error {
+			return reset(gui)
 		}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func initSpeedKeys(g *gocui.Gui) error{
-	if err := initSpeedKey(g, 'w', -10); err != nil {return err}
-	if err := initSpeedKey(g, 's', 10); err != nil {return err}
+func initSpeedKeys(gui *gocui.Gui) error{
+	if err := initSpeedKey(gui, 'w', -10); err != nil {return err}
+	if err := initSpeedKey(gui, 's', 10); err != nil {return err}
 	return nil
 }
 
-func initSpeedKey(g *gocui.Gui, key rune, speedChange time.Duration) error{
-	if err := g.SetKeybinding("", key, gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
+func initSpeedKey(gui *gocui.Gui, key rune, speedChange time.Duration) error{
+	if err := gui.SetKeybinding("", key, gocui.ModNone,
+		func(gui *gocui.Gui, view *gocui.View) error {
 			tickInterval +=  speedChange * time.Millisecond
 			return nil
 		}); err != nil {
@@ -106,10 +106,10 @@ func initSpeedKey(g *gocui.Gui, key rune, speedChange time.Duration) error{
 	return nil
 }
 
-func initPauseKey(g *gocui.Gui) error {
-	if err := g.SetKeybinding("", 'p', gocui.ModNone,
-		func(g *gocui.Gui, v *gocui.View) error {
-			return pause(g)
+func initPauseKey(gui *gocui.Gui) error {
+	if err := gui.SetKeybinding("", 'p', gocui.ModNone,
+		func(gui *gocui.Gui, view *gocui.View) error {
+			return pause(gui)
 		}); err != nil {
 		return err
 	}

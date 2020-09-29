@@ -7,8 +7,8 @@ import (
 const gameOverViewName = "gameOver"
 var gameOverView *gocui.View
 
-func initGameOverView(g *gocui.Gui) error {
-	maxX, maxY, err := getMaxXY(g, gameViewName)
+func initGameOverView(gui *gocui.Gui) error {
+	maxX, maxY, err := getMaxXY(gui, gameViewName)
 	if err != nil {
 		return err
 	}
@@ -26,17 +26,16 @@ func initGameOverView(g *gocui.Gui) error {
 		viewPositionY,
 		viewPositionY + viewLenY}
 
-	v, err := createView(g, gameOverViewProperties, false)
-	gameOverView = v
+	gameOverView, err = createView(gui, gameOverViewProperties, false)
 	return err
 }
 
-func gameOver(g *gocui.Gui) error {
+func gameOver(gui *gocui.Gui) error {
 	gameOverView.Visible = true
-	if _, err := g.SetCurrentView(gameOverViewName); err != nil {
+	if _, err := gui.SetCurrentView(gameOverViewName); err != nil {
 		return err
 	}
-	if _, err := g.SetViewOnTop(gameOverViewName); err != nil {
+	if _, err := gui.SetViewOnTop(gameOverViewName); err != nil {
 		return err
 	}
 	running = false

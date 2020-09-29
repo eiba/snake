@@ -5,11 +5,11 @@ import (
 	"time"
 )
 
-func reset(g *gocui.Gui) error {
+func reset(gui *gocui.Gui) error {
 	running = true
 	tickInterval = 50 * time.Millisecond
 
-	if err := deleteSnekBody(g); err != nil {
+	if err := deleteSnekBody(gui); err != nil {
 		return err
 	}
 
@@ -17,28 +17,28 @@ func reset(g *gocui.Gui) error {
 	snekHead = &snekBodyPart{headDirection, headDirection, "s0"}
 	snekBodyParts = []*snekBodyPart{snekHead}
 
-	if err := setViewAtRandom(g, snekHead.viewName, true); err != nil {
+	if err := setViewAtRandom(gui, snekHead.viewName, true); err != nil {
 		return err
 	}
-	if err := setViewAtRandom(g, boxViewName, false); err != nil {
+	if err := setViewAtRandom(gui, boxViewName, false); err != nil {
 		return err
 	}
 
 	gameOverView.Visible = false
 	pauseView.Visible = false
 	gameFinished = false
-	if err := updateStat(g, &restartStat, restartStat.value+1); err != nil {
+	if err := updateStat(&restartStat, restartStat.value+1); err != nil {
 		return err
 	}
-	if err := updateStat(g, &lengthStat, 1); err != nil {
+	if err := updateStat(&lengthStat, 1); err != nil {
 		return err
 	}
 	return nil
 }
 
-func deleteSnekBody(g *gocui.Gui) error {
+func deleteSnekBody(gui *gocui.Gui) error {
 	for i := 1; i < len(snekBodyParts); i++ {
-		if err := g.DeleteView(snekBodyParts[i].viewName); err != nil && !gocui.IsUnknownView(err) {
+		if err := gui.DeleteView(snekBodyParts[i].viewName); err != nil && !gocui.IsUnknownView(err) {
 			return err
 		}
 	}
