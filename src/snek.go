@@ -80,16 +80,16 @@ func checkViewCollision(view1 string, view2 string) (bool, error) {
 	return false, nil
 }
 
-func moveSnekHead(snekBodyPart *snekBodyPart) error {
-	snekBodyPart.previousDirection = snekBodyPart.currentDirection
-	snekBodyPart.currentDirection = headDirection
+func moveSnekHead() error {
+	snekHead.previousDirection = snekHead.currentDirection
+	snekHead.currentDirection = headDirection
 
-	err := moveHeadView(snekBodyPart)
+	err := moveHeadView(snekHead)
 	if err != nil {
 		return err
 	}
 
-	headToMainViewCollision, err := checkHeadToMainViewCollision(*snekBodyPart)
+	headToMainViewCollision, err := checkHeadToMainViewCollision()
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func moveSnekHead(snekBodyPart *snekBodyPart) error {
 		return gameOver()
 	}
 
-	headToBoxCollision, err := checkViewCollision(snekBodyPart.viewName, boxViewName)
+	headToBoxCollision, err := checkViewCollision(snekHead.viewName, boxViewName)
 	if err != nil {
 		return err
 	}
@@ -136,7 +136,7 @@ func checkHeadToBodyCollision() (bool, error) {
 	return false, nil
 }
 
-func checkHeadToMainViewCollision(snekHead snekBodyPart) (bool, error) {
+func checkHeadToMainViewCollision() (bool, error) {
 	xG0, yG0, xG1, yG1, err := gui.ViewPosition(gameViewName)
 	if err != nil {
 		return false, err

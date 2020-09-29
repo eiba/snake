@@ -87,7 +87,7 @@ func updateMovement() {
 			continue
 		}
 		gui.Update(func(gui *gocui.Gui) error {
-			if err := moveSnekHead(snekHead); err != nil {
+			if err := moveSnekHead(); err != nil {
 				log.Panicln(err)
 			}
 			if err := moveSnekBodyParts(); err != nil {
