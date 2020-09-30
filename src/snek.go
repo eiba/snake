@@ -192,18 +192,18 @@ func moveSnekBodyParts() error {
 }
 
 func moveSnekBodyPart(previousSnekBodyPart *snekBodyPart, currentSnekBodyPart *snekBodyPart) error {
-	pX0, pY0, pX1, pY1, err := gui.ViewPosition(previousSnekBodyPart.viewName)
+	/*pX0, pY0, pX1, pY1, err := gui.ViewPosition(previousSnekBodyPart.viewName)
 	if err != nil {
 		return err
 	}
-	offsetX, offsetY := calculateBodyPartOffsets(*previousSnekBodyPart)
+	offsetX, offsetY := calculateBodyPartOffsets(*previousSnekBodyPart)*/
 
-	position := position{pX0 + offsetX, pY0 + offsetY, pX1 + offsetX, pY1 + offsetY}
-	_, err = gui.SetView(currentSnekBodyPart.viewName, pX0+offsetX, pY0+offsetY, pX1+offsetX, pY1+offsetY, 0)
+	newPosition := getPositionOfNextMove(*previousSnekBodyPart)
+	_, err := gui.SetView(currentSnekBodyPart.viewName, newPosition.x0, newPosition.y0, newPosition.x1, newPosition.y1, 0)
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
 	}
-	currentSnekBodyPart.position = position
+	currentSnekBodyPart.position = newPosition
 
 	currentSnekBodyPart.previousDirection = currentSnekBodyPart.currentDirection
 	currentSnekBodyPart.currentDirection = previousSnekBodyPart.previousDirection
@@ -217,14 +217,19 @@ func moveHeadView(snekHead *snekBodyPart) error {
 	}
 	offsetX, offsetY := calculateBodyPartOffsets(*snekHead)
 
-	newX0, newY0, newX1, newY1 := x0-offsetX, y0-offsetY, x1-offsetX, y1-offsetY
-	_, err = gui.SetView(snekHead.viewName, newX0, newY0, newX1, newY1, 0)
+	newPosition := position{x0-offsetX, y0-offsetY, x1-offsetX, y1-offsetY}
+	_, err = gui.SetView(snekHead.viewName, newPosition.x0,newPosition.y0,newPosition.x1,newPosition.y1, 0)
 	if err != nil {
 		return err
 	}
-	position := position{newX0, newY0, newX1, newY1}
-	snekHead.position = position
+	snekHead.position = newPosition
 	return nil
+}
+
+func getPositionOfNextMove(snekBodyPart snekBodyPart) position  {
+	offsetX, offsetY := calculateBodyPartOffsets(snekBodyPart)
+	currentPosition := snekBodyPart.position
+	return position{currentPosition.x0+offsetX, currentPosition.y0+offsetY, currentPosition.x1+offsetX, currentPosition.y1+offsetY}
 }
 
 func calculateBodyPartOffsets(snekBodyPart snekBodyPart) (int, int) {
