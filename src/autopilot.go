@@ -12,16 +12,37 @@ func autopilot() error {
 
 	if xH0 < xB0 && directionIsValid(directions.right) {
 		headDirection = directions.right
-	} else if xH0 > xB0 && directionIsValid(directions.left) {
+	}
+	if xH0 > xB0 && directionIsValid(directions.left) {
 		headDirection = directions.left
-	} else if yH0 < yB0 && directionIsValid(directions.down) {
+	}
+	if yH0 < yB0 && directionIsValid(directions.down) {
 		headDirection = directions.down
-	} else if yH0 > yB0 && directionIsValid(directions.up) {
+	}
+	if yH0 > yB0 && directionIsValid(directions.up) {
 		headDirection = directions.up
 	}
-
-	
+	for i := 1; i < 100; i++ {
+		if validDirection(headDirection){
+			break
+		}
+		headDirection = getRandomValidDirection(snekHead.currentDirection)
+	}
 	return nil
+}
+
+func validDirection(direction direction) bool  {
+	positions := make([]position, len(snekBodyParts)-1)
+	for i := 1; i < len(snekBodyParts); i++ {
+		positions[i-1] = getPositionOfNextMove2(snekBodyParts[i-1].currentDirection,snekBodyParts[i-1].position)
+	}
+	nextPosition := getPositionOfNextMove3(direction,snekHead.position)
+
+	mainViewCollision, _ := mainViewCollision(nextPosition)
+	if collision(nextPosition,positions) || mainViewCollision {
+		return false
+	}
+	return true
 }
 
 func directionIsValid(direction direction) bool {
@@ -31,6 +52,13 @@ func directionIsValid(direction direction) bool {
 	return true
 }
 
-func checkCollision()  {
-	
+func getRandomValidDirection(currentDirection direction) direction  {
+	oppositeDirection := getOppositeDirection(currentDirection)
+
+	for  {
+		direction := direction(r.Intn(4))
+		if direction != oppositeDirection && direction != headDirection{
+			return direction
+		}
+	}
 }

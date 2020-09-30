@@ -45,7 +45,7 @@ func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
 	if err != nil {
 		return err
 	}
-	offsetX, offsetY := calculateBodyPartOffsets(currentLastSnekBodyPart)
+	offsetX, offsetY := calculateBodyPartOffsets2(currentLastSnekBodyPart.currentDirection)
 
 	name := fmt.Sprintf("s%v", len(snekBodyParts))
 	position := position{x0 + offsetX, y0 + offsetY, x1 + offsetX, y1 + offsetY}
@@ -90,7 +90,7 @@ func checkViewCollision(view1 string, view2 string) (bool, error) {
 }
 
 //Checks collision between position1 and position2, returning true for collision and false otherwise.
-func checkCollision2(position1 position, position2 position) bool {
+func positionOverlap(position1 position, position2 position) bool {
 	Ax, Ay, Aw, Ah := position1.x0, position1.y0, position1.x1-position1.x0, position1.y1-position1.y0
 	Bx, By, Bw, Bh := position2.x0, position2.y0, position2.x1-position2.x0, position2.y1-position2.y0
 
@@ -112,23 +112,21 @@ func moveSnekHead() error {
 		return err
 	}
 
-	headToMainViewCollision, err := mainViewCollision(snekHead)
+	fatalCollision, err := fatalCollision(snekHead.position)
 	if err != nil {
 		return err
 	}
-	if headToMainViewCollision {
+	if fatalCollision {
 		return gameOver()
 	}
 
-	headToBodyCollision, err := checkBodyCollision(snekHead)
-	if err != nil {
-		return err
-	}
+	/*headToBodyCollision := checkBodyCollision(snekHead.position)
+
 	if headToBodyCollision {
 		return gameOver()
-	}
+	}*/
 
-	headToBoxCollision := checkCollision2(snekHead.position, boxView.position)
+	headToBoxCollision := positionOverlap(snekHead.position, boxView.position)
 	/*if err != nil {
 		return err
 	}*/
@@ -136,6 +134,19 @@ func moveSnekHead() error {
 		return collideWithBox()
 	}
 	return nil
+}
+
+func fatalCollision(position position) (bool, error) {
+	mainViewCollision, err := mainViewCollision(position)
+	if err != nil {
+		return true,err
+	}
+	if mainViewCollision {
+		return true, nil
+	}
+	if checkBodyCollision(position) {return true, nil}
+
+	return false,nil
 }
 
 func collideWithBox() error {
@@ -149,30 +160,37 @@ func collideWithBox() error {
 	return err
 }
 
-func checkBodyCollision(snekBodyPart *snekBodyPart) (bool, error) {
+func checkBodyCollision(position position) bool {
 	for i := 1; i < len(snekBodyParts); i++ {
-		collision := checkCollision2(snekBodyPart.position, snekBodyParts[i].position)
+		collision := positionOverlap(position, snekBodyParts[i].position)
 		/*collision, err := checkViewCollision(snekBodyPart.viewName, snekBodyParts[i].viewName)
 		if err != nil {
 			return false, err
 		}*/
 		if collision {
-			return true, nil
+			return true
 		}
 	}
-	return false, nil
+	return false
 }
 
-func mainViewCollision(snekBodyPart *snekBodyPart) (bool, error) {
+func collision(position position, positions []position) bool {
+	for i := 1; i < len(positions); i++ {
+		if positionOverlap(position, positions[i]){
+			return true
+		}
+	}
+	return false
+}
+
+func mainViewCollision(position position) (bool, error) {
 	xG0, yG0, xG1, yG1, err := gui.ViewPosition(gameViewName)
 	if err != nil {
 		return false, err
 	}
 
-	xH0, yH0, xH1, yH1, err := gui.ViewPosition(snekBodyPart.viewName)
-	if err != nil {
-		return false, err
-	}
+	//position := snekBodyPart.position
+	xH0, yH0, xH1, yH1 := position.x0, position.y0, position.x1, position.y1
 
 	maxX, maxY, minX, minY := xG1-xG0, yG1-yG0, 0, 0
 	if xH0 >= minX && yH0 >= minY && xH1 <= maxX && yH1 <= maxY {
@@ -198,7 +216,7 @@ func moveSnekBodyPart(previousSnekBodyPart *snekBodyPart, currentSnekBodyPart *s
 	}
 	offsetX, offsetY := calculateBodyPartOffsets(*previousSnekBodyPart)*/
 
-	newPosition := getPositionOfNextMove(*previousSnekBodyPart)
+	newPosition := getPositionOfNextMove2(previousSnekBodyPart.currentDirection,previousSnekBodyPart.position)
 	_, err := gui.SetView(currentSnekBodyPart.viewName, newPosition.x0, newPosition.y0, newPosition.x1, newPosition.y1, 0)
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
@@ -215,7 +233,7 @@ func moveHeadView(snekHead *snekBodyPart) error {
 	if err != nil {
 		return err
 	}
-	offsetX, offsetY := calculateBodyPartOffsets(*snekHead)
+	offsetX, offsetY := calculateBodyPartOffsets2(snekHead.currentDirection)
 
 	newPosition := position{x0-offsetX, y0-offsetY, x1-offsetX, y1-offsetY}
 	_, err = gui.SetView(snekHead.viewName, newPosition.x0,newPosition.y0,newPosition.x1,newPosition.y1, 0)
@@ -227,15 +245,42 @@ func moveHeadView(snekHead *snekBodyPart) error {
 }
 
 func getPositionOfNextMove(snekBodyPart snekBodyPart) position  {
-	offsetX, offsetY := calculateBodyPartOffsets(snekBodyPart)
+	offsetX, offsetY := calculateBodyPartOffsets2(snekBodyPart.currentDirection)
 	currentPosition := snekBodyPart.position
 	return position{currentPosition.x0+offsetX, currentPosition.y0+offsetY, currentPosition.x1+offsetX, currentPosition.y1+offsetY}
+}
+
+func getPositionOfNextMove2(currentDirection direction, currentPosition position) position  {
+	offsetX, offsetY := calculateBodyPartOffsets2(currentDirection)
+	return position{currentPosition.x0+offsetX, currentPosition.y0+offsetY, currentPosition.x1+offsetX, currentPosition.y1+offsetY}
+}
+
+func getPositionOfNextMove3(currentDirection direction, currentPosition position) position  {
+	offsetX, offsetY := calculateBodyPartOffsets2(currentDirection)
+	return position{currentPosition.x0-offsetX, currentPosition.y0-offsetY, currentPosition.x1-offsetX, currentPosition.y1-offsetY}
 }
 
 func calculateBodyPartOffsets(snekBodyPart snekBodyPart) (int, int) {
 	offsetX := 0
 	offsetY := deltaY
 	switch snekBodyPart.currentDirection {
+	case directions.right:
+		offsetX = -deltaX
+		offsetY = 0
+	case directions.down:
+		offsetX = 0
+		offsetY = -deltaY
+	case directions.left:
+		offsetX = deltaX
+		offsetY = 0
+	}
+	return offsetX, offsetY
+}
+
+func calculateBodyPartOffsets2(direction direction) (int, int) {
+	offsetX := 0
+	offsetY := deltaY
+	switch direction {
 	case directions.right:
 		offsetX = -deltaX
 		offsetY = 0

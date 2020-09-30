@@ -95,7 +95,6 @@ func updateMovement() {
 		if autoPilotEnabled {
 			err := autopilot(); if err != nil {log.Panicln(err)}
 		}
-		updatePosition()
 		gui.Update(func(gui *gocui.Gui) error {
 			if err := moveSnekHead(); err != nil {
 				log.Panicln(err)
