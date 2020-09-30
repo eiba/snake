@@ -2,12 +2,10 @@ package main
 
 import (
 	"github.com/awesome-gocui/gocui"
-	"time"
 )
 
 func reset() error {
 	running = true
-	tickInterval = 50 * time.Millisecond
 
 	if err := deleteSnekBody(); err != nil {
 		return err
