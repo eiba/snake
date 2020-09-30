@@ -9,6 +9,14 @@ type snekBodyPart struct {
 	currentDirection  direction
 	previousDirection direction
 	viewName          string
+	position position
+}
+
+type position struct {
+	x0 int
+	y0 int
+	x1 int
+	y1 int
 }
 
 type direction int
@@ -28,7 +36,7 @@ const (
 var (
 	directions    = movementDirections{0, 1, 2, 3}
 	headDirection = direction(r.Intn(4))
-	snekHead      = &snekBodyPart{headDirection, headDirection, "s0"}
+	snekHead      = &snekBodyPart{headDirection, headDirection, "s0",position{0,0,0,0}}
 	snekBodyParts = []*snekBodyPart{snekHead}
 )
 
@@ -40,6 +48,7 @@ func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
 	offsetX, offsetY := calculateBodyPartOffsets(currentLastSnekBodyPart)
 
 	name := fmt.Sprintf("s%v", len(snekBodyParts))
+	position := position{x0+offsetX, y0+offsetY, x1+offsetX, y1+offsetY}
 	_, err = gui.SetView(name, x0+offsetX, y0+offsetY, x1+offsetX, y1+offsetY, 0)
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
@@ -49,7 +58,7 @@ func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
 		&snekBodyPart{
 			currentLastSnekBodyPart.currentDirection,
 			currentLastSnekBodyPart.previousDirection,
-			name})
+			name,position})
 
 	if err := updateStat(&lengthStat, lengthStat.value+1); err != nil {
 		return err
@@ -120,7 +129,8 @@ func collideWithBox() error {
 	if err != nil {
 		return err
 	}
-	return setViewAtRandom(boxViewName, false)
+	_, err = setViewAtRandom(boxViewName, false)
+	return err
 }
 
 func checkBodyCollision(snekBodyPart *snekBodyPart) (bool, error) {
@@ -171,10 +181,12 @@ func moveSnekBodyPart(previousSnekBodyPart *snekBodyPart, currentSnekBodyPart *s
 	}
 	offsetX, offsetY := calculateBodyPartOffsets(*previousSnekBodyPart)
 
+	position := position{pX0+offsetX, pY0+offsetY, pX1+offsetX, pY1+offsetY}
 	_, err = gui.SetView(currentSnekBodyPart.viewName, pX0+offsetX, pY0+offsetY, pX1+offsetX, pY1+offsetY, 0)
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
 	}
+	currentSnekBodyPart.position = position
 
 	currentSnekBodyPart.previousDirection = currentSnekBodyPart.currentDirection
 	currentSnekBodyPart.currentDirection = previousSnekBodyPart.previousDirection
@@ -193,6 +205,8 @@ func moveHeadView(snekHead *snekBodyPart) error {
 	if err != nil {
 		return err
 	}
+	position := position{newX0, newY0, newX1, newY1}
+	snekHead.position = position
 	return nil
 }
 

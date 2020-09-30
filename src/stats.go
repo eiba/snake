@@ -23,7 +23,7 @@ func initStatsView() error {
 	maxX, _ := gui.Size()
 
 	var err error
-	statsView, err = gui.SetView(statsViewName, maxX-25, 9, maxX-1, 12, 0)
+	statsView, err = gui.SetView(statsViewName, maxX-25, 9, maxX-1, 13, 0)
 	if err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
@@ -32,8 +32,13 @@ func initStatsView() error {
 
 		fmt.Fprintln(statsView, fmt.Sprint(lengthStat.name, ":", lengthStat.value))
 		fmt.Fprintln(statsView, fmt.Sprint(restartStat.name, ":", restartStat.value))
+		fmt.Fprintln(statsView, fmt.Sprint("Position", ":", snekHead.position))
 	}
 	return nil
+}
+
+func updatePosition()  {
+	statsView.SetLine(2, fmt.Sprint("Position", ":", snekHead.position))
 }
 
 func updateStat(stat *stat, value int) error {

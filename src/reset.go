@@ -12,13 +12,14 @@ func reset() error {
 	}
 
 	headDirection = direction(r.Intn(4))
-	snekHead = &snekBodyPart{headDirection, headDirection, "s0"}
+	snekHead = &snekBodyPart{headDirection, headDirection, "s0",position{0,0,0,0}}
 	snekBodyParts = []*snekBodyPart{snekHead}
 
-	if err := setViewAtRandom(snekHead.viewName, true); err != nil {
+	position, err := setViewAtRandom(snekHead.viewName, true); if err != nil {
 		return err
 	}
-	if err := setViewAtRandom(boxViewName, false); err != nil {
+	snekHead.position = position
+	if _, err := setViewAtRandom(boxViewName, false); err != nil {
 		return err
 	}
 

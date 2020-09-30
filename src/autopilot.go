@@ -19,6 +19,8 @@ func autopilot() error {
 	} else if yH0 > yB0 && directionIsValid(directions.up) {
 		headDirection = directions.up
 	}
+
+
 	return nil
 }
 

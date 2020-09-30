@@ -64,10 +64,12 @@ func manageGame(gui *gocui.Gui) error {
 			log.Panicln(err)
 		}
 
-		if err := setViewAtRandom(snekHead.viewName, true); err != nil {
+		position,err := setViewAtRandom(snekHead.viewName, true); if err != nil {
 			log.Panicln(err)
 		}
-		if err := setViewAtRandom(boxViewName, false); err != nil {
+		snekHead.position = position
+
+		if _,err := setViewAtRandom(boxViewName, false); err != nil {
 			log.Panicln(err)
 		}
 		go updateMovement()
@@ -91,6 +93,7 @@ func updateMovement() {
 		if autoPilotEnabled {
 			err := autopilot(); if err != nil {log.Panicln(err)}
 		}
+		updatePosition()
 		gui.Update(func(gui *gocui.Gui) error {
 			if err := moveSnekHead(); err != nil {
 				log.Panicln(err)
