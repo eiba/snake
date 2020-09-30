@@ -5,7 +5,7 @@ func autopilot() error {
 	if err != nil {
 		return err
 	}
-	xB0, yB0, _, _, err := gui.ViewPosition(boxViewName)
+	xB0, yB0, _, _, err := gui.ViewPosition(boxView.name)
 	if err != nil {
 		return err
 	}
@@ -20,7 +20,7 @@ func autopilot() error {
 		headDirection = directions.up
 	}
 
-
+	
 	return nil
 }
 
@@ -29,4 +29,8 @@ func directionIsValid(direction direction) bool {
 		return false
 	}
 	return true
+}
+
+func checkCollision()  {
+	
 }

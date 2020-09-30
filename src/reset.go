@@ -15,13 +15,15 @@ func reset() error {
 	snekHead = &snekBodyPart{headDirection, headDirection, "s0",position{0,0,0,0}}
 	snekBodyParts = []*snekBodyPart{snekHead}
 
-	position, err := setViewAtRandom(snekHead.viewName, true); if err != nil {
+	headPosition, err := setViewAtRandom(snekHead.viewName, true); if err != nil {
 		return err
 	}
-	snekHead.position = position
-	if _, err := setViewAtRandom(boxViewName, false); err != nil {
+	snekHead.position = headPosition
+
+	boxPosition, err := setViewAtRandom(boxView.name, false); if err != nil {
 		return err
 	}
+	boxView.position = boxPosition
 
 	gameOverView.Visible = false
 	pauseView.Visible = false

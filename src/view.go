@@ -7,13 +7,10 @@ import (
 )
 
 type viewProperties struct {
-	name  string
-	title string
-	text  string
-	x0    int
-	x1    int
-	y0    int
-	y1    int
+	name     string
+	title    string
+	text     string
+	position position
 }
 
 func getMaxXY(viewName string) (int, int, error) {
@@ -25,7 +22,7 @@ func getMaxXY(viewName string) (int, int, error) {
 }
 
 func createView(viewProperties viewProperties, visible bool) (*gocui.View, error) {
-	view, err := gui.SetView(viewProperties.name, viewProperties.x0, viewProperties.y0, viewProperties.x1, viewProperties.y1, 0)
+	view, err := gui.SetView(viewProperties.name, viewProperties.position.x0, viewProperties.position.y0, viewProperties.position.x1, viewProperties.position.y1, 0)
 	if err != nil {
 		if !gocui.IsUnknownView(err) {
 			return nil, err
@@ -50,7 +47,7 @@ func setViewAtRandom(name string, setCurrent bool) (position, error) {
 
 	maxX, maxY := x1-x0-3, y1-y0-2
 	positionX, positionY := r.Intn(maxX)+1, r.Intn(maxY)+1
-	viewPosition := position{positionX, positionY, positionX+deltaX, positionY+deltaY}
+	viewPosition := position{positionX, positionY, positionX + deltaX, positionY + deltaY}
 
 	_, err = gui.SetView(name, viewPosition.x0, viewPosition.y0, viewPosition.x1, viewPosition.y1, 0)
 	if err != nil && !gocui.IsUnknownView(err) {

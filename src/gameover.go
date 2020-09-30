@@ -21,10 +21,10 @@ func initGameOverView() error {
 		gameOverViewName,
 		"Game over",
 		"Press space to restart",
-		viewPositionX,
-		viewPositionX + viewLenX,
+		position{viewPositionX,
 		viewPositionY,
-		viewPositionY + viewLenY}
+		viewPositionX + viewLenX,
+		viewPositionY + viewLenY}}
 
 	gameOverView, err = createView(gameOverViewProperties, false)
 	return err
