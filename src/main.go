@@ -64,15 +64,12 @@ func manageGame(gui *gocui.Gui) error {
 			log.Panicln(err)
 		}
 
-		headPosition,err := setViewAtRandom(snekHead.viewName, true); if err != nil {
+		snekHead.position,err = setViewAtRandom(snekHead.viewName, true); if err != nil {
 			log.Panicln(err)
 		}
-		snekHead.position = headPosition
-
-		boxPosition,err := setViewAtRandom(boxView.name, false); if err != nil {
+		boxView.position,err = setViewAtRandom(boxView.name, false); if err != nil {
 			log.Panicln(err)
 		}
-		boxView.position = boxPosition
 
 		go updateMovement()
 	}

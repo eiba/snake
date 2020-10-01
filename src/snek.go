@@ -154,9 +154,7 @@ func collideWithBox() error {
 	if err != nil {
 		return err
 	}
-	var position position
-	position, err = setViewAtRandom(boxView.name, false)
-	boxView.position = position
+	boxView.position, err = setViewAtRandom(boxView.name, false)
 	return err
 }
 
