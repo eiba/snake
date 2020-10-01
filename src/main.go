@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-const gameViewName = "game"
-
 var (
 	gui              *gocui.Gui
 	r                = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -16,6 +14,7 @@ var (
 	gameFinished     = false
 	autoPilotEnabled = false
 	tickInterval     = 50 * time.Millisecond
+	gameView         = viewProperties{"game", "Snek", "", position{}}
 )
 
 func main() {
@@ -42,19 +41,20 @@ func initGUI() *gocui.Gui {
 	return gui
 }
 
-func initGameView(maxX int, maxY int) error {
-	if v, err := gui.SetView(gameViewName, 0, 0, maxX-26, maxY-1, 0); err != nil {
+func initGameView(maxX int, maxY int) (position, error) {
+	gameViewPosition := position{0, 0, maxX - 26, maxY - 1}
+	if v, err := gui.SetView(gameView.name, gameViewPosition.x0, gameViewPosition.x0, gameViewPosition.x1, gameViewPosition.y1, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
-			return err
+			return gameViewPosition, err
 		}
 		v.Title = "Snek"
 
-		if _, err := gui.SetViewOnBottom(gameViewName); err != nil {
-			return err
+		if _, err := gui.SetViewOnBottom(gameView.name); err != nil {
+			return gameViewPosition, err
 		}
-		return initGame()
+		return gameViewPosition, initGame()
 	}
-	return nil
+	return gameViewPosition, nil
 }
 
 func initGame() error {
@@ -82,7 +82,9 @@ func manageGame(gui *gocui.Gui) error {
 		log.Panicln(err)
 	}
 
-	if err := initGameView(maxX, maxY); err != nil {
+	var err error
+	gameView.position, err = initGameView(maxX, maxY)
+	if err != nil {
 		log.Panicln(err)
 	}
 

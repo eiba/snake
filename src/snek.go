@@ -35,9 +35,9 @@ const (
 var (
 	directions    = movementDirections{0, 1, 2, 3}
 	headDirection = direction(r.Intn(4))
-	snekHead      = &snekBodyPart{headDirection, headDirection, "s0", position{0, 0, 0, 0}}
+	snekHead      = &snekBodyPart{headDirection, headDirection, "s0", position{}}
 	snekBodyParts = []*snekBodyPart{snekHead}
-	boxView       = viewProperties{"box", "", "", position{0, 0, 0, 0}}
+	boxView       = viewProperties{"box", "", "", position{}}
 )
 
 func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
@@ -97,34 +97,21 @@ func moveSnekHead() error {
 		return err
 	}
 
-	fatalCollision, err := fatalCollision(snekHead.position)
-	if err != nil {
-		return err
-	}
-	if fatalCollision {
+	if fatalCollision(snekHead.position) {
 		return gameOver()
 	}
 
-	headToBoxCollision := positionOverlap(snekHead.position, boxView.position)
-	if headToBoxCollision {
+	if positionOverlap(snekHead.position, boxView.position) {
 		return collideWithBox()
 	}
 	return nil
 }
 
-func fatalCollision(position position) (bool, error) {
-	mainViewCollision, err := mainViewCollision(position)
-	if err != nil {
-		return true, err
+func fatalCollision(position position) bool {
+	if mainViewCollision(position) || checkBodyCollision(position) {
+		return true
 	}
-	if mainViewCollision {
-		return true, nil
-	}
-	if checkBodyCollision(position) {
-		return true, nil
-	}
-
-	return false, nil
+	return false
 }
 
 func collideWithBox() error {
@@ -146,19 +133,15 @@ func checkBodyCollision(position position) bool {
 	return false
 }
 
-func mainViewCollision(position position) (bool, error) {
-	xG0, yG0, xG1, yG1, err := gui.ViewPosition(gameViewName)
-	if err != nil {
-		return false, err
-	}
-
+func mainViewCollision(position position) bool {
+	xG0, yG0, xG1, yG1 := gameView.position.x0, gameView.position.y0, gameView.position.x1, gameView.position.y1
 	xH0, yH0, xH1, yH1 := position.x0, position.y0, position.x1, position.y1
 
 	maxX, maxY, minX, minY := xG1-xG0, yG1-yG0, 0, 0
 	if xH0 >= minX && yH0 >= minY && xH1 <= maxX && yH1 <= maxY {
-		return false, nil
+		return false
 	}
-	return true, nil
+	return true
 }
 
 func moveSnekBodyParts() error {

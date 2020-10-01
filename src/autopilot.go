@@ -36,10 +36,9 @@ func validDirection(direction direction) bool {
 	for i := 1; i < len(snekBodyParts); i++ {
 		positions[i-1] = getPositionOfNextMove(snekBodyParts[i-1].currentDirection, snekBodyParts[i-1].position, false)
 	}
-	nextPosition := getPositionOfNextMove(direction, snekHead.position, true)
 
-	mainViewCollision, _ := mainViewCollision(nextPosition)
-	if positionsOverlap(nextPosition, positions) || mainViewCollision {
+	nextPosition := getPositionOfNextMove(direction, snekHead.position, true)
+	if positionsOverlap(nextPosition, positions) || mainViewCollision(nextPosition) {
 		return false
 	}
 	return true

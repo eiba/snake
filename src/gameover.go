@@ -9,12 +9,12 @@ const gameOverViewName = "gameOver"
 var gameOverView *gocui.View
 
 func initGameOverView() error {
-	maxX, maxY, err := getMaxXY(gameViewName)
+	lenX, lenY, err := getLenXY(gameView.name)
 	if err != nil {
 		return err
 	}
 
-	viewPositionX, viewPositionY := (maxX/2)-12, (maxY/2)-2
+	viewPositionX, viewPositionY := (lenX/2)-12, (lenY/2)-2
 	viewLenX := 25
 	viewLenY := 4
 

@@ -9,12 +9,12 @@ const pauseViewName = "pause"
 var pauseView *gocui.View
 
 func initPauseView() error {
-	maxX, maxY, err := getMaxXY(gameViewName)
+	lenX, lenY, err := getLenXY(gameView.name)
 	if err != nil {
 		return err
 	}
 
-	viewPositionX, viewPositionY := (maxX/2)-10, (maxY/2)-2
+	viewPositionX, viewPositionY := (lenX/2)-10, (lenY/2)-2
 	viewLenX := 20
 	viewLenY := 4
 
