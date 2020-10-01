@@ -39,7 +39,6 @@ func initGUI() *gocui.Gui {
 	gui.Highlight = true
 	gui.SelFgColor = gocui.ColorRed
 	gui.SetManagerFunc(manageGame)
-
 	return gui
 }
 
