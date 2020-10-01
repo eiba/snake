@@ -214,12 +214,17 @@ func moveSnekBodyPart(previousSnekBodyPart *snekBodyPart, currentSnekBodyPart *s
 	}
 	offsetX, offsetY := calculateBodyPartOffsets(*previousSnekBodyPart)*/
 
-	newPosition := getPositionOfNextMove2(previousSnekBodyPart.currentDirection,previousSnekBodyPart.position)
-	_, err := gui.SetView(currentSnekBodyPart.viewName, newPosition.x0, newPosition.y0, newPosition.x1, newPosition.y1, 0)
+	currentSnekBodyPart.position = getPositionOfNextMove2(previousSnekBodyPart.currentDirection,previousSnekBodyPart.position)
+	_, err := gui.SetView(
+		currentSnekBodyPart.viewName,
+		currentSnekBodyPart.position.x0,
+		currentSnekBodyPart.position.y0,
+		currentSnekBodyPart.position.x1,
+		currentSnekBodyPart.position.y1,
+		0)
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
 	}
-	currentSnekBodyPart.position = newPosition
 
 	currentSnekBodyPart.previousDirection = currentSnekBodyPart.currentDirection
 	currentSnekBodyPart.currentDirection = previousSnekBodyPart.previousDirection
@@ -233,12 +238,17 @@ func moveHeadView(snekHead *snekBodyPart) error {
 	}
 	offsetX, offsetY := calculateBodyPartOffsets2(snekHead.currentDirection)
 
-	newPosition := position{x0-offsetX, y0-offsetY, x1-offsetX, y1-offsetY}
-	_, err = gui.SetView(snekHead.viewName, newPosition.x0,newPosition.y0,newPosition.x1,newPosition.y1, 0)
+	snekHead.position = position{x0-offsetX, y0-offsetY, x1-offsetX, y1-offsetY}
+	_, err = gui.SetView(
+		snekHead.viewName,
+		snekHead.position.x0,
+		snekHead.position.y0,
+		snekHead.position.x1,
+		snekHead.position.y1,
+		0)
 	if err != nil {
 		return err
 	}
-	snekHead.position = newPosition
 	return nil
 }
 
