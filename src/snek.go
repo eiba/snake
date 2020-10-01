@@ -69,7 +69,7 @@ func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
 
 //Checks if there is a collision between position and all positions in positions
 func positionsOverlap(position position, positions []position) bool {
-	for i := 1; i < len(positions); i++ {
+	for i := 0; i < len(positions); i++ {
 		if positionOverlap(position, positions[i]) {
 			return true
 		}
