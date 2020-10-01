@@ -39,7 +39,7 @@ func validDirection(direction direction) bool  {
 	nextPosition := getPositionOfNextMove3(direction,snekHead.position)
 
 	mainViewCollision, _ := mainViewCollision(nextPosition)
-	if collision(nextPosition,positions) || mainViewCollision {
+	if positionsOverlap(nextPosition,positions) || mainViewCollision {
 		return false
 	}
 	return true

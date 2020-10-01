@@ -66,27 +66,14 @@ func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
 	return nil
 }
 
-//Checks collision between view1 and view2, returning true for collision and false otherwise.
-func checkViewCollision(view1 string, view2 string) (bool, error) {
-	x10, y10, x11, y11, err := gui.ViewPosition(view1)
-	if err != nil {
-		return false, err
+//Checks if there is a collision between position and all positions in positions
+func positionsOverlap(position position, positions []position) bool {
+	for i := 1; i < len(positions); i++ {
+		if positionOverlap(position, positions[i]){
+			return true
+		}
 	}
-	x20, y20, x21, y21, err := gui.ViewPosition(view2)
-	if err != nil {
-		return false, err
-	}
-
-	Ax, Ay, Aw, Ah := x10, y10, x11-x10, y11-y10
-	Bx, By, Bw, Bh := x20, y20, x21-x20, y21-y20
-
-	if Bx+Bw > Ax &&
-		By+Bh > Ay &&
-		Ax+Aw > Bx &&
-		Ay+Ah > By {
-		return true, nil
-	}
-	return false, nil
+	return false
 }
 
 //Checks collision between position1 and position2, returning true for collision and false otherwise.
@@ -120,16 +107,7 @@ func moveSnekHead() error {
 		return gameOver()
 	}
 
-	/*headToBodyCollision := checkBodyCollision(snekHead.position)
-
-	if headToBodyCollision {
-		return gameOver()
-	}*/
-
 	headToBoxCollision := positionOverlap(snekHead.position, boxView.position)
-	/*if err != nil {
-		return err
-	}*/
 	if headToBoxCollision {
 		return collideWithBox()
 	}
@@ -161,20 +139,7 @@ func collideWithBox() error {
 func checkBodyCollision(position position) bool {
 	for i := 1; i < len(snekBodyParts); i++ {
 		collision := positionOverlap(position, snekBodyParts[i].position)
-		/*collision, err := checkViewCollision(snekBodyPart.viewName, snekBodyParts[i].viewName)
-		if err != nil {
-			return false, err
-		}*/
 		if collision {
-			return true
-		}
-	}
-	return false
-}
-
-func collision(position position, positions []position) bool {
-	for i := 1; i < len(positions); i++ {
-		if positionOverlap(position, positions[i]){
 			return true
 		}
 	}
@@ -187,7 +152,6 @@ func mainViewCollision(position position) (bool, error) {
 		return false, err
 	}
 
-	//position := snekBodyPart.position
 	xH0, yH0, xH1, yH1 := position.x0, position.y0, position.x1, position.y1
 
 	maxX, maxY, minX, minY := xG1-xG0, yG1-yG0, 0, 0
@@ -240,12 +204,6 @@ func moveHeadView(snekHead *snekBodyPart) error {
 	return nil
 }
 
-func getPositionOfNextMove(snekBodyPart snekBodyPart) position  {
-	offsetX, offsetY := calculateBodyPartOffsets2(snekBodyPart.currentDirection)
-	currentPosition := snekBodyPart.position
-	return position{currentPosition.x0+offsetX, currentPosition.y0+offsetY, currentPosition.x1+offsetX, currentPosition.y1+offsetY}
-}
-
 func getPositionOfNextMove2(currentDirection direction, currentPosition position) position  {
 	offsetX, offsetY := calculateBodyPartOffsets2(currentDirection)
 	return position{currentPosition.x0+offsetX, currentPosition.y0+offsetY, currentPosition.x1+offsetX, currentPosition.y1+offsetY}
@@ -254,23 +212,6 @@ func getPositionOfNextMove2(currentDirection direction, currentPosition position
 func getPositionOfNextMove3(currentDirection direction, currentPosition position) position  {
 	offsetX, offsetY := calculateBodyPartOffsets2(currentDirection)
 	return position{currentPosition.x0-offsetX, currentPosition.y0-offsetY, currentPosition.x1-offsetX, currentPosition.y1-offsetY}
-}
-
-func calculateBodyPartOffsets(snekBodyPart snekBodyPart) (int, int) {
-	offsetX := 0
-	offsetY := deltaY
-	switch snekBodyPart.currentDirection {
-	case directions.right:
-		offsetX = -deltaX
-		offsetY = 0
-	case directions.down:
-		offsetX = 0
-		offsetY = -deltaY
-	case directions.left:
-		offsetX = deltaX
-		offsetY = 0
-	}
-	return offsetX, offsetY
 }
 
 func calculateBodyPartOffsets2(direction direction) (int, int) {
