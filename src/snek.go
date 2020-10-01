@@ -41,29 +41,30 @@ var (
 )
 
 func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
-	x0, y0, x1, y1, err := gui.ViewPosition(currentLastSnekBodyPart.viewName)
-	if err != nil {
-		return err
-	}
 	offsetX, offsetY := calculateBodyPartOffsets2(currentLastSnekBodyPart.currentDirection)
 
 	name := fmt.Sprintf("s%v", len(snekBodyParts))
-	position := position{x0 + offsetX, y0 + offsetY, x1 + offsetX, y1 + offsetY}
-	_, err = gui.SetView(name, x0+offsetX, y0+offsetY, x1+offsetX, y1+offsetY, 0)
+	position := position{
+		currentLastSnekBodyPart.position.x0 + offsetX,
+		currentLastSnekBodyPart.position.y0 + offsetY,
+		currentLastSnekBodyPart.position.x1 + offsetX,
+		currentLastSnekBodyPart.position.y1 + offsetY,
+	}
+
+	_, err := gui.SetView(name, position.x0, position.y0, position.x1, position.y1, 0)
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
 	}
+
 	snekBodyParts = append(
 		snekBodyParts,
 		&snekBodyPart{
 			currentLastSnekBodyPart.currentDirection,
 			currentLastSnekBodyPart.previousDirection,
-			name, position})
-
-	if err := updateStat(&lengthStat, lengthStat.value+1); err != nil {
-		return err
-	}
-	return nil
+			name,
+			position,
+		})
+	return updateStat(&lengthStat, lengthStat.value+1)
 }
 
 //Checks if there is a collision between position and all positions in positions
@@ -91,9 +92,6 @@ func positionOverlap(position1 position, position2 position) bool {
 }
 
 func moveSnekHead() error {
-	snekHead.previousDirection = snekHead.currentDirection
-	snekHead.currentDirection = headDirection
-
 	err := moveHeadView(snekHead)
 	if err != nil {
 		return err
@@ -190,6 +188,9 @@ func moveSnekBodyPart(previousSnekBodyPart *snekBodyPart, currentSnekBodyPart *s
 }
 
 func moveHeadView(snekHead *snekBodyPart) error {
+	snekHead.previousDirection = snekHead.currentDirection
+	snekHead.currentDirection = headDirection
+
 	snekHead.position = getPositionOfNextMove3(snekHead.currentDirection,snekHead.position)
 	_, err := gui.SetView(
 		snekHead.viewName,

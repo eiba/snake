@@ -38,11 +38,7 @@ func createView(viewProperties viewProperties, visible bool) (*gocui.View, error
 func setViewAtRandom(name string, setCurrent bool) (position, error) {
 	x0, y0, x1, y1, err := gui.ViewPosition(gameViewName)
 	if err != nil {
-		return position{
-			x0: 0,
-			y0: 0,
-			x1: 0,
-			y1: 0}, err
+		return position{0,0,0,0}, err
 	}
 
 	maxX, maxY := x1-x0-3, y1-y0-2
@@ -51,11 +47,7 @@ func setViewAtRandom(name string, setCurrent bool) (position, error) {
 
 	_, err = gui.SetView(name, viewPosition.x0, viewPosition.y0, viewPosition.x1, viewPosition.y1, 0)
 	if err != nil && !gocui.IsUnknownView(err) {
-		return position{
-			x0: 0,
-			y0: 0,
-			x1: 0,
-			y1: 0}, err
+		return position{0,0,0,0}, err
 	}
 
 	if setCurrent {

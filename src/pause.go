@@ -22,10 +22,11 @@ func initPauseView() error {
 		pauseViewName,
 		"Pause",
 		pauseViewText,
-		position{viewPositionX,
-		viewPositionY,
-		viewPositionX + viewLenX,
-		viewPositionY + viewLenY}}
+		position{
+			viewPositionX,
+			viewPositionY,
+			viewPositionX + viewLenX,
+			viewPositionY + viewLenY}}
 	pauseView, err = createView(pauseViewProps, false)
 	return err
 }
