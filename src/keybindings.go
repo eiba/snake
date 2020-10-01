@@ -25,7 +25,9 @@ func initKeybindingsView() error {
 }
 
 func initKeybindings() error {
-	if err := initQuitKey(); err != nil {return err}
+	if err := initQuitKey(); err != nil {
+		return err
+	}
 	if err := initSpaceKey(); err != nil {
 		return err
 	}

@@ -23,7 +23,7 @@ func autopilot() error {
 		headDirection = directions.up
 	}
 	for i := 1; i < 100; i++ {
-		if validDirection(headDirection){
+		if validDirection(headDirection) {
 			break
 		}
 		headDirection = getRandomValidDirection(snekHead.currentDirection)
@@ -31,15 +31,15 @@ func autopilot() error {
 	return nil
 }
 
-func validDirection(direction direction) bool  {
+func validDirection(direction direction) bool {
 	positions := make([]position, len(snekBodyParts)-1)
 	for i := 1; i < len(snekBodyParts); i++ {
-		positions[i-1] = getPositionOfNextMove2(snekBodyParts[i-1].currentDirection,snekBodyParts[i-1].position)
+		positions[i-1] = getPositionOfNextMove(snekBodyParts[i-1].currentDirection, snekBodyParts[i-1].position, false)
 	}
-	nextPosition := getPositionOfNextMove3(direction,snekHead.position)
+	nextPosition := getPositionOfNextMove(direction, snekHead.position, true)
 
 	mainViewCollision, _ := mainViewCollision(nextPosition)
-	if positionsOverlap(nextPosition,positions) || mainViewCollision {
+	if positionsOverlap(nextPosition, positions) || mainViewCollision {
 		return false
 	}
 	return true
@@ -52,12 +52,12 @@ func directionIsValid(direction direction) bool {
 	return true
 }
 
-func getRandomValidDirection(currentDirection direction) direction  {
+func getRandomValidDirection(currentDirection direction) direction {
 	oppositeDirection := getOppositeDirection(currentDirection)
 
-	for  {
+	for {
 		direction := direction(r.Intn(4))
-		if direction != oppositeDirection && direction != headDirection{
+		if direction != oppositeDirection && direction != headDirection {
 			return direction
 		}
 	}

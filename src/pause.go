@@ -5,6 +5,7 @@ import (
 )
 
 const pauseViewName = "pause"
+
 var pauseView *gocui.View
 
 func initPauseView() error {

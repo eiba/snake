@@ -5,6 +5,7 @@ import (
 )
 
 const gameOverViewName = "gameOver"
+
 var gameOverView *gocui.View
 
 func initGameOverView() error {

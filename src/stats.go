@@ -6,6 +6,7 @@ import (
 )
 
 const statsViewName = "stats"
+
 var statsView *gocui.View
 
 type stat struct {

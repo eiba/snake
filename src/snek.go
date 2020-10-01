@@ -41,7 +41,7 @@ var (
 )
 
 func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
-	offsetX, offsetY := calculateBodyPartOffsets2(currentLastSnekBodyPart.currentDirection)
+	offsetX, offsetY := calculateOffsets(currentLastSnekBodyPart.currentDirection, false)
 
 	name := fmt.Sprintf("s%v", len(snekBodyParts))
 	position := position{
@@ -70,7 +70,7 @@ func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
 //Checks if there is a collision between position and all positions in positions
 func positionsOverlap(position position, positions []position) bool {
 	for i := 1; i < len(positions); i++ {
-		if positionOverlap(position, positions[i]){
+		if positionOverlap(position, positions[i]) {
 			return true
 		}
 	}
@@ -115,14 +115,16 @@ func moveSnekHead() error {
 func fatalCollision(position position) (bool, error) {
 	mainViewCollision, err := mainViewCollision(position)
 	if err != nil {
-		return true,err
+		return true, err
 	}
 	if mainViewCollision {
 		return true, nil
 	}
-	if checkBodyCollision(position) {return true, nil}
+	if checkBodyCollision(position) {
+		return true, nil
+	}
 
-	return false,nil
+	return false, nil
 }
 
 func collideWithBox() error {
@@ -170,7 +172,7 @@ func moveSnekBodyParts() error {
 }
 
 func moveSnekBodyPart(previousSnekBodyPart *snekBodyPart, currentSnekBodyPart *snekBodyPart) error {
-	currentSnekBodyPart.position = getPositionOfNextMove2(previousSnekBodyPart.currentDirection,previousSnekBodyPart.position)
+	currentSnekBodyPart.position = getPositionOfNextMove(previousSnekBodyPart.currentDirection, previousSnekBodyPart.position, false)
 	_, err := gui.SetView(
 		currentSnekBodyPart.viewName,
 		currentSnekBodyPart.position.x0,
@@ -191,7 +193,7 @@ func moveHeadView(snekHead *snekBodyPart) error {
 	snekHead.previousDirection = snekHead.currentDirection
 	snekHead.currentDirection = headDirection
 
-	snekHead.position = getPositionOfNextMove3(snekHead.currentDirection,snekHead.position)
+	snekHead.position = getPositionOfNextMove(snekHead.currentDirection, snekHead.position, true)
 	_, err := gui.SetView(
 		snekHead.viewName,
 		snekHead.position.x0,
@@ -205,17 +207,17 @@ func moveHeadView(snekHead *snekBodyPart) error {
 	return nil
 }
 
-func getPositionOfNextMove2(currentDirection direction, currentPosition position) position  {
-	offsetX, offsetY := calculateBodyPartOffsets2(currentDirection)
-	return position{currentPosition.x0+offsetX, currentPosition.y0+offsetY, currentPosition.x1+offsetX, currentPosition.y1+offsetY}
+func getPositionOfNextMove(currentDirection direction, currentPosition position, isHead bool) position {
+	offsetX, offsetY := calculateOffsets(currentDirection, isHead)
+	return position{currentPosition.x0 + offsetX, currentPosition.y0 + offsetY, currentPosition.x1 + offsetX, currentPosition.y1 + offsetY}
 }
 
-func getPositionOfNextMove3(currentDirection direction, currentPosition position) position  {
-	offsetX, offsetY := calculateBodyPartOffsets2(currentDirection)
-	return position{currentPosition.x0-offsetX, currentPosition.y0-offsetY, currentPosition.x1-offsetX, currentPosition.y1-offsetY}
-}
+func calculateOffsets(direction direction, isHead bool) (int, int) {
+	modifier := 1
+	if isHead {
+		modifier = -1
+	}
 
-func calculateBodyPartOffsets2(direction direction) (int, int) {
 	offsetX := 0
 	offsetY := deltaY
 	switch direction {
@@ -229,7 +231,7 @@ func calculateBodyPartOffsets2(direction direction) (int, int) {
 		offsetX = deltaX
 		offsetY = 0
 	}
-	return offsetX, offsetY
+	return modifier * offsetX, modifier * offsetY
 }
 
 func getOppositeDirection(direction direction) direction {
