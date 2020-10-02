@@ -6,11 +6,11 @@ type slot struct {
 	position position
 }
 
-func initAutopilot(gameViewPosition position) {
+func initAutopilot(gameViewPosition position) ([][]position, []position) {
 	//gameViewPosition := gameView.position
 	//snekHeadPosition := snekHead.position
 
-	_ = getPositionMatrix(gameViewPosition)
+	return getPositionMatrix(gameViewPosition)
 
 	//log.Panicln(matrix, len(matrix),len(matrix[0]))
 	//log.Panicln(gameViewPosition.x0,gameViewPosition.y0,gameViewPosition.x1,gameViewPosition.y1,len(positions))
@@ -31,23 +31,26 @@ func initAutopilot(gameViewPosition position) {
 	}*/
 
 }
-func getPositionMatrix(gameViewPosition position) [][]position {
+func getPositionMatrix(gameViewPosition position) ([][]position, []position) {
 	totalCols := gameViewPosition.x1/deltaX
 	totalRows := gameViewPosition.y1/deltaY
 	column := 0
 	positions := make([]position, totalCols*totalRows)
 	positionMatrix := make([][]position, totalCols)
+	positionSet := make(map[position]bool)
 
 	for x := 0; x < gameViewPosition.x1; x += deltaX {
 		positionMatrix[column] = make([]position, totalRows)
 		for row := 0; row < gameViewPosition.y1; row += deltaY {
 			position := position{x, row, x + deltaX, row + deltaY}
+
 			positionMatrix[column][row] = position
 			positions[(column*totalRows)+row] = position
+			positionSet[position] = true
 		}
 		column++
 	}
-	return positionMatrix
+	return positionMatrix, positions
 }
 
 func autopilot() error {

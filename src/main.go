@@ -15,6 +15,8 @@ var (
 	autoPilotEnabled = false
 	tickInterval     = 50 * time.Millisecond
 	gameView         = viewProperties{"game", "Snek", "", position{}}
+	positionMatrix   [][]position
+	positions        []position
 )
 
 func main() {
@@ -86,7 +88,7 @@ func manageGame(gui *gocui.Gui) error {
 	if err != nil {
 		log.Panicln(err)
 	}
-	initAutopilot(gameView.position)
+	positionMatrix, positions = initAutopilot(gameView.position)
 
 	if err := initPauseView(); err != nil {
 		log.Panicln(err)
