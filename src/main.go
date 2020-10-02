@@ -48,7 +48,6 @@ func initGameView(maxX int, maxY int) (position, error) {
 			return gameViewPosition, err
 		}
 		v.Title = "Snek"
-
 		if _, err := gui.SetViewOnBottom(gameView.name); err != nil {
 			return gameViewPosition, err
 		}
@@ -87,6 +86,7 @@ func manageGame(gui *gocui.Gui) error {
 	if err != nil {
 		log.Panicln(err)
 	}
+	initAutopilot(gameView.position)
 
 	if err := initPauseView(); err != nil {
 		log.Panicln(err)

@@ -1,5 +1,55 @@
 package main
 
+
+type slot struct {
+	taken    bool
+	position position
+}
+
+func initAutopilot(gameViewPosition position) {
+	//gameViewPosition := gameView.position
+	//snekHeadPosition := snekHead.position
+
+	_ = getPositionMatrix(gameViewPosition)
+
+	//log.Panicln(matrix, len(matrix),len(matrix[0]))
+	//log.Panicln(gameViewPosition.x0,gameViewPosition.y0,gameViewPosition.x1,gameViewPosition.y1,len(positions))
+
+	/*for i := 0; i < len(positions); i++ {
+		var positionsWithoutI []position
+		for j := 0; j < len(positions); j++ {
+			if j==i {
+				continue
+			}
+			positionsWithoutI = append(
+				positionsWithoutI,
+				positions[j])
+		}
+		if positionsOverlap(positions[i],positionsWithoutI){
+			log.Panicln("overlapping")
+		}
+	}*/
+
+}
+func getPositionMatrix(gameViewPosition position) [][]position {
+	totalCols := gameViewPosition.x1/deltaX
+	totalRows := gameViewPosition.y1/deltaY
+	column := 0
+	positions := make([]position, totalCols*totalRows)
+	positionMatrix := make([][]position, totalCols)
+
+	for x := 0; x < gameViewPosition.x1; x += deltaX {
+		positionMatrix[column] = make([]position, totalRows)
+		for row := 0; row < gameViewPosition.y1; row += deltaY {
+			position := position{x, row, x + deltaX, row + deltaY}
+			positionMatrix[column][row] = position
+			positions[(column*totalRows)+row] = position
+		}
+		column++
+	}
+	return positionMatrix
+}
+
 func autopilot() error {
 	xH0, yH0, _, _, err := gui.ViewPosition(snekHead.viewName)
 	if err != nil {

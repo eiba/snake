@@ -55,7 +55,6 @@ func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
 	}
-
 	snekBodyParts = append(
 		snekBodyParts,
 		&snekBodyPart{
