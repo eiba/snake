@@ -88,7 +88,7 @@ func manageGame(gui *gocui.Gui) error {
 	if err != nil {
 		log.Panicln(err)
 	}
-	positionMatrix, positions = initAutopilot(gameView.position)
+	//positionMatrix, positions = initAutopilot(gameView.position)
 
 	if err := initPauseView(); err != nil {
 		log.Panicln(err)
