@@ -82,16 +82,6 @@ func positionOverlap(position1 position, position2 position) bool {
 		 return true
 	}
 	return false
-	/*Ax, Ay, Aw, Ah := position1.x0, position1.y0, position1.x1-position1.x0, position1.y1-position1.y0
-	Bx, By, Bw, Bh := position2.x0, position2.y0, position2.x1-position2.x0, position2.y1-position2.y0
-
-	if Bx+Bw > Ax &&
-		By+Bh > Ay &&
-		Ax+Aw > Bx &&
-		Ay+Ah > By {
-		return true
-	}
-	return false*/
 }
 
 func moveSnekHead() error {
@@ -218,6 +208,14 @@ func calculateOffsets(direction direction, isHead bool) (int, int) {
 		offsetY = 0
 	}
 	return modifier * offsetX, modifier * offsetY
+}
+
+func getSnekPositionSet(snek []*snekBodyPart) map[position]bool  {
+	snekPositionSet := make(map[position]bool)
+	for _, bodyPart := range snek {
+		snekPositionSet[bodyPart.position] = true
+	}
+	return snekPositionSet
 }
 
 func getOppositeDirection(direction direction) direction {
