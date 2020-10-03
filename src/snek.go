@@ -37,7 +37,6 @@ var (
 	headDirection = direction(r.Intn(4))
 	snekHead      = &snekBodyPart{headDirection, headDirection, "s0", position{}}
 	snekBodyParts = []*snekBodyPart{snekHead}
-	foodView      = viewProperties{"food", "", "", position{}}
 )
 
 func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
@@ -78,8 +77,8 @@ func positionsOverlap(position position, positions []position) bool {
 
 //Checks collision between position1 and position2, returning true for collision and false otherwise.
 func positionOverlap(position1 position, position2 position) bool {
-	if position1 == position2{
-		 return true
+	if position1 == position2 {
+		return true
 	}
 	return false
 }
@@ -91,7 +90,7 @@ func moveSnekHead() error {
 	}
 
 	if fatalCollision(snekHead.position) {
-		return gameOver()
+		return gameOver("Game Over")
 	}
 
 	if positionOverlap(snekHead.position, foodView.position) {
@@ -105,15 +104,6 @@ func fatalCollision(position position) bool {
 		return true
 	}
 	return false
-}
-
-func eatFood() error {
-	err := addBodyPartToEnd(*snekBodyParts[len(snekBodyParts)-1])
-	if err != nil {
-		return err
-	}
-	foodView.position, err = setViewAtRandom(foodView.name, positionMatrix, false)
-	return err
 }
 
 func bodyCollision(position position) bool {
@@ -210,7 +200,7 @@ func calculateOffsets(direction direction, isHead bool) (int, int) {
 	return modifier * offsetX, modifier * offsetY
 }
 
-func getSnekPositionSet(snek []*snekBodyPart) map[position]bool  {
+func getSnekPositionSet(snek []*snekBodyPart) map[position]bool {
 	snekPositionSet := make(map[position]bool)
 	for _, bodyPart := range snek {
 		snekPositionSet[bodyPart.position] = true

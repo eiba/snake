@@ -20,7 +20,7 @@ func initGameOverView() error {
 
 	gameOverViewProperties := viewProperties{
 		gameOverViewName,
-		"Game over",
+		"",
 		"Press space to restart",
 		position{
 			viewPositionX,
@@ -32,8 +32,9 @@ func initGameOverView() error {
 	return err
 }
 
-func gameOver() error {
+func gameOver(title string) error {
 	gameOverView.Visible = true
+	gameOverView.Title = title
 	if _, err := gui.SetCurrentView(gameOverViewName); err != nil {
 		return err
 	}

@@ -60,11 +60,11 @@ func initGameView(maxX int, maxY int) (position, error) {
 
 func initGame() error {
 	var err error
-	snekHead.position, err = setViewAtRandom(snekHead.viewName, positionMatrix, true)
+	snekHead.position, err = setViewAtRandomPosition(snekHead.viewName, positionMatrix, true)
 	if err != nil {
 		return err
 	}
-	foodView.position, err = setViewAtRandom(foodView.name, positionMatrix, false)
+	foodView.position, err = setViewAtRandomPosition(foodView.name, positionMatrix, false)
 	if err != nil {
 		return err
 	}
@@ -88,7 +88,6 @@ func manageGame(gui *gocui.Gui) error {
 	if err != nil {
 		log.Panicln(err)
 	}
-	//initPositionMatrix(gameView.position)
 
 	if err := initPauseView(); err != nil {
 		log.Panicln(err)
@@ -97,6 +96,7 @@ func manageGame(gui *gocui.Gui) error {
 	if err := initGameOverView(); err != nil {
 		log.Panicln(err)
 	}
+
 	return nil
 }
 

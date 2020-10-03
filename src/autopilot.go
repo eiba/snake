@@ -6,38 +6,18 @@ type slot struct {
 }
 
 func initPositionMatrix(gameViewPosition position) {
-	//gameViewPosition := gameView.position
-	//snekHeadPosition := snekHead.position
-	gameViewCols := gameViewPosition.x1/deltaX
-	gameViewRows := gameViewPosition.y1/deltaY
+	gameViewCols := gameViewPosition.x1 / deltaX
+	gameViewRows := gameViewPosition.y1 / deltaY
 
-	if len(positionMatrix) == gameViewCols && len(positionMatrix[0]) == gameViewRows{
+	if len(positionMatrix) == gameViewCols && len(positionMatrix[0]) == gameViewRows {
 		return
 	}
 	positionMatrix = generatePositionMatrix(gameViewPosition)
-
-	//log.Panicln(matrix, len(matrix),len(matrix[0]))
-	//log.Panicln(gameViewPosition.x0,gameViewPosition.y0,gameViewPosition.x1,gameViewPosition.y1,len(positions))
-
-	/*for i := 0; i < len(positions); i++ {
-		var positionsWithoutI []position
-		for j := 0; j < len(positions); j++ {
-			if j==i {
-				continue
-			}
-			positionsWithoutI = append(
-				positionsWithoutI,
-				positions[j])
-		}
-		if positionsOverlap(positions[i],positionsWithoutI){
-			log.Panicln("overlapping")
-		}
-	}*/
-
 }
+
 func generatePositionMatrix(gameViewPosition position) [][]position {
-	totalCols := gameViewPosition.x1/deltaX
-	totalRows := gameViewPosition.y1/deltaY
+	totalCols := gameViewPosition.x1 / deltaX
+	totalRows := gameViewPosition.y1 / deltaY
 	column := 0
 	positionMatrix := make([][]position, totalCols)
 	//positions := make([]position, totalCols*totalRows)
