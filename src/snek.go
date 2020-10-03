@@ -118,7 +118,7 @@ func collideWithBox() error {
 	if err != nil {
 		return err
 	}
-	boxView.position, err = setViewAtRandom(boxView.name, false)
+	boxView.position, err = setViewAtRandom(boxView.name, positionMatrix, false)
 	return err
 }
 

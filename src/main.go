@@ -16,7 +16,6 @@ var (
 	tickInterval     = 50 * time.Millisecond
 	gameView         = viewProperties{"game", "Snek", "", position{}}
 	positionMatrix   [][]position
-	positions        []position
 )
 
 func main() {
@@ -45,6 +44,7 @@ func initGUI() *gocui.Gui {
 
 func initGameView(maxX int, maxY int) (position, error) {
 	gameViewPosition := position{0, 0, maxX - 26, maxY - 1}
+	initPositionMatrix(gameViewPosition)
 	if v, err := gui.SetView(gameView.name, gameViewPosition.x0, gameViewPosition.x0, gameViewPosition.x1, gameViewPosition.y1, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			return gameViewPosition, err
@@ -60,11 +60,11 @@ func initGameView(maxX int, maxY int) (position, error) {
 
 func initGame() error {
 	var err error
-	snekHead.position, err = setViewAtRandom(snekHead.viewName, true)
+	snekHead.position, err = setViewAtRandom(snekHead.viewName, positionMatrix, true)
 	if err != nil {
 		return err
 	}
-	boxView.position, err = setViewAtRandom(boxView.name, false)
+	boxView.position, err = setViewAtRandom(boxView.name, positionMatrix, false)
 	if err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ func manageGame(gui *gocui.Gui) error {
 	if err != nil {
 		log.Panicln(err)
 	}
-	//positionMatrix, positions = initAutopilot(gameView.position)
+	//initPositionMatrix(gameView.position)
 
 	if err := initPauseView(); err != nil {
 		log.Panicln(err)

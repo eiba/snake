@@ -1,16 +1,20 @@
 package main
 
-
 type slot struct {
 	taken    bool
 	position position
 }
 
-func initAutopilot(gameViewPosition position) ([][]position, []position) {
+func initPositionMatrix(gameViewPosition position) {
 	//gameViewPosition := gameView.position
 	//snekHeadPosition := snekHead.position
+	gameViewCols := gameViewPosition.x1/deltaX
+	gameViewRows := gameViewPosition.y1/deltaY
 
-	return getPositionMatrix(gameViewPosition)
+	if len(positionMatrix) == gameViewCols && len(positionMatrix[0]) == gameViewRows{
+		return
+	}
+	positionMatrix = generatePositionMatrix(gameViewPosition)
 
 	//log.Panicln(matrix, len(matrix),len(matrix[0]))
 	//log.Panicln(gameViewPosition.x0,gameViewPosition.y0,gameViewPosition.x1,gameViewPosition.y1,len(positions))
@@ -31,13 +35,13 @@ func initAutopilot(gameViewPosition position) ([][]position, []position) {
 	}*/
 
 }
-func getPositionMatrix(gameViewPosition position) ([][]position, []position) {
+func generatePositionMatrix(gameViewPosition position) [][]position {
 	totalCols := gameViewPosition.x1/deltaX
 	totalRows := gameViewPosition.y1/deltaY
 	column := 0
-	positions := make([]position, totalCols*totalRows)
 	positionMatrix := make([][]position, totalCols)
-	positionSet := make(map[position]bool)
+	//positions := make([]position, totalCols*totalRows)
+	//positionSet := make(map[position]bool)
 
 	for x := 0; x < gameViewPosition.x1; x += deltaX {
 		positionMatrix[column] = make([]position, totalRows)
@@ -45,12 +49,12 @@ func getPositionMatrix(gameViewPosition position) ([][]position, []position) {
 			position := position{x, row, x + deltaX, row + deltaY}
 
 			positionMatrix[column][row] = position
-			positions[(column*totalRows)+row] = position
-			positionSet[position] = true
+			//positions[(column*totalRows)+row] = position
+			//positionSet[position] = true
 		}
 		column++
 	}
-	return positionMatrix, positions
+	return positionMatrix
 }
 
 func autopilot() error {

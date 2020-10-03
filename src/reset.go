@@ -12,11 +12,11 @@ func reset() error {
 	}
 
 	var err error
-	snekHead.position, err = setViewAtRandom(snekHead.viewName, true)
+	snekHead.position, err = setViewAtRandom(snekHead.viewName, positionMatrix, true)
 	if err != nil {
 		return err
 	}
-	boxView.position, err = setViewAtRandom(boxView.name, false)
+	boxView.position, err = setViewAtRandom(boxView.name, positionMatrix, false)
 	if err != nil {
 		return err
 	}
