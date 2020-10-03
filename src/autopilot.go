@@ -62,7 +62,7 @@ func autopilot() error {
 	if err != nil {
 		return err
 	}
-	xB0, yB0, _, _, err := gui.ViewPosition(boxView.name)
+	xB0, yB0, _, _, err := gui.ViewPosition(foodView.name)
 	if err != nil {
 		return err
 	}

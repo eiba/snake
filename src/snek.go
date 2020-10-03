@@ -37,7 +37,7 @@ var (
 	headDirection = direction(r.Intn(4))
 	snekHead      = &snekBodyPart{headDirection, headDirection, "s0", position{}}
 	snekBodyParts = []*snekBodyPart{snekHead}
-	boxView       = viewProperties{"box", "", "", position{}}
+	foodView      = viewProperties{"food", "", "", position{}}
 )
 
 func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
@@ -100,29 +100,29 @@ func moveSnekHead() error {
 		return gameOver()
 	}
 
-	if positionOverlap(snekHead.position, boxView.position) {
-		return collideWithBox()
+	if positionOverlap(snekHead.position, foodView.position) {
+		return eatFood()
 	}
 	return nil
 }
 
 func fatalCollision(position position) bool {
-	if mainViewCollision(position) || checkBodyCollision(position) {
+	if mainViewCollision(position) || bodyCollision(position) {
 		return true
 	}
 	return false
 }
 
-func collideWithBox() error {
+func eatFood() error {
 	err := addBodyPartToEnd(*snekBodyParts[len(snekBodyParts)-1])
 	if err != nil {
 		return err
 	}
-	boxView.position, err = setViewAtRandom(boxView.name, positionMatrix, false)
+	foodView.position, err = setViewAtRandom(foodView.name, positionMatrix, false)
 	return err
 }
 
-func checkBodyCollision(position position) bool {
+func bodyCollision(position position) bool {
 	for i := 1; i < len(snekBodyParts); i++ {
 		collision := positionOverlap(position, snekBodyParts[i].position)
 		if collision {

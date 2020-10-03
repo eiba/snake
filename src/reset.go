@@ -16,7 +16,7 @@ func reset() error {
 	if err != nil {
 		return err
 	}
-	boxView.position, err = setViewAtRandom(boxView.name, positionMatrix, false)
+	foodView.position, err = setViewAtRandom(foodView.name, positionMatrix, false)
 	if err != nil {
 		return err
 	}
