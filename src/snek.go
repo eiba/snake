@@ -78,7 +78,11 @@ func positionsOverlap(position position, positions []position) bool {
 
 //Checks collision between position1 and position2, returning true for collision and false otherwise.
 func positionOverlap(position1 position, position2 position) bool {
-	Ax, Ay, Aw, Ah := position1.x0, position1.y0, position1.x1-position1.x0, position1.y1-position1.y0
+	if position1 == position2{
+		 return true
+	}
+	return false
+	/*Ax, Ay, Aw, Ah := position1.x0, position1.y0, position1.x1-position1.x0, position1.y1-position1.y0
 	Bx, By, Bw, Bh := position2.x0, position2.y0, position2.x1-position2.x0, position2.y1-position2.y0
 
 	if Bx+Bw > Ax &&
@@ -87,7 +91,7 @@ func positionOverlap(position1 position, position2 position) bool {
 		Ay+Ah > By {
 		return true
 	}
-	return false
+	return false*/
 }
 
 func moveSnekHead() error {

@@ -37,15 +37,27 @@ func createView(viewProperties viewProperties, visible bool) (*gocui.View, error
 func setViewAtRandom(name string, positionMatrix [][]position, setCurrent bool) (position, error) {
 	randomPosition := positionMatrix[r.Intn(len(positionMatrix))][r.Intn(len(positionMatrix[0]))]
 
-	_, err := gui.SetView(name, randomPosition.x0, randomPosition.y0, randomPosition.x1, randomPosition.y1, 0)
-	if err != nil && !gocui.IsUnknownView(err) {
-		return position{}, err
-	}
+	if err := setViewPosition(name, randomPosition); err != nil {return position{}, err}
 
 	if setCurrent {
-		if _, err = gui.SetCurrentView(name); err != nil {
+		if  err := setCurrentView(name); err != nil {
 			return position{}, err
 		}
 	}
 	return randomPosition, nil
+}
+
+func setViewPosition(name string, position position) error{
+	_, err := gui.SetView(name, position.x0, position.y0, position.x1, position.y1, 0)
+	if err != nil && !gocui.IsUnknownView(err) {
+		return  err
+	}
+	return nil
+}
+
+func setCurrentView(name string) error{
+	if _, err := gui.SetCurrentView(name); err != nil {
+		return err
+	}
+	return nil
 }
