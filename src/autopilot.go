@@ -8,7 +8,6 @@ type slot struct {
 func initPositionMatrix(gameViewPosition position) {
 	gameViewCols := gameViewPosition.x1 / deltaX
 	gameViewRows := gameViewPosition.y1 / deltaY
-
 	if len(positionMatrix) == gameViewCols && len(positionMatrix[0]) == gameViewRows {
 		return
 	}
@@ -35,6 +34,21 @@ func generatePositionMatrix(gameViewPosition position) [][]position {
 		column++
 	}
 	return positionMatrix
+}
+
+func generateMaze(positionMatrix [][]position, snekHead *snekBodyPart) []direction  {
+	numNodes := len(positionMatrix)*len(positionMatrix[0])
+	tour := make([]direction,numNodes)
+	tour[0] = snekHead.currentDirection
+
+	for i := 1; i < numNodes; i++ {
+		tour[i] = getNextDirection(tour[i-1])
+	}
+	return tour
+}
+
+func getNextDirection(previousDirection direction) direction {
+	return previousDirection
 }
 
 func autopilot() error {

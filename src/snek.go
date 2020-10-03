@@ -211,3 +211,7 @@ func getSnekPositionSet(snek []*snekBodyPart) map[position]bool {
 func getOppositeDirection(direction direction) direction {
 	return (direction + 2) % 4
 }
+
+func getValidDirections(currentDirection direction) []direction {
+	return []direction{currentDirection, (currentDirection + 1) % 4, (currentDirection + 3) % 4}
+}
