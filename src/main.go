@@ -53,7 +53,14 @@ func initGameView(maxX int, maxY int) (position, error) {
 		if _, err := gui.SetViewOnBottom(gameView.name); err != nil {
 			return gameViewPosition, err
 		}
-		return gameViewPosition, initGame()
+		err = initGame()
+		hamiltonianCycle := generateHamiltonianCycle(positionMatrix,snekHead)
+		log.Panicln(hamiltonianCycle)
+		//log.Panicln(hamiltonianCycle)
+		/*for i, n := range hamiltonianCycle {
+			setViewPosition(string(i),n.position)
+		}*/
+		return gameViewPosition, err
 	}
 	return gameViewPosition, nil
 }
