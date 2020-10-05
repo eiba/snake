@@ -207,10 +207,31 @@ func getPositionVertices(col int, row int, cols int, rows int) []direction {
 }
 
 func autopilot2() error  {
-	headPostion := snekHead.position
-	hCycleIndex := cycleIndexMap[headPostion]
-	cycleNode := hCycle[hCycleIndex]
-	headDirection = cycleNode.direction
+	headPosition := snekHead.position
+	headCycleIndex := cycleIndexMap[headPosition]
+	headCycleNode := hCycle[headCycleIndex]
+	headDirection = headCycleNode.direction
+
+	foodPosition  := foodView.position
+	foodCycleIndex := cycleIndexMap[foodPosition]
+
+	snekPositionSet := getSnekPositionSet(snekBodyParts)
+	if foodCycleIndex > headCycleIndex {
+		for i := headCycleIndex+1; i < foodCycleIndex; i++ {
+			if  snekPositionSet[hCycle[i].position] {
+				return nil
+			}
+		}
+		autopilot()
+	}else{
+		/*for i := 0; i < headCycleIndex; i++ {
+			if  snekPositionSet[hCycle[i].position] {
+				return nil
+			}
+		}
+		autopilot()*/
+	}
+
 	return nil
 }
 
