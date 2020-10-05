@@ -21,10 +21,10 @@ var (
 )
 
 func initStatsView() error {
-	maxX, _ := gui.Size()
+	maxX  := gameView.position.x1
 
 	var err error
-	statsView, err = gui.SetView(statsViewName, maxX-25, 9, maxX-1, 12, 0)
+	statsView, err = gui.SetView(statsViewName, maxX+2, 9, maxX+26, 12, 0)
 	if err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err

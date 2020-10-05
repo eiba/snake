@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"math"
 )
 
@@ -31,12 +32,12 @@ func initHamiltonianCycle(gameViewPosition position) error  {
 	}
 
 	if err := loading(true); err != nil{
-		return err
+		log.Panicln(err)
 	}
 	hCycle = generateHamiltonianCycle(positionMatrix)
 	cycleIndexMap = generateHamiltonianCycleIndexMap(hCycle)
 	if err := loading(false); err != nil{
-		return err
+		log.Panicln(err)
 	}
 	return nil
 }

@@ -7,8 +7,8 @@ import (
 )
 
 func initKeybindingsView() error {
-	maxX, _ := gui.Size()
-	if v, err := gui.SetView("keybindings", maxX-25, 0, maxX-1, 8, 0); err != nil {
+	maxX  := gameView.position.x1
+	if v, err := gui.SetView("keybindings", maxX+2, 0, maxX+26, 8, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}

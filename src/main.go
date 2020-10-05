@@ -12,7 +12,7 @@ var (
 	r                = rand.New(rand.NewSource(time.Now().UnixNano()))
 	running          = true
 	gameFinished     = false
-	autoPilotEnabled = true
+	autoPilotEnabled = false
 	tickInterval     = 50 * time.Millisecond
 	gameView         = viewProperties{"game", "Snek", "", position{}}
 	positionMatrix   [][]position
@@ -124,9 +124,9 @@ func manageGame(gui *gocui.Gui) error {
 
 func updateMovement() {
 	for {
+		time.Sleep(tickInterval)
 		initPositionMatrix(gameView.position)
 		initHamiltonianCycle(gameView.position)
-		time.Sleep(tickInterval)
 		if !running {
 			continue
 		}
