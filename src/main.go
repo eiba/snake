@@ -116,12 +116,17 @@ func manageGame(gui *gocui.Gui) error {
 		log.Panicln(err)
 	}
 
+	if err := initLoadingView(); err != nil {
+		log.Panicln(err)
+	}
 	return nil
 }
 
 func updateMovement() {
 	for {
-		initHamiltonianCycle(gameView.position)
+		if err := initHamiltonianCycle(gameView.position); err != nil {
+			log.Panicln(err)
+		}
 		initPositionMatrix(gameView.position)
 		time.Sleep(tickInterval)
 		if !running {

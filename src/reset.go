@@ -27,6 +27,7 @@ func reset() error {
 
 	gameOverView.Visible = false
 	pauseView.Visible = false
+	loadingView.Visible = false
 	gameFinished = false
 
 	if err := updateStat(&restartStat, restartStat.value+1); err != nil {

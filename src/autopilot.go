@@ -23,14 +23,22 @@ func initPositionMatrix(gameViewPosition position) {
 	positionMatrix = generatePositionMatrix(gameViewPosition)
 }
 
-func initHamiltonianCycle(gameViewPosition position)  {
+func initHamiltonianCycle(gameViewPosition position) error  {
 	gameViewCols := gameViewPosition.x1 / deltaX
 	gameViewRows := gameViewPosition.y1 / deltaY
 	if len(hCycle)-1 == gameViewCols*gameViewRows || !autoPilotEnabled{
-		return
+		return nil
+	}
+
+	if err := loading(true); err != nil{
+		return err
 	}
 	hCycle = generateHamiltonianCycle(positionMatrix)
 	cycleIndexMap = generateHamiltonianCycleIndexMap(hCycle)
+	if err := loading(false); err != nil{
+		return err
+	}
+	return nil
 }
 
 func generatePositionMatrix(gameViewPosition position) [][]position {
@@ -47,7 +55,6 @@ func generatePositionMatrix(gameViewPosition position) [][]position {
 			positionMatrix[col][row] = position
 		}
 	}
-	//	log.Panicln(len(positionMatrix),len(positionMatrix[0]),gameViewPosition)
 	return positionMatrix
 }
 
