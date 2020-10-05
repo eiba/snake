@@ -13,7 +13,7 @@ var (
 	running          = true
 	gameFinished     = false
 	autoPilotEnabled = true
-	tickInterval     = time.Millisecond
+	tickInterval     = 50 * time.Millisecond
 	gameView         = viewProperties{"game", "Snek", "", position{}}
 	positionMatrix   [][]position
 )
@@ -43,10 +43,7 @@ func initGUI() *gocui.Gui {
 }
 
 func initGameView(maxX int, maxY int) (position, error) {
-	gameViewPosition := calculateGameViewPosition(maxX,maxY)
-	//log.Panicln(gameViewPosition)
-	//log.Panicln(gameViewPosition)
-	initPositionMatrix(gameViewPosition)
+	gameViewPosition := calculateGameViewPosition(maxX, maxY)
 	if v, err := gui.SetView(gameView.name, gameViewPosition.x0, gameViewPosition.x0, gameViewPosition.x1, gameViewPosition.y1, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			return gameViewPosition, err
@@ -55,33 +52,26 @@ func initGameView(maxX int, maxY int) (position, error) {
 		if _, err := gui.SetViewOnBottom(gameView.name); err != nil {
 			return gameViewPosition, err
 		}
-		//err = initGame()
-		hCycle = generateHamiltonianCycle(positionMatrix,snekHead)
-		cycleIndexMap = generateHamiltonianCycleIndexMap(hCycle)
-		//log.Panicln(hamiltonianCycle)
-		//log.Panicln(hamiltonianCycle)
-		/*for i, n := range hamiltonianCycle {
-			setViewPosition(string(i),n.position)
-		}*/
+		initPositionMatrix(gameViewPosition)
 		return gameViewPosition, initGame()
 	}
 	return gameViewPosition, nil
 }
 
-func calculateGameViewPosition(maxX int, maxY int) position  {
+func calculateGameViewPosition(maxX int, maxY int) position {
 	defaultPosition := position{0, 0, maxX - 26, maxY - 1}
 
-	if defaultPosition.x1 % 2 != 0 {
+	if defaultPosition.x1%2 != 0 {
 		defaultPosition.x1--
 	}
-	if (defaultPosition.x1/deltaX) % 2 != 0{
+	if (defaultPosition.x1/deltaX)%2 != 0 {
 		defaultPosition.x1 = defaultPosition.x1 - deltaX
 	}
 
-	if defaultPosition.y1 % 2 != 0 {
+	if defaultPosition.y1%2 != 0 {
 		defaultPosition.y1--
 	}
-	if (defaultPosition.y1/deltaY) % 2 != 0 {
+	if (defaultPosition.y1/deltaY)%2 != 0 {
 		defaultPosition.y1 = defaultPosition.y1 - deltaY
 	}
 	return defaultPosition
@@ -131,6 +121,8 @@ func manageGame(gui *gocui.Gui) error {
 
 func updateMovement() {
 	for {
+		initHamiltonianCycle(gameView.position)
+		initPositionMatrix(gameView.position)
 		time.Sleep(tickInterval)
 		if !running {
 			continue

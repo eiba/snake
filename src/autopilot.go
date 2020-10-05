@@ -23,6 +23,16 @@ func initPositionMatrix(gameViewPosition position) {
 	positionMatrix = generatePositionMatrix(gameViewPosition)
 }
 
+func initHamiltonianCycle(gameViewPosition position)  {
+	gameViewCols := gameViewPosition.x1 / deltaX
+	gameViewRows := gameViewPosition.y1 / deltaY
+	if len(hCycle)-1 == gameViewCols*gameViewRows || !autoPilotEnabled{
+		return
+	}
+	hCycle = generateHamiltonianCycle(positionMatrix)
+	cycleIndexMap = generateHamiltonianCycleIndexMap(hCycle)
+}
+
 func generatePositionMatrix(gameViewPosition position) [][]position {
 	totalCols := gameViewPosition.x1 / deltaX
 	totalRows := gameViewPosition.y1 / deltaY
@@ -37,11 +47,11 @@ func generatePositionMatrix(gameViewPosition position) [][]position {
 			positionMatrix[col][row] = position
 		}
 	}
-	//log.Panicln(len(positionMatrix),len(positionMatrix[0]),gameViewPosition)
+	//	log.Panicln(len(positionMatrix),len(positionMatrix[0]),gameViewPosition)
 	return positionMatrix
 }
 
-func generateHamiltonianCycle(positionMatrix [][]position, snekHead *snekBodyPart) []node {
+func generateHamiltonianCycle(positionMatrix [][]position) []node {
 	vertexGraph := generateVertexGraph(positionMatrix)
 	numNodes := len(positionMatrix) * len(positionMatrix[0])
 	//log.Panicln(len(positionMatrix),len(positionMatrix[0]))
@@ -234,7 +244,7 @@ func autopilot2() error  {
 		if nextPositionCycleIndex > headCycleIndex && nextPositionCycleIndex > tailCycleIndex && nextPositionCycleIndex > highestValidIndex  && nextPositionCycleIndex < foodCycleIndex{
 			highestValidIndex = nextPositionCycleIndex
 			headDirection = nextPosition.direction
-		}else if headCycleIndex > foodCycleIndex && nextPositionCycleIndex < foodCycleIndex && nextPositionCycleIndex < tailCycleIndex{
+		}else if headCycleIndex > foodCycleIndex && nextPositionCycleIndex < foodCycleIndex && nextPositionCycleIndex < tailCycleIndex && validDirection(nextPosition.direction){
 			headDirection = nextPosition.direction
 			break
 		}
