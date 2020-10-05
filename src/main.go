@@ -13,7 +13,7 @@ var (
 	running          = true
 	gameFinished     = false
 	autoPilotEnabled = true
-	tickInterval     = 10 * time.Millisecond
+	tickInterval     = time.Millisecond
 	gameView         = viewProperties{"game", "Snek", "", position{}}
 	positionMatrix   [][]position
 )
@@ -129,7 +129,7 @@ func updateMovement() {
 			continue
 		}
 		if autoPilotEnabled {
-			err := autopilot()
+			err := autopilot2()
 			if err != nil {
 				log.Panicln(err)
 			}

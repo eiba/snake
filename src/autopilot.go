@@ -206,6 +206,14 @@ func getPositionVertices(col int, row int, cols int, rows int) []direction {
 	return []direction{directions.up, directions.right, directions.down, directions.left}
 }
 
+func autopilot2() error  {
+	headPostion := snekHead.position
+	hCycleIndex := cycleIndexMap[headPostion]
+	cycleNode := hCycle[hCycleIndex]
+	headDirection = cycleNode.direction
+	return nil
+}
+
 func autopilot() error {
 	xH0, yH0, _, _, err := gui.ViewPosition(snekHead.viewName)
 	if err != nil {
