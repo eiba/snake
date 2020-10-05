@@ -212,10 +212,22 @@ func autopilot2() error  {
 	headCycleNode := hCycle[headCycleIndex]
 	headDirection = headCycleNode.direction
 
+
 	foodPosition  := foodView.position
 	foodCycleIndex := cycleIndexMap[foodPosition]
 
-	snekPositionSet := getSnekPositionSet(snekBodyParts)
+	tailPosition  := snekBodyParts[len(snekBodyParts)-1].position
+	tailCycleIndex := cycleIndexMap[tailPosition]
+
+	validNextPositions := getPositionOfDirection(snekHead.currentDirection, snekHead.position, positionMatrix)
+
+	for _, nextPosition := range validNextPositions {
+		nextPositionCycleIndex := cycleIndexMap[nextPosition.position]
+		if nextPositionCycleIndex > headCycleIndex && nextPositionCycleIndex > tailCycleIndex && nextPositionCycleIndex < foodCycleIndex{
+			headDirection = nextPosition.direction
+		}
+	}
+	/*snekPositionSet := getSnekPositionSet(snekBodyParts)
 	if foodCycleIndex > headCycleIndex {
 		for i := headCycleIndex+1; i < foodCycleIndex; i++ {
 			if  snekPositionSet[hCycle[i].position] {
@@ -229,10 +241,38 @@ func autopilot2() error  {
 				return nil
 			}
 		}
-		autopilot()*/
-	}
+		autopilot()
+	}*/
 
 	return nil
+}
+
+func getPositionOfDirection(currentDirection direction, currentPosition position, positionMatrix [][]position) []node  {
+	currentCol, currentRow := currentPosition.x0/deltaX, currentPosition.y0/deltaY
+
+	positionVetrices := getPositionVertices(currentCol,currentRow,len(positionMatrix),len(positionMatrix[0]))
+
+	var possibleNextPositions []node
+	for _, possibleDirection := range positionVetrices {
+		if possibleDirection == currentDirection {
+			continue
+		}
+		nextCol, nextRow := currentCol,currentRow
+		switch possibleDirection {
+		case directions.up:
+			nextRow = currentRow-1
+		case directions.right:
+			nextCol = currentCol+1
+		case directions.down:
+			nextRow = currentRow+1
+		case directions.left:
+			nextCol = currentCol-1
+		}
+		possibleNextPositions = append(
+			possibleNextPositions,
+			node{possibleDirection,positionMatrix[nextCol][nextRow]})
+	}
+	return possibleNextPositions
 }
 
 func autopilot() error {
