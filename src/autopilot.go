@@ -1,5 +1,7 @@
 package main
 
+import "math"
+
 type node struct {
 	direction direction
 	position  position
@@ -210,7 +212,9 @@ func autopilot2() error  {
 	headPosition := snekHead.position
 	headCycleIndex := cycleIndexMap[headPosition]
 	headCycleNode := hCycle[headCycleIndex]
-	headDirection = headCycleNode.direction
+	if headCycleNode.direction != getOppositeDirection(snekHead.currentDirection) {
+		headDirection = headCycleNode.direction
+	}
 
 
 	foodPosition  := foodView.position
@@ -223,28 +227,23 @@ func autopilot2() error  {
 
 	for _, nextPosition := range validNextPositions {
 		nextPositionCycleIndex := cycleIndexMap[nextPosition.position]
-		if nextPositionCycleIndex > headCycleIndex && nextPositionCycleIndex > tailCycleIndex && nextPositionCycleIndex < foodCycleIndex{
+		highestValidIndex := headCycleIndex
+		if nextPositionCycleIndex > headCycleIndex && nextPositionCycleIndex > tailCycleIndex && nextPositionCycleIndex > highestValidIndex  && nextPositionCycleIndex < foodCycleIndex{
+			highestValidIndex = nextPositionCycleIndex
+			headDirection = nextPosition.direction
+		}
+		if headCycleIndex > foodCycleIndex && nextPositionCycleIndex < foodCycleIndex/*calculatePositionDistance(nextPosition.position,foodPosition) < calculatePositionDistance(headPosition,foodPosition)*/{
 			headDirection = nextPosition.direction
 		}
 	}
-	/*snekPositionSet := getSnekPositionSet(snekBodyParts)
-	if foodCycleIndex > headCycleIndex {
-		for i := headCycleIndex+1; i < foodCycleIndex; i++ {
-			if  snekPositionSet[hCycle[i].position] {
-				return nil
-			}
-		}
-		autopilot()
-	}else{
-		/*for i := 0; i < headCycleIndex; i++ {
-			if  snekPositionSet[hCycle[i].position] {
-				return nil
-			}
-		}
-		autopilot()
-	}*/
-
 	return nil
+}
+
+func calculatePositionDistance(position1 position, position2 position) int  {
+	position1Col, position1Row := position1.x0/deltaX, position1.y0/deltaY
+	position2Col, position2Row := position2.x0/deltaX, position2.y0/deltaY
+
+	return int(math.Abs(float64(position1Col-position2Col)) + math.Abs(float64(position1Row - position2Row)))
 }
 
 func getPositionOfDirection(currentDirection direction, currentPosition position, positionMatrix [][]position) []node  {
@@ -254,7 +253,7 @@ func getPositionOfDirection(currentDirection direction, currentPosition position
 
 	var possibleNextPositions []node
 	for _, possibleDirection := range positionVetrices {
-		if possibleDirection == currentDirection {
+		if possibleDirection == getOppositeDirection(currentDirection) {
 			continue
 		}
 		nextCol, nextRow := currentCol,currentRow

@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"math"
 	"math/rand"
 	"time"
 )
@@ -39,7 +40,7 @@ const (
 )
 
 var (
-	gameViewPosition = position{0, 0, 88 * deltaX, 68}
+	gameViewPosition = position{0, 0, 20 * deltaX, 10}
 	positionMatrix   = generatePositionMatrix(gameViewPosition)
 	snekHead         = &snekBodyPart{directions.up, directions.up, "s0", positionMatrix[0][0]}
 	directions       = movementDirections{0, 1, 2, 3}
@@ -51,7 +52,7 @@ func main() {
 	//positionMatrix := generatePositionMatrix(gameViewPosition)*
 	//vertexGraph := generateVertexGraph(positionMatrix)
 
-	//cycle := generateHamiltonianCycle(positionMatrix, snekHead)
+	//_ = generateHamiltonianCycle(positionMatrix, snekHead)
 	//log.Println(cycle)
 	/*directions := getPositionVertices(1,1,10,10)
 	directions2 := getPositionVertices(1,1,10,10)
@@ -59,9 +60,17 @@ func main() {
 	shuffleDirections(directions)
 	log.Println(directions)
 	log.Println(directions2)*/
-	log.Println(calculateGameViewPosition(40,30))
-
+	//log.Println(calculateGameViewPosition(40,30))
+	log.Println(calculatePositionDistance(position{0,0,0,0},position{5,5,0,0}))
 }
+
+func calculatePositionDistance(position1 position, position2 position) int  {
+	position1Col, position1Row := position1.x0/deltaX, position1.y0/deltaY
+	position2Col, position2Row := position2.x0/deltaX, position2.y0/deltaY
+
+	return int(math.Abs(float64(position1Col-position2Col)) + math.Abs(float64(position1Row - position2Row)))
+}
+
 func calculateGameViewPosition(maxX int, maxY int) position  {
 	defaultPosition := position{0, 0, maxX - 26, maxY - 1}
 	log.Println(defaultPosition)
@@ -105,7 +114,7 @@ func generateVertexGraph(positionMatrix [][]position) [][][]direction {
 	for col := range positionMatrix {
 		vertexGraph[col] = make([][]direction, rows)
 		for row := range vertexGraph[col] {
-			vertexGraph[col][row] = getPositionVertices(col, row, cols, rows)
+			vertexGraph[col][row] = getPositionVertices2(col, row, cols, rows)
 		}
 	}
 	return vertexGraph
@@ -116,7 +125,7 @@ func generateHamiltonianCycle(positionMatrix [][]position, snekHead *snekBodyPar
 	numNodes := len(positionMatrix) * len(positionMatrix[0])
 	startCol, startRow := snekHead.position.x0/deltaX, snekHead.position.y0/deltaY
 	startPosition := positionMatrix[startCol][startRow]
-	directions := getPositionVertices(startCol, startRow, len(positionMatrix), len(positionMatrix[0]))
+	directions := getPositionVertices2(startCol, startRow, len(positionMatrix), len(positionMatrix[0]))
 	var tour []node
 	//for i := range directions {
 		tour = make([]node, numNodes+1)
@@ -142,7 +151,7 @@ func hamiltonianCycle(usedPositions map[position]bool, tour []node, moveNumber i
 	usedPositionsCopy := copyPositionMapMap(usedPositions)
 	usedPositionsCopy[nextPosition] = true
 	validVertices := vertexGraph[nextCol][nextRow]
-
+	shuffleDirections(validVertices)
 	for _, nextDirection := range validVertices {
 		if nextDirection == getOppositeDirection(previousNode.direction) {
 			continue
@@ -212,6 +221,34 @@ func getPositionVertices(col int, row int, cols int, rows int) []direction {
 		return []direction{directions.up, directions.right, directions.left}
 	}
 	return []direction{directions.up, directions.right, directions.down, directions.left}
+}
+
+func getPositionVertices2(col int, row int, cols int, rows int) []direction {
+	if col == 0 && row == 0 {
+		return []direction{directions.right, directions.down}
+	}
+	if col == 0 && row == rows-1 {
+		return []direction{directions.up, directions.right}
+	}
+	if col == cols-1 && row == 0 {
+		return []direction{directions.left, directions.down}
+	}
+	if col == cols-1 && row == rows-1 {
+		return []direction{directions.up, directions.left}
+	}
+	if col == 0 {
+		return []direction{directions.up, directions.down, directions.right}
+	}
+	if col == cols-1 {
+		return []direction{directions.down, directions.up, directions.left}
+	}
+	if row == 0 {
+		return []direction{directions.right,directions.left, directions.down}
+	}
+	if row == rows-1 {
+		return []direction{directions.up, directions.right, directions.left}
+	}
+	return []direction{directions.left,directions.up, directions.down, directions.right}
 }
 
 func shuffleDirections(directions []direction) {
