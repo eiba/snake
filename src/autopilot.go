@@ -212,6 +212,7 @@ func autopilot2() error  {
 	headPosition := snekHead.position
 	headCycleIndex := cycleIndexMap[headPosition]
 	headCycleNode := hCycle[headCycleIndex]
+
 	if headCycleNode.direction != getOppositeDirection(snekHead.currentDirection) {
 		headDirection = headCycleNode.direction
 	}
@@ -231,11 +232,15 @@ func autopilot2() error  {
 		if nextPositionCycleIndex > headCycleIndex && nextPositionCycleIndex > tailCycleIndex && nextPositionCycleIndex > highestValidIndex  && nextPositionCycleIndex < foodCycleIndex{
 			highestValidIndex = nextPositionCycleIndex
 			headDirection = nextPosition.direction
-		}
-		if headCycleIndex > foodCycleIndex && nextPositionCycleIndex < foodCycleIndex/*calculatePositionDistance(nextPosition.position,foodPosition) < calculatePositionDistance(headPosition,foodPosition)*/{
+		}else if headCycleIndex > foodCycleIndex && nextPositionCycleIndex < foodCycleIndex && nextPositionCycleIndex < tailCycleIndex /*calculatePositionDistance(nextPosition.position,foodPosition) < calculatePositionDistance(headPosition,foodPosition)*/{
 			headDirection = nextPosition.direction
+			break
 		}
 	}
+	if !validDirection(headDirection){
+		headDirection = getRandomValidDirection(snekHead.currentDirection)
+	}
+
 	return nil
 }
 
