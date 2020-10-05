@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+	"math/rand"
+	"time"
 )
 
 type snekBodyPart struct {
@@ -32,24 +34,36 @@ type node struct {
 }
 
 const (
-	deltaX = 2
+	deltaX = 1
 	deltaY = 1
 )
 
 var (
-	gameViewPosition = position{0, 0, 100*deltaX, 100}
-	positionMatrix = generatePositionMatrix(gameViewPosition)
-	snekHead   = &snekBodyPart{directions.up, directions.up, "s0", positionMatrix[1][0]}
-	directions    = movementDirections{0, 1, 2, 3}
+	gameViewPosition = position{0, 0, 100 * deltaX, 100}
+	positionMatrix   = generatePositionMatrix(gameViewPosition)
+	snekHead         = &snekBodyPart{directions.up, directions.up, "s0", positionMatrix[0][0]}
+	directions       = movementDirections{0, 1, 2, 3}
+	r                = rand.New(rand.NewSource(time.Now().UnixNano()))
+	k                = 0
 )
 
 func main() {
-	//positionMatrix := generatePositionMatrix(gameViewPosition)
+	//positionMatrix := generatePositionMatrix(gameViewPosition)*
 	//vertexGraph := generateVertexGraph(positionMatrix)
 
-	_ = generateHamiltonianCycle(positionMatrix,snekHead)
+	_ = generateHamiltonianCycle(positionMatrix, snekHead)
+
+	/*directions := getPositionVertices(1,1,10,10)
+	directions2 := getPositionVertices(1,1,10,10)
+	log.Println(directions)
+	shuffleDirections(directions)
+	log.Println(directions)
+	log.Println(directions2)*/
 }
 
+func test(list []int)  {
+	list[0] = 1
+}
 func generatePositionMatrix(gameViewPosition position) [][]position {
 	totalCols := gameViewPosition.x1 / deltaX
 	totalRows := gameViewPosition.y1 / deltaY
@@ -58,9 +72,9 @@ func generatePositionMatrix(gameViewPosition position) [][]position {
 	for col := range positionMatrix {
 		positionMatrix[col] = make([]position, totalRows)
 		for row := range positionMatrix[col] {
-			x0 := col*deltaX
-			y0 := row*deltaY
-			position := position{x0, y0, x0+deltaX, y0 + deltaY}
+			x0 := col * deltaX
+			y0 := row * deltaY
+			position := position{x0, y0, x0 + deltaX, y0 + deltaY}
 			positionMatrix[col][row] = position
 		}
 	}
@@ -84,54 +98,66 @@ func generateVertexGraph(positionMatrix [][]position) [][][]direction {
 func generateHamiltonianCycle(positionMatrix [][]position, snekHead *snekBodyPart) []node {
 	vertexGraph := generateVertexGraph(positionMatrix)
 	numNodes := len(positionMatrix) * len(positionMatrix[0])
-	tour := make([]node, numNodes+1)
-	log.Println("Tour length:", len(tour))
 	startCol, startRow := snekHead.position.x0/deltaX, snekHead.position.y0/deltaY
 	startPosition := positionMatrix[startCol][startRow]
-	directions := getPositionVertices(startCol,startRow,len(positionMatrix),len(positionMatrix[0]))
-
-	for i := range directions {
-		tour[0] = node{directions[i], startPosition}
+	directions := getPositionVertices(startCol, startRow, len(positionMatrix), len(positionMatrix[0]))
+	var tour []node
+	//for i := range directions {
+		tour = make([]node, numNodes+1)
+		tour[0] = node{directions[0], startPosition}
 		tour[numNodes] = tour[0]
 		usedPositions := make(map[position]bool)
 		usedPositions[startPosition] = true
+		k=0
 		tour = h(usedPositions, tour, 1, numNodes, vertexGraph, positionMatrix)
-
-		if isNeighbours(tour[numNodes-1].position,tour[0].position) {
-			break
+		log.Println(k)
+		if isNeighbours(tour[numNodes-1].position, tour[0].position) {
+			log.Println("Hamiltonian cycle found")
+			//break
 		}
-	}
+	//}
 	log.Println(tour)
 	return tour
 }
 
 func h(usedPositions map[position]bool, tour []node, moveNumber int, totalMoves int, vertexGraph [][][]direction, positionMatrix [][]position) []node {
-	/*if moveNumber == totalMoves && isNeighbours(tour[totalMoves-1].position,tour[0].position){
-		log.Println(totalMoves, "completed")
-		tour[totalMoves] = tour[0]
+	previousNode := tour[moveNumber-1]
+
+	/*if isNeighbours(tour[totalMoves-1].position, tour[0].position) {
 		return tour
 	}*/
-	log.Println(moveNumber)
-	previousNode := tour[moveNumber-1]
 	nextCol, nextRow := getNextPosition(previousNode)
 	nextPosition := positionMatrix[nextCol][nextRow]
-
+	//tour[moveNumber-1] = currentNode
+	//log.Println(usedPositions)
 	if usedPositions[nextPosition] {
-		log.Println(nextPosition, "already taken")
+		//log.Println("Used position",nextPosition)
 		return tour
 	}
-	usedPositions[nextPosition] = true
-	for _, nextDirection := range vertexGraph[nextCol][nextRow] {
+	k++
+	usedPositions2 := make(map[position]bool)
+	for k,v := range usedPositions {
+		usedPositions2[k] = v
+	}
+	//log.Println(k)
+	//log.Println(moveNumber)
+
+	usedPositions2[nextPosition] = true
+	validVertices := vertexGraph[nextCol][nextRow]
+	//shuffleDirections(validVertices)
+	for _, nextDirection := range validVertices {
 		if nextDirection == getOppositeDirection(previousNode.direction) {
 			continue
 		}
-		if isNeighbours(tour[totalMoves-1].position,tour[0].position) {
-			log.Println(totalMoves, "completed")
+		//log.Println("trying direction",nextDirection)
+		if isNeighbours(tour[totalMoves-1].position, tour[0].position) {
 			return tour
-		}else{
+		} else {
 			nextNode := node{nextDirection, nextPosition}
 			tour[moveNumber] = nextNode
-			tour = h(usedPositions, tour, moveNumber+1, totalMoves, vertexGraph, positionMatrix)
+			//k++
+			tour = h(usedPositions2, tour, moveNumber+1, totalMoves, vertexGraph, positionMatrix)
+			//log.Println(tour)
 		}
 	}
 	return tour
@@ -140,22 +166,31 @@ func h(usedPositions map[position]bool, tour []node, moveNumber int, totalMoves 
 func getNextPosition(currentNode node) (int, int) {
 	currentCol, currentRow := currentNode.position.x0/deltaX, currentNode.position.y0/deltaY
 
-	var nextCol, nextRow int
 	switch currentNode.direction {
-	case directions.right:
-		nextCol = currentCol + 1
-		nextRow = currentRow
-	case directions.left:
-		nextCol = currentCol - 1
-		nextRow = currentRow
 	case directions.up:
-		nextCol = currentCol
-		nextRow = currentRow - 1
+		currentRow--
+	case directions.right:
+		currentCol++
 	case directions.down:
-		nextCol = currentCol
-		nextRow = currentRow + 1
+		currentRow++
+	case directions.left:
+		currentCol--
 	}
-	return nextCol, nextRow
+	return currentCol, currentRow
+}
+
+func getNextPosition2(currentCol int, currentRow int, currentDirection direction) (int, int) {
+	switch currentDirection {
+	case directions.up:
+		currentRow--
+	case directions.right:
+		currentCol++
+	case directions.down:
+		currentRow++
+	case directions.left:
+		currentCol--
+	}
+	return currentCol, currentRow
 }
 
 func getOppositeDirection(direction direction) direction {
@@ -190,9 +225,41 @@ func getPositionVertices(col int, row int, cols int, rows int) []direction {
 	return []direction{directions.up, directions.right, directions.down, directions.left}
 }
 
-func isNeighbours(position1 position, position2 position)bool  {
+func getPositionVertices2(col int, row int, cols int, rows int) []direction {
+	if col == 0 && row == 0 {
+		return []direction{directions.right, directions.down}
+	}
+	if col == 0 && row == rows-1 {
+		return []direction{directions.up, directions.right}
+	}
+	if col == cols-1 && row == 0 {
+		return []direction{directions.left, directions.down}
+	}
+	if col == cols-1 && row == rows-1 {
+		return []direction{directions.left, directions.up}
+	}
+	if col == 0 {
+		return []direction{directions.up, directions.right, directions.down}
+	}
+	if col == cols-1 {
+		return []direction{directions.left, directions.up, directions.down}
+	}
+	if row == 0 {
+		return []direction{directions.left, directions.right, directions.down}
+	}
+	if row == rows-1 {
+		return []direction{directions.left, directions.up, directions.right}
+	}
+	return []direction{directions.left, directions.up, directions.right, directions.down}
+}
+
+func shuffleDirections(directions []direction) {
+	r.Shuffle(len(directions), func(i, j int) { directions[i], directions[j] = directions[j], directions[i] })
+}
+
+func isNeighbours(position1 position, position2 position) bool {
 	emptyPosition := position{}
-	if position1 == emptyPosition || position2 == emptyPosition{
+	if position1 == emptyPosition || position2 == emptyPosition {
 		return false
 	}
 	if position1.y0+deltaY == position2.y0 && position1.x0 == position2.x0 {
@@ -201,10 +268,10 @@ func isNeighbours(position1 position, position2 position)bool  {
 	if position1.y0-deltaY == position2.y0 && position1.x0 == position2.x0 {
 		return true
 	}
-	if position1.x0+deltaX == position2.x0 && position1.y0 == position2.y0{
+	if position1.x0+deltaX == position2.x0 && position1.y0 == position2.y0 {
 		return true
 	}
-	if position1.x0-deltaX == position2.x0 && position1.y0 == position2.y0{
+	if position1.x0-deltaX == position2.x0 && position1.y0 == position2.y0 {
 		return true
 	}
 	return false
