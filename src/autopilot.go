@@ -5,6 +5,11 @@ type node struct {
 	position  position
 }
 
+var (
+	hCycle []node
+	cycleIndexMap map[position]int
+)
+
 func initPositionMatrix(gameViewPosition position) {
 	gameViewCols := gameViewPosition.x1 / deltaX
 	gameViewRows := gameViewPosition.y1 / deltaY
@@ -48,6 +53,13 @@ func generateHamiltonianCycle(positionMatrix [][]position, snekHead *snekBodyPar
 	tour = hamiltonianCycle(usedPositions, tour, 1, numNodes, vertexGraph, positionMatrix)
 	//}
 	return tour
+}
+func generateHamiltonianCycleIndexMap(hamiltonianCycle []node) map[position]int{
+	indexMap := make(map[position]int)
+	for i := 0; i < len(hamiltonianCycle)-1; i++ {
+		indexMap[hamiltonianCycle[i].position] = i
+	}
+	return indexMap
 }
 
 func isNeighbours(position1 position, position2 position) bool {

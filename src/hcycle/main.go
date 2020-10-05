@@ -34,12 +34,12 @@ type node struct {
 }
 
 const (
-	deltaX = 2
+	deltaX = 1
 	deltaY = 1
 )
 
 var (
-	gameViewPosition = position{0, 0, 47 * deltaX, 29}
+	gameViewPosition = position{0, 0, 88 * deltaX, 68}
 	positionMatrix   = generatePositionMatrix(gameViewPosition)
 	snekHead         = &snekBodyPart{directions.up, directions.up, "s0", positionMatrix[0][0]}
 	directions       = movementDirections{0, 1, 2, 3}
@@ -51,15 +51,31 @@ func main() {
 	//positionMatrix := generatePositionMatrix(gameViewPosition)*
 	//vertexGraph := generateVertexGraph(positionMatrix)
 
-	cycle := generateHamiltonianCycle(positionMatrix, snekHead)
-	log.Println(cycle)
+	//cycle := generateHamiltonianCycle(positionMatrix, snekHead)
+	//log.Println(cycle)
 	/*directions := getPositionVertices(1,1,10,10)
 	directions2 := getPositionVertices(1,1,10,10)
 	log.Println(directions)
 	shuffleDirections(directions)
 	log.Println(directions)
 	log.Println(directions2)*/
+	log.Println(calculateGameViewPosition(40,30))
+
 }
+func calculateGameViewPosition(maxX int, maxY int) position  {
+	defaultPosition := position{0, 0, maxX - 26, maxY - 1}
+	log.Println(defaultPosition)
+
+	if defaultPosition.x1 % 2 != 0{
+		defaultPosition.x1 = defaultPosition.x1 - 1
+	}
+	if defaultPosition.y1 % 2 != 0{
+		defaultPosition.y1 --
+	}
+	log.Println(defaultPosition)
+	return defaultPosition
+}
+
 
 func test(list []int)  {
 	list[0] = 1

@@ -12,8 +12,8 @@ var (
 	r                = rand.New(rand.NewSource(time.Now().UnixNano()))
 	running          = true
 	gameFinished     = false
-	autoPilotEnabled = false
-	tickInterval     = 50 * time.Millisecond
+	autoPilotEnabled = true
+	tickInterval     = 10 * time.Millisecond
 	gameView         = viewProperties{"game", "Snek", "", position{}}
 	positionMatrix   [][]position
 )
@@ -43,7 +43,8 @@ func initGUI() *gocui.Gui {
 }
 
 func initGameView(maxX int, maxY int) (position, error) {
-	gameViewPosition := position{0, 0, maxX - 26, maxY - 1}
+	gameViewPosition := calculateGameViewPosition(maxX,maxY)
+	//log.Panicln(gameViewPosition)
 	//log.Panicln(gameViewPosition)
 	initPositionMatrix(gameViewPosition)
 	if v, err := gui.SetView(gameView.name, gameViewPosition.x0, gameViewPosition.x0, gameViewPosition.x1, gameViewPosition.y1, 0); err != nil {
@@ -55,7 +56,8 @@ func initGameView(maxX int, maxY int) (position, error) {
 			return gameViewPosition, err
 		}
 		//err = initGame()
-		_ = generateHamiltonianCycle(positionMatrix,snekHead)
+		hCycle = generateHamiltonianCycle(positionMatrix,snekHead)
+		cycleIndexMap = generateHamiltonianCycleIndexMap(hCycle)
 		//log.Panicln(hamiltonianCycle)
 		//log.Panicln(hamiltonianCycle)
 		/*for i, n := range hamiltonianCycle {
@@ -64,6 +66,18 @@ func initGameView(maxX int, maxY int) (position, error) {
 		return gameViewPosition, initGame()
 	}
 	return gameViewPosition, nil
+}
+
+func calculateGameViewPosition(maxX int, maxY int) position  {
+	defaultPosition := position{0, 0, maxX - 26, maxY - 1}
+	//log.Panicln(defaultPosition)
+	if (defaultPosition.x1/deltaX) % 2 != 0{
+		defaultPosition.x1 = defaultPosition.x1 - deltaX
+	}
+	if (defaultPosition.y1/deltaY) % 2 != 0 {
+		defaultPosition.y1 = defaultPosition.y1 - deltaY
+	}
+	return defaultPosition
 }
 
 func initGame() error {
