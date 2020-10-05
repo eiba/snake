@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"math/rand"
 	"time"
 )
@@ -33,12 +34,12 @@ type node struct {
 }
 
 const (
-	deltaX = 1
+	deltaX = 2
 	deltaY = 1
 )
 
 var (
-	gameViewPosition = position{0, 0, 100 * deltaX, 100}
+	gameViewPosition = position{0, 0, 47 * deltaX, 29}
 	positionMatrix   = generatePositionMatrix(gameViewPosition)
 	snekHead         = &snekBodyPart{directions.up, directions.up, "s0", positionMatrix[0][0]}
 	directions       = movementDirections{0, 1, 2, 3}
@@ -50,8 +51,8 @@ func main() {
 	//positionMatrix := generatePositionMatrix(gameViewPosition)*
 	//vertexGraph := generateVertexGraph(positionMatrix)
 
-	_ = generateHamiltonianCycle(positionMatrix, snekHead)
-
+	cycle := generateHamiltonianCycle(positionMatrix, snekHead)
+	log.Println(cycle)
 	/*directions := getPositionVertices(1,1,10,10)
 	directions2 := getPositionVertices(1,1,10,10)
 	log.Println(directions)

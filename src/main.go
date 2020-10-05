@@ -44,6 +44,7 @@ func initGUI() *gocui.Gui {
 
 func initGameView(maxX int, maxY int) (position, error) {
 	gameViewPosition := position{0, 0, maxX - 26, maxY - 1}
+	//log.Panicln(gameViewPosition)
 	initPositionMatrix(gameViewPosition)
 	if v, err := gui.SetView(gameView.name, gameViewPosition.x0, gameViewPosition.x0, gameViewPosition.x1, gameViewPosition.y1, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
@@ -53,14 +54,14 @@ func initGameView(maxX int, maxY int) (position, error) {
 		if _, err := gui.SetViewOnBottom(gameView.name); err != nil {
 			return gameViewPosition, err
 		}
-		err = initGame()
-		hamiltonianCycle := generateHamiltonianCycle(positionMatrix,snekHead)
-		log.Panicln(hamiltonianCycle)
+		//err = initGame()
+		_ = generateHamiltonianCycle(positionMatrix,snekHead)
+		//log.Panicln(hamiltonianCycle)
 		//log.Panicln(hamiltonianCycle)
 		/*for i, n := range hamiltonianCycle {
 			setViewPosition(string(i),n.position)
 		}*/
-		return gameViewPosition, err
+		return gameViewPosition, initGame()
 	}
 	return gameViewPosition, nil
 }

@@ -17,10 +17,7 @@ func initPositionMatrix(gameViewPosition position) {
 func generatePositionMatrix(gameViewPosition position) [][]position {
 	totalCols := gameViewPosition.x1 / deltaX
 	totalRows := gameViewPosition.y1 / deltaY
-	//column := 0
 	positionMatrix := make([][]position, totalCols)
-	//positions := make([]position, totalCols*totalRows)
-	//positionSet := make(map[position]bool)
 
 	for col := range positionMatrix {
 		positionMatrix[col] = make([]position, totalRows)
@@ -31,121 +28,72 @@ func generatePositionMatrix(gameViewPosition position) [][]position {
 			positionMatrix[col][row] = position
 		}
 	}
-	/*for x := 0; x < totalCols; x += 1 {
-		//log.Panicln(gameViewPosition, totalCols, totalRows)
-		positionMatrix[x] = make([]position, totalRows)
-		for row := 0; row < gameViewPosition.y1; row += deltaY {
-			position := position{x*2, row, (x*2) + deltaX, row + deltaY}
-
-			positionMatrix[x][row] = position
-			//positions[(column*totalRows)+row] = position
-			//positionSet[position] = true
-		}
-		//column++
-	}*/
 	return positionMatrix
 }
 
 func generateHamiltonianCycle(positionMatrix [][]position, snekHead *snekBodyPart) []node {
 	vertexGraph := generateVertexGraph(positionMatrix)
 	numNodes := len(positionMatrix) * len(positionMatrix[0])
-	tour := make([]node, numNodes+1)
-
-	/*if positionMatrix[startCol][startRow] == snekHead.position{
-		log.Panicln("s",positionMatrix[startCol][startRow],snekHead.position)
-	}
-	log.Panicln("s",positionMatrix[startCol][startRow],snekHead.position)*/
-	emptyNode := node{
-		direction: 0,
-		position:  position{},
-	}
-	//for /*!isNeighbours(tour[len(tour)-1].position,tour[0].position) &&*/ tour[len(tour)-1] == emptyNode {
-		//snekHead.position, _ = setViewAtRandomPosition(snekHead.viewName, positionMatrix, true)
-		startCol, startRow := snekHead.position.x0/deltaX, snekHead.position.y0/deltaY
-		startPosition := positionMatrix[startCol][startRow]
-		directions := getPositionVertices(startCol,startRow,len(positionMatrix),len(positionMatrix[0]))
-
-		for i := range directions {
-			tour[0] = node{directions[i], startPosition}
-			usedPositions := make(map[position]bool)
-			usedPositions[startPosition] = true
-			tour = h(usedPositions, tour, 1, numNodes, vertexGraph, positionMatrix)
-
-			if /*isNeighbours(tour[len(tour)-1].position,tour[0].position) &&*/ tour[len(tour)-1] != emptyNode {
-				break
-			}
-		}
-	//}
-
-	//for tour[numNodes-1] == emptyNode {
-
-
-	//}
-	/*tour[0] = node{randomValidDirection(startCol, startRow, vertexGraph), startPosition}
+	//log.Panicln(len(positionMatrix),len(positionMatrix[0]))
+	startCol, startRow := 0,0//snekHead.position.x0/deltaX, snekHead.position.y0/deltaY
+	startPosition := positionMatrix[startCol][startRow]
+	directions := getPositionVertices(startCol, startRow, len(positionMatrix), len(positionMatrix[0]))
+	var tour []node
+	//for i := range directions {
+	tour = make([]node, numNodes+1)
+	tour[0] = node{directions[0], startPosition}
+	tour[numNodes] = tour[0]
 	usedPositions := make(map[position]bool)
-	usedPositions[startPosition] = true*/
-
-	/*tour := h(usedPositions,tour,1,numNodes,vertexGraph,positionMatrix)
-
-	addedNodes := 1
-	for addedNodes < numNodes {
-		tour[addedNodes] = getNextNode(positionMatrix, vertexGraph, tour[addedNodes-1])
-		addedNodes++
-	}*/
-
-	/*for i := range vertexGraph {
-		for j := range vertexGraph[i] {
-			vertices := vertexGraph[i][j]
-		}
-	}
-	tour[0] = snekHead.currentDirection
-
-	for i := 1; i < numNodes; i++ {
-		tour[i] = getNextDirection(tour[i-1])
-	}*/
+	usedPositions[startPosition] = true
+	tour = hamiltonianCycle(usedPositions, tour, 1, numNodes, vertexGraph, positionMatrix)
+	//}
 	return tour
 }
 
-func isNeighbours(position1 position, position2 position)bool  {
+func isNeighbours(position1 position, position2 position) bool {
+	emptyPosition := position{}
+	if position1 == emptyPosition || position2 == emptyPosition {
+		return false
+	}
 	if position1.y0+deltaY == position2.y0 && position1.x0 == position2.x0 {
 		return true
 	}
 	if position1.y0-deltaY == position2.y0 && position1.x0 == position2.x0 {
 		return true
 	}
-	if position1.x0+deltaX == position2.x0 && position1.y0 == position2.y0{
+	if position1.x0+deltaX == position2.x0 && position1.y0 == position2.y0 {
 		return true
 	}
-	if position1.x0-deltaX == position2.x0 && position1.y0 == position2.y0{
+	if position1.x0-deltaX == position2.x0 && position1.y0 == position2.y0 {
 		return true
 	}
 	return false
 }
 
-func h(usedPositions map[position]bool, tour []node, moveNumber int, totalMoves int, vertexGraph [][][]direction, positionMatrix [][]position) []node {
-	if moveNumber == totalMoves && isNeighbours(tour[totalMoves-1].position,tour[0].position){
-		tour[totalMoves] = tour[0]
-		return tour
-	}
-
+func hamiltonianCycle(usedPositions map[position]bool, tour []node, moveNumber int, totalMoves int, vertexGraph [][][]direction, positionMatrix [][]position) []node {
 	previousNode := tour[moveNumber-1]
 	nextCol, nextRow := getNextPosition(previousNode)
 	nextPosition := positionMatrix[nextCol][nextRow]
 
 	if usedPositions[nextPosition] {
-		//tour[moveNumber-1] =
-		//delete(usedPositions, previousNode.position)
-		//return h(usedPositions, tour, moveNumber-1, totalMoves, vertexGraph, positionMatrix)
 		return tour
 	}
-	usedPositions[nextPosition] = true
-	for _, nextDirection := range vertexGraph[nextCol][nextRow] {
+
+	usedPositionsCopy := copyPositionMapMap(usedPositions)
+	usedPositionsCopy[nextPosition] = true
+	validVertices := vertexGraph[nextCol][nextRow]
+
+	for _, nextDirection := range validVertices {
 		if nextDirection == getOppositeDirection(previousNode.direction) {
 			continue
 		}
-		nextNode := node{nextDirection, nextPosition}
-		tour[moveNumber] = nextNode
-		h(usedPositions, tour, moveNumber+1, totalMoves, vertexGraph, positionMatrix)
+		if isNeighbours(tour[totalMoves-1].position, tour[0].position) {
+			return tour
+		} else {
+			nextNode := node{nextDirection, nextPosition}
+			tour[moveNumber] = nextNode
+			tour = hamiltonianCycle(usedPositionsCopy, tour, moveNumber+1, totalMoves, vertexGraph, positionMatrix)
+		}
 	}
 	return tour
 }
@@ -153,22 +101,25 @@ func h(usedPositions map[position]bool, tour []node, moveNumber int, totalMoves 
 func getNextPosition(currentNode node) (int, int) {
 	currentCol, currentRow := currentNode.position.x0/deltaX, currentNode.position.y0/deltaY
 
-	var nextCol, nextRow int
 	switch currentNode.direction {
-	case directions.right:
-		nextCol = currentCol + 1
-		nextRow = currentRow
-	case directions.left:
-		nextCol = currentCol - 1
-		nextRow = currentRow
 	case directions.up:
-		nextCol = currentCol
-		nextRow = currentRow - 1
+		currentRow--
+	case directions.right:
+		currentCol++
 	case directions.down:
-		nextCol = currentCol
-		nextRow = currentRow + 1
+		currentRow++
+	case directions.left:
+		currentCol--
 	}
-	return nextCol, nextRow
+	return currentCol, currentRow
+}
+
+func copyPositionMapMap(positionMap map[position]bool) map[position]bool  {
+	positionMapCopy := make(map[position]bool)
+	for key,value := range positionMap {
+		positionMapCopy[key] = value
+	}
+	return positionMapCopy
 }
 
 func randomValidDirection(col int, row int, vertexGraph [][][]direction) direction {
