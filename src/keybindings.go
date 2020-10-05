@@ -127,6 +127,9 @@ func initSpeedKey(key rune, speedChange time.Duration) error {
 	if err := gui.SetKeybinding("", key, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
 			tickInterval += speedChange * time.Millisecond
+			if tickInterval < time.Millisecond {
+				tickInterval = time.Millisecond
+			}
 			return nil
 		}); err != nil {
 		return err
