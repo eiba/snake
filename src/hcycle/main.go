@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"math/rand"
 	"time"
 )
@@ -109,78 +108,51 @@ func generateHamiltonianCycle(positionMatrix [][]position, snekHead *snekBodyPar
 		usedPositions := make(map[position]bool)
 		usedPositions[startPosition] = true
 		k=0
-		tour = h(usedPositions, tour, 1, numNodes, vertexGraph, positionMatrix)
-		log.Println(k)
-		if isNeighbours(tour[numNodes-1].position, tour[0].position) {
-			log.Println("Hamiltonian cycle found")
-			//break
-		}
+		tour = hamiltonianCycle(usedPositions, tour, 1, numNodes, vertexGraph, positionMatrix)
 	//}
-	log.Println(tour)
 	return tour
 }
 
-func h(usedPositions map[position]bool, tour []node, moveNumber int, totalMoves int, vertexGraph [][][]direction, positionMatrix [][]position) []node {
+func hamiltonianCycle(usedPositions map[position]bool, tour []node, moveNumber int, totalMoves int, vertexGraph [][][]direction, positionMatrix [][]position) []node {
 	previousNode := tour[moveNumber-1]
-
-	/*if isNeighbours(tour[totalMoves-1].position, tour[0].position) {
-		return tour
-	}*/
 	nextCol, nextRow := getNextPosition(previousNode)
 	nextPosition := positionMatrix[nextCol][nextRow]
-	//tour[moveNumber-1] = currentNode
-	//log.Println(usedPositions)
+
 	if usedPositions[nextPosition] {
-		//log.Println("Used position",nextPosition)
 		return tour
 	}
-	k++
-	usedPositions2 := make(map[position]bool)
-	for k,v := range usedPositions {
-		usedPositions2[k] = v
-	}
-	//log.Println(k)
-	//log.Println(moveNumber)
 
-	usedPositions2[nextPosition] = true
+	usedPositionsCopy := copyPositionMapMap(usedPositions)
+	usedPositionsCopy[nextPosition] = true
 	validVertices := vertexGraph[nextCol][nextRow]
-	//shuffleDirections(validVertices)
+
 	for _, nextDirection := range validVertices {
 		if nextDirection == getOppositeDirection(previousNode.direction) {
 			continue
 		}
-		//log.Println("trying direction",nextDirection)
 		if isNeighbours(tour[totalMoves-1].position, tour[0].position) {
 			return tour
 		} else {
 			nextNode := node{nextDirection, nextPosition}
 			tour[moveNumber] = nextNode
-			//k++
-			tour = h(usedPositions2, tour, moveNumber+1, totalMoves, vertexGraph, positionMatrix)
-			//log.Println(tour)
+			tour = hamiltonianCycle(usedPositionsCopy, tour, moveNumber+1, totalMoves, vertexGraph, positionMatrix)
 		}
 	}
 	return tour
+}
+
+func copyPositionMapMap(positionMap map[position]bool) map[position]bool  {
+	positionMapCopy := make(map[position]bool)
+	for key,value := range positionMap {
+		positionMapCopy[key] = value
+	}
+	return positionMapCopy
 }
 
 func getNextPosition(currentNode node) (int, int) {
 	currentCol, currentRow := currentNode.position.x0/deltaX, currentNode.position.y0/deltaY
 
 	switch currentNode.direction {
-	case directions.up:
-		currentRow--
-	case directions.right:
-		currentCol++
-	case directions.down:
-		currentRow++
-	case directions.left:
-		currentCol--
-	}
-	return currentCol, currentRow
-}
-
-func getNextPosition2(currentCol int, currentRow int, currentDirection direction) (int, int) {
-	switch currentDirection {
 	case directions.up:
 		currentRow--
 	case directions.right:
@@ -223,34 +195,6 @@ func getPositionVertices(col int, row int, cols int, rows int) []direction {
 		return []direction{directions.up, directions.right, directions.left}
 	}
 	return []direction{directions.up, directions.right, directions.down, directions.left}
-}
-
-func getPositionVertices2(col int, row int, cols int, rows int) []direction {
-	if col == 0 && row == 0 {
-		return []direction{directions.right, directions.down}
-	}
-	if col == 0 && row == rows-1 {
-		return []direction{directions.up, directions.right}
-	}
-	if col == cols-1 && row == 0 {
-		return []direction{directions.left, directions.down}
-	}
-	if col == cols-1 && row == rows-1 {
-		return []direction{directions.left, directions.up}
-	}
-	if col == 0 {
-		return []direction{directions.up, directions.right, directions.down}
-	}
-	if col == cols-1 {
-		return []direction{directions.left, directions.up, directions.down}
-	}
-	if row == 0 {
-		return []direction{directions.left, directions.right, directions.down}
-	}
-	if row == rows-1 {
-		return []direction{directions.left, directions.up, directions.right}
-	}
-	return []direction{directions.left, directions.up, directions.right, directions.down}
 }
 
 func shuffleDirections(directions []direction) {
