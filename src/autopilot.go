@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"math"
 )
 
@@ -27,17 +26,17 @@ func initPositionMatrix(gameViewPosition position) {
 func initHamiltonianCycle(gameViewPosition position) error  {
 	gameViewCols := gameViewPosition.x1 / deltaX
 	gameViewRows := gameViewPosition.y1 / deltaY
-	if len(hCycle)-1 == gameViewCols*gameViewRows || !autoPilotEnabled{
+	if len(hCycle)-1 == gameViewCols*gameViewRows || !autoPilotEnabled {
 		return nil
 	}
 
 	if err := loading(true); err != nil{
-		log.Panicln(err)
+		return err
 	}
 	hCycle = generateHamiltonianCycle(positionMatrix)
 	cycleIndexMap = generateHamiltonianCycleIndexMap(hCycle)
 	if err := loading(false); err != nil{
-		log.Panicln(err)
+		return err
 	}
 	return nil
 }

@@ -1,6 +1,8 @@
 package main
 
-import "github.com/awesome-gocui/gocui"
+import (
+	"github.com/awesome-gocui/gocui"
+)
 
 const loadingViewName = "loading"
 

@@ -126,7 +126,9 @@ func updateMovement() {
 	for {
 		time.Sleep(tickInterval)
 		initPositionMatrix(gameView.position)
-		initHamiltonianCycle(gameView.position)
+		if err := initHamiltonianCycle(gameView.position); err != nil {
+			log.Panicln(err)
+		}
 		if !running {
 			continue
 		}
