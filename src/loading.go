@@ -31,7 +31,7 @@ func initLoadingView() error {
 }
 
 func loading(loading bool) error {
-	if gameFinished && !running{
+	if gameFinished && !running {
 		return nil
 	}
 	loadingView.Visible = loading

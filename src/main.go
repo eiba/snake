@@ -12,7 +12,7 @@ var (
 	r                = rand.New(rand.NewSource(time.Now().UnixNano()))
 	running          = true
 	gameFinished     = false
-	autoPilotEnabled = true
+	autoPilotEnabled = false
 	tickInterval     = 50 * time.Millisecond
 	gameView         = viewProperties{"game", "Snek", "", position{}}
 	positionMatrix   [][]position
@@ -59,7 +59,7 @@ func initGameView(maxX int, maxY int) (position, error) {
 }
 
 func calculateGameViewPosition(maxX int, maxY int) position {
-	defaultPosition := position{0, 0, maxX - 26, maxY - 1}
+	defaultPosition := position{0, 0, maxX - 25, maxY - 1}
 
 	if defaultPosition.x1%2 != 0 {
 		defaultPosition.x1--
@@ -94,6 +94,12 @@ func initGame() error {
 func manageGame(gui *gocui.Gui) error {
 	maxX, maxY := gui.Size()
 
+	var err error
+	gameView.position, err = initGameView(maxX, maxY)
+	if err != nil {
+		log.Panicln(err)
+	}
+
 	if err := initKeybindingsView(); err != nil {
 		log.Panicln(err)
 	}
@@ -102,9 +108,7 @@ func manageGame(gui *gocui.Gui) error {
 		log.Panicln(err)
 	}
 
-	var err error
-	gameView.position, err = initGameView(maxX, maxY)
-	if err != nil {
+	if err := initLoadingView(); err != nil {
 		log.Panicln(err)
 	}
 
@@ -113,10 +117,6 @@ func manageGame(gui *gocui.Gui) error {
 	}
 
 	if err := initGameOverView(); err != nil {
-		log.Panicln(err)
-	}
-
-	if err := initLoadingView(); err != nil {
 		log.Panicln(err)
 	}
 	return nil
