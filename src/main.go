@@ -12,7 +12,7 @@ var (
 	r                = rand.New(rand.NewSource(time.Now().UnixNano()))
 	running          = true
 	gameFinished     = false
-	autoPilotEnabled = false
+	autoPilotEnabled = true
 	tickInterval     = 50 * time.Millisecond
 	gameView         = viewProperties{"game", "Snek", "", position{}}
 	positionMatrix   [][]position
