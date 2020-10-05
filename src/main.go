@@ -70,9 +70,16 @@ func initGameView(maxX int, maxY int) (position, error) {
 
 func calculateGameViewPosition(maxX int, maxY int) position  {
 	defaultPosition := position{0, 0, maxX - 26, maxY - 1}
-	//log.Panicln(defaultPosition)
+
+	if defaultPosition.x1 % 2 != 0 {
+		defaultPosition.x1--
+	}
 	if (defaultPosition.x1/deltaX) % 2 != 0{
 		defaultPosition.x1 = defaultPosition.x1 - deltaX
+	}
+
+	if defaultPosition.y1 % 2 != 0 {
+		defaultPosition.y1--
 	}
 	if (defaultPosition.y1/deltaY) % 2 != 0 {
 		defaultPosition.y1 = defaultPosition.y1 - deltaY

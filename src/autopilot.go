@@ -1,6 +1,8 @@
 package main
 
-import "math"
+import (
+	"math"
+)
 
 type node struct {
 	direction direction
@@ -35,6 +37,7 @@ func generatePositionMatrix(gameViewPosition position) [][]position {
 			positionMatrix[col][row] = position
 		}
 	}
+	//log.Panicln(len(positionMatrix),len(positionMatrix[0]),gameViewPosition)
 	return positionMatrix
 }
 
@@ -217,7 +220,6 @@ func autopilot2() error  {
 		headDirection = headCycleNode.direction
 	}
 
-
 	foodPosition  := foodView.position
 	foodCycleIndex := cycleIndexMap[foodPosition]
 
@@ -232,7 +234,7 @@ func autopilot2() error  {
 		if nextPositionCycleIndex > headCycleIndex && nextPositionCycleIndex > tailCycleIndex && nextPositionCycleIndex > highestValidIndex  && nextPositionCycleIndex < foodCycleIndex{
 			highestValidIndex = nextPositionCycleIndex
 			headDirection = nextPosition.direction
-		}else if headCycleIndex > foodCycleIndex && nextPositionCycleIndex < foodCycleIndex && nextPositionCycleIndex < tailCycleIndex /*calculatePositionDistance(nextPosition.position,foodPosition) < calculatePositionDistance(headPosition,foodPosition)*/{
+		}else if headCycleIndex > foodCycleIndex && nextPositionCycleIndex < foodCycleIndex && nextPositionCycleIndex < tailCycleIndex{
 			headDirection = nextPosition.direction
 			break
 		}
