@@ -1,9 +1,20 @@
 package main
 
-import "math"
+import (
+	"math"
+)
 
 func aStar(startPosition position, goalPosition position, positionMatrix [][]position){
-	openSet := []position{startPosition}
+	//TODO heap
+	//openSet := []position{startPosition}
+
+	//cameFrom := make(map[position]position)
+
+	gScore := make(map[position]int)
+	gScore[startPosition] = 0
+
+	fScore := make(map[position]int)
+	fScore[startPosition] = distance(startPosition,goalPosition)
 
 }
 
