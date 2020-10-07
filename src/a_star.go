@@ -1,12 +1,14 @@
 package main
 
 import (
+	"container/heap"
 	"math"
 )
 
 func aStar(startPosition position, goalPosition position, positionMatrix [][]position){
-	//TODO heap
-	//openSet := []position{startPosition}
+	openSet := make(PriorityQueue, 1)
+	openSet[0] = &PriorityNode{startPosition,0+distance(startPosition,goalPosition),0}
+	heap.Init(&openSet)
 
 	//cameFrom := make(map[position]position)
 

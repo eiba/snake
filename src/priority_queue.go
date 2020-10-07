@@ -3,8 +3,8 @@ package main
 import "container/heap"
 
 type PriorityNode struct {
-	value    position
-	priority int
+	position position
+	fScore   int
 	index    int
 }
 
@@ -13,7 +13,7 @@ type PriorityQueue []*PriorityNode
 func (pq PriorityQueue) Len() int { return len(pq) }
 
 func (pq PriorityQueue) Less(i, j int) bool {
-	return pq[i].priority > pq[j].priority
+	return pq[i].fScore < pq[j].fScore
 }
 
 func (pq PriorityQueue) Swap(i, j int) {
@@ -40,7 +40,7 @@ func (pq *PriorityQueue) Pop() interface{} {
 }
 
 func (pq *PriorityQueue) update(item *PriorityNode, value position, priority int) {
-	item.value = value
-	item.priority = priority
+	item.position = value
+	item.fScore = priority
 	heap.Fix(pq, item.index)
 }
