@@ -1,8 +1,6 @@
 package main
 
-import (
-	"container/heap"
-)
+import "container/heap"
 
 type PriorityNode struct {
 	value    position

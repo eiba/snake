@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/heap"
 	"log"
 	"math"
 	"math/rand"
@@ -61,32 +62,53 @@ func main() {
 	log.Println(directions)
 	log.Println(directions2)*/
 	//log.Println(calculateGameViewPosition(40,30))
-	log.Println(calculatePositionDistance(position{0,0,0,0},position{5,5,0,0}))
+	//log.Println(calculatePositionDistance(position{0,0,0,0}, position{5,5,0,0}))
+	/*priorityNode1 := PriorityNode{
+		value:    position{1, 2, 3, 4},
+		priority: 3,
+		index:    0,
+	}
+	pq := make(PriorityQueue, 1)
+	pq[0] = &priorityNode1
+	heap.Init(&pq)
+
+	priorityNode2 := PriorityNode{
+		value:    position{4, 3, 2, 1},
+		priority: 4,
+	}
+	priorityNode3 := PriorityNode{
+		value:    position{4, 3, 2, 1},
+		priority: 1,
+	}
+	heap.Push(&pq, &priorityNode2)
+	heap.Push(&pq, &priorityNode3)
+	log.Println("1:", heap.Pop(&pq))
+	log.Println("2:", heap.Pop(&pq))
+	log.Println("3:", heap.Pop(&pq))*/
 }
 
-func calculatePositionDistance(position1 position, position2 position) int  {
+func calculatePositionDistance(position1 position, position2 position) int {
 	position1Col, position1Row := position1.x0/deltaX, position1.y0/deltaY
 	position2Col, position2Row := position2.x0/deltaX, position2.y0/deltaY
 
-	return int(math.Abs(float64(position1Col-position2Col)) + math.Abs(float64(position1Row - position2Row)))
+	return int(math.Abs(float64(position1Col-position2Col)) + math.Abs(float64(position1Row-position2Row)))
 }
 
-func calculateGameViewPosition(maxX int, maxY int) position  {
+func calculateGameViewPosition(maxX int, maxY int) position {
 	defaultPosition := position{0, 0, maxX - 26, maxY - 1}
 	log.Println(defaultPosition)
 
-	if defaultPosition.x1 % 2 != 0{
+	if defaultPosition.x1%2 != 0 {
 		defaultPosition.x1 = defaultPosition.x1 - 1
 	}
-	if defaultPosition.y1 % 2 != 0{
-		defaultPosition.y1 --
+	if defaultPosition.y1%2 != 0 {
+		defaultPosition.y1--
 	}
 	log.Println(defaultPosition)
 	return defaultPosition
 }
 
-
-func test(list []int)  {
+func test(list []int) {
 	list[0] = 1
 }
 func generatePositionMatrix(gameViewPosition position) [][]position {
@@ -128,13 +150,13 @@ func generateHamiltonianCycle(positionMatrix [][]position, snekHead *snekBodyPar
 	directions := getPositionVertices2(startCol, startRow, len(positionMatrix), len(positionMatrix[0]))
 	var tour []node
 	//for i := range directions {
-		tour = make([]node, numNodes+1)
-		tour[0] = node{directions[0], startPosition}
-		tour[numNodes] = tour[0]
-		usedPositions := make(map[position]bool)
-		usedPositions[startPosition] = true
-		k=0
-		tour = hamiltonianCycle(usedPositions, tour, 1, numNodes, vertexGraph, positionMatrix)
+	tour = make([]node, numNodes+1)
+	tour[0] = node{directions[0], startPosition}
+	tour[numNodes] = tour[0]
+	usedPositions := make(map[position]bool)
+	usedPositions[startPosition] = true
+	k = 0
+	tour = hamiltonianCycle(usedPositions, tour, 1, numNodes, vertexGraph, positionMatrix)
 	//}
 	return tour
 }
@@ -167,9 +189,9 @@ func hamiltonianCycle(usedPositions map[position]bool, tour []node, moveNumber i
 	return tour
 }
 
-func copyPositionMapMap(positionMap map[position]bool) map[position]bool  {
+func copyPositionMapMap(positionMap map[position]bool) map[position]bool {
 	positionMapCopy := make(map[position]bool)
-	for key,value := range positionMap {
+	for key, value := range positionMap {
 		positionMapCopy[key] = value
 	}
 	return positionMapCopy
@@ -243,12 +265,12 @@ func getPositionVertices2(col int, row int, cols int, rows int) []direction {
 		return []direction{directions.down, directions.up, directions.left}
 	}
 	if row == 0 {
-		return []direction{directions.right,directions.left, directions.down}
+		return []direction{directions.right, directions.left, directions.down}
 	}
 	if row == rows-1 {
 		return []direction{directions.up, directions.right, directions.left}
 	}
-	return []direction{directions.left,directions.up, directions.down, directions.right}
+	return []direction{directions.left, directions.up, directions.down, directions.right}
 }
 
 func shuffleDirections(directions []direction) {
@@ -273,4 +295,47 @@ func isNeighbours(position1 position, position2 position) bool {
 		return true
 	}
 	return false
+}
+
+type PriorityNode struct {
+	value    position
+	priority int
+	index    int
+}
+
+type PriorityQueue []*PriorityNode
+
+func (pq PriorityQueue) Len() int { return len(pq) }
+
+func (pq PriorityQueue) Less(i, j int) bool {
+	return pq[i].priority > pq[j].priority
+}
+
+func (pq PriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+	pq[i].index = i
+	pq[j].index = j
+}
+
+func (pq *PriorityQueue) Push(x interface{}) {
+	n := len(*pq)
+	item := x.(*PriorityNode)
+	item.index = n
+	*pq = append(*pq, item)
+}
+
+func (pq *PriorityQueue) Pop() interface{} {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	old[n-1] = nil  // avoid memory leak
+	item.index = -1 // for safety
+	*pq = old[0 : n-1]
+	return item
+}
+
+func (pq *PriorityQueue) update(item *PriorityNode, value position, priority int) {
+	item.value = value
+	item.priority = priority
+	heap.Fix(pq, item.index)
 }
