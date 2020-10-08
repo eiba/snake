@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-func aStar(startPosition position, goalPosition position, snekBodyParts []*snekBodyPart, positionMatrix [][]position) []position {
+func aStar(startPosition position, goalPosition position, bodyPositionSet map[position]bool, positionMatrix [][]position) []position {
 	openSet := make(PriorityQueue, 1)
 	openSet[0] = &PriorityNode{startPosition, 0 + distance(startPosition, goalPosition), 0}
 	heap.Init(&openSet)
@@ -24,8 +24,40 @@ func aStar(startPosition position, goalPosition position, snekBodyParts []*snekB
 		if current.position == goalPosition {
 			return reconstructPath(cameFrom, current.position)
 		}
+
 	}
 	return nil
+}
+
+func getNeighbours(currentPosition position, bodyPositionSet map[position]bool, positionMatrix [][]position) []position {
+	positionCol := currentPosition.x1 / deltaX
+	positionRow := currentPosition.y1 / deltaY
+	var neighbours []position
+	if positionCol < len(positionMatrix)-1 {
+		neighbour := positionMatrix[positionCol+1][positionRow]
+		if !bodyPositionSet[neighbour] {
+			neighbours = append(neighbours, neighbour)
+		}
+	}
+	if positionCol > 0 {
+		neighbour := positionMatrix[positionCol-1][positionRow]
+		if !bodyPositionSet[neighbour] {
+			neighbours = append(neighbours, neighbour)
+		}
+	}
+	if positionRow > 0 {
+		neighbour := positionMatrix[positionCol][positionRow+1]
+		if !bodyPositionSet[neighbour] {
+			neighbours = append(neighbours, neighbour)
+		}
+	}
+	if positionRow < len(positionMatrix[0])-1 {
+		neighbour := positionMatrix[positionCol][positionRow-1]
+		if !bodyPositionSet[neighbour] {
+			neighbours = append(neighbours, neighbour)
+		}
+	}
+	return neighbours
 }
 
 func reconstructPath(cameFrom map[position]position, current position) []position {
