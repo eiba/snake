@@ -87,6 +87,15 @@ func main() {
 	log.Println("3:", heap.Pop(&pq))*/
 }
 
+func reconstructPath(cameFrom map[position]position, current position) []position {
+	totalPath := []position{current}
+	for position, exist := cameFrom[current]; exist; {
+		current = position
+		totalPath = append(totalPath, current)
+	}
+	return totalPath
+}
+
 func calculatePositionDistance(position1 position, position2 position) int {
 	position1Col, position1Row := position1.x0/deltaX, position1.y0/deltaY
 	position2Col, position2Row := position2.x0/deltaX, position2.y0/deltaY
