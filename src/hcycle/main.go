@@ -85,13 +85,21 @@ func main() {
 	log.Println("1:", heap.Pop(&pq))
 	log.Println("2:", heap.Pop(&pq))
 	log.Println("3:", heap.Pop(&pq))*/
+
+	cameFrom := make(map[position]position)
+	cameFrom[position{2,2,2,2}] = position{3,3,3,3}
+	cameFrom[position{1,1,1,1}] = position{2,2,2,2}
+	//position, exist := cameFrom[position{1,1,1,2}]
+
+	//log.Println(position,exist)
+	log.Println(reconstructPath(cameFrom,position{1,1,1,1}))
 }
 
 func reconstructPath(cameFrom map[position]position, current position) []position {
 	totalPath := []position{current}
 	for position, exist := cameFrom[current]; exist; {
-		current = position
-		totalPath = append(totalPath, current)
+		totalPath = append(totalPath, position)
+		position, exist = cameFrom[position]
 	}
 	return totalPath
 }

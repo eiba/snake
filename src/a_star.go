@@ -31,8 +31,8 @@ func aStar(startPosition position, goalPosition position, snekBodyParts []*snekB
 func reconstructPath(cameFrom map[position]position, current position) []position {
 	totalPath := []position{current}
 	for position, exist := cameFrom[current]; exist; {
-		current = position
-		totalPath = append(totalPath, current)
+		totalPath = append(totalPath, position)
+		position, exist = cameFrom[position]
 	}
 	return totalPath
 }
