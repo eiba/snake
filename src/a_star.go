@@ -15,9 +15,6 @@ func aStar(startPosition position, goalPosition position, bodyPositionSet map[po
 	gScore := make(map[position]int)
 	gScore[startPosition] = 0
 
-	fScore := make(map[position]int)
-	fScore[startPosition] = distance(startPosition, goalPosition)
-
 	for openSet.Len() > 0 {
 		var current = heap.Pop(&openSet).(*PriorityNode)
 
@@ -27,16 +24,27 @@ func aStar(startPosition position, goalPosition position, bodyPositionSet map[po
 
 		for _, neighbour := range getNeighbours(current.position, bodyPositionSet, positionMatrix) {
 			tentativeGScore := gScore[current.position] + 1
-			if tentativeGScore < getGScore(gScore, neighbour) {
+			if tentativeGScore < getScore(gScore, neighbour) {
 				cameFrom[neighbour] = current.position
+				gScore[neighbour] = tentativeGScore
+				fScore := gScore[neighbour] + distance(neighbour, goalPosition)
 
+				if priorityNode, exist := openSet.Exist(neighbour); exist {
+					priorityNode.fScore = fScore
+				} else {
+					heap.Push(&openSet,
+						PriorityNode{
+							position: neighbour,
+							fScore:   fScore,
+						})
+				}
 			}
 		}
 	}
 	return nil
 }
 
-func getGScore(gScore map[position]int, position position) int {
+func getScore(gScore map[position]int, position position) int {
 	if score, exist := gScore[position]; exist {
 		return score
 	}

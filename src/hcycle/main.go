@@ -63,7 +63,7 @@ func main() {
 	log.Println(directions2)*/
 	//log.Println(calculateGameViewPosition(40,30))
 	//log.Println(calculatePositionDistance(position{0,0,0,0}, position{5,5,0,0}))
-	/*priorityNode1 := PriorityNode{
+	priorityNode1 := PriorityNode{
 		value:    position{1, 2, 3, 4},
 		priority: 3,
 		index:    0,
@@ -82,17 +82,20 @@ func main() {
 	}
 	heap.Push(&pq, &priorityNode2)
 	heap.Push(&pq, &priorityNode3)
+	log.Println(pq.Exist(position{1, 2, 3, 4}))
 	log.Println("1:", heap.Pop(&pq))
+	log.Println(pq.Exist(position{1, 2, 3, 4}))
 	log.Println("2:", heap.Pop(&pq))
-	log.Println("3:", heap.Pop(&pq))*/
+	log.Println(pq.Exist(position{1, 2, 3, 4}))
+	//log.Println("3:", heap.Pop(&pq))
 
-	cameFrom := make(map[position]position)
-	cameFrom[position{2,2,2,2}] = position{3,3,3,3}
-	cameFrom[position{1,1,1,1}] = position{2,2,2,2}
+	//cameFrom := make(map[position]position)
+	//cameFrom[position{2,2,2,2}] = position{3,3,3,3}
+	//cameFrom[position{1,1,1,1}] = position{2,2,2,2}
 	//position, exist := cameFrom[position{1,1,1,2}]
 
 	//log.Println(position,exist)
-	log.Println(reconstructPath(cameFrom,position{1,1,1,1}))
+	//log.Println(reconstructPath(cameFrom,position{1,1,1,1}))
 }
 
 func reconstructPath(cameFrom map[position]position, current position) []position {
@@ -332,6 +335,15 @@ func (pq PriorityQueue) Swap(i, j int) {
 	pq[i], pq[j] = pq[j], pq[i]
 	pq[i].index = i
 	pq[j].index = j
+}
+
+func (pq PriorityQueue) Exist(value position) (*PriorityNode, bool) {
+	for _, priorityNode := range pq {
+		if priorityNode.value == value {
+			return priorityNode, true
+		}
+	}
+	return nil, false
 }
 
 func (pq *PriorityQueue) Push(x interface{}) {

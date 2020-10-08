@@ -22,6 +22,15 @@ func (pq PriorityQueue) Swap(i, j int) {
 	pq[j].index = j
 }
 
+func (pq PriorityQueue) Exist(value position) (*PriorityNode, bool) {
+	for _, priorityNode := range pq {
+		if priorityNode.position == value {
+			return priorityNode, true
+		}
+	}
+	return nil, false
+}
+
 func (pq *PriorityQueue) Push(x interface{}) {
 	n := len(*pq)
 	item := x.(*PriorityNode)
