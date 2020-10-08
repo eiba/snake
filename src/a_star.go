@@ -25,8 +25,22 @@ func aStar(startPosition position, goalPosition position, bodyPositionSet map[po
 			return reconstructPath(cameFrom, current.position)
 		}
 
+		for _, neighbour := range getNeighbours(current.position, bodyPositionSet, positionMatrix) {
+			tentativeGScore := gScore[current.position] + 1
+			if tentativeGScore < getGScore(gScore, neighbour) {
+				cameFrom[neighbour] = current.position
+
+			}
+		}
 	}
 	return nil
+}
+
+func getGScore(gScore map[position]int, position position) int {
+	if score, exist := gScore[position]; exist {
+		return score
+	}
+	return math.MaxInt32
 }
 
 func getNeighbours(currentPosition position, bodyPositionSet map[position]bool, positionMatrix [][]position) []position {
