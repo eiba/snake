@@ -17,7 +17,6 @@ func aStar(startPosition position, goalPosition position, bodyPositionSet map[po
 
 	for openSet.Len() > 0 {
 		var current = heap.Pop(&openSet).(*PriorityNode)
-
 		if current.position == goalPosition {
 			return reconstructPath(cameFrom, current.position)
 		}
@@ -30,10 +29,10 @@ func aStar(startPosition position, goalPosition position, bodyPositionSet map[po
 				fScore := gScore[neighbour] + distance(neighbour, goalPosition)
 
 				if priorityNode, exist := openSet.Exist(neighbour); exist {
-					priorityNode.fScore = fScore
+					openSet.update(priorityNode, priorityNode.position, fScore)
 				} else {
 					heap.Push(&openSet,
-						PriorityNode{
+						&PriorityNode{
 							position: neighbour,
 							fScore:   fScore,
 						})
@@ -52,8 +51,9 @@ func getScore(gScore map[position]int, position position) int {
 }
 
 func getNeighbours(currentPosition position, bodyPositionSet map[position]bool, positionMatrix [][]position) []position {
-	positionCol := currentPosition.x1 / deltaX
-	positionRow := currentPosition.y1 / deltaY
+	positionCol := currentPosition.x0 / deltaX
+	positionRow := currentPosition.y0 / deltaY
+
 	var neighbours []position
 	if positionCol < len(positionMatrix)-1 {
 		neighbour := positionMatrix[positionCol+1][positionRow]
@@ -67,13 +67,13 @@ func getNeighbours(currentPosition position, bodyPositionSet map[position]bool, 
 			neighbours = append(neighbours, neighbour)
 		}
 	}
-	if positionRow > 0 {
+	if positionRow < len(positionMatrix[0])-1 {
 		neighbour := positionMatrix[positionCol][positionRow+1]
 		if !bodyPositionSet[neighbour] {
 			neighbours = append(neighbours, neighbour)
 		}
 	}
-	if positionRow < len(positionMatrix[0])-1 {
+	if positionRow > 0 {
 		neighbour := positionMatrix[positionCol][positionRow-1]
 		if !bodyPositionSet[neighbour] {
 			neighbours = append(neighbours, neighbour)
@@ -85,10 +85,17 @@ func getNeighbours(currentPosition position, bodyPositionSet map[position]bool, 
 func reconstructPath(cameFrom map[position]position, current position) []position {
 	totalPath := []position{current}
 	for position, exist := cameFrom[current]; exist; {
-		totalPath = append(totalPath, position)
+		totalPath = prependArray(totalPath, position)
 		position, exist = cameFrom[position]
 	}
 	return totalPath
+}
+
+func prependArray(positions []position, position position) []position {
+	positions = append(positions, position)
+	copy(positions[1:], positions)
+	positions[0] = position
+	return positions
 }
 
 func distance(position1 position, position2 position) int {

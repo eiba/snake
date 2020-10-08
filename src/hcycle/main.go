@@ -50,61 +50,123 @@ var (
 )
 
 func main() {
-	//positionMatrix := generatePositionMatrix(gameViewPosition)*
-	//vertexGraph := generateVertexGraph(positionMatrix)
+	positionMatrix := generatePositionMatrix(gameViewPosition)
+	startPosition := positionMatrix[0][0]
+	goalPosition := positionMatrix[19][9]
+	bodyPositionSet := make(map[position]bool)
+	bodyPositionSet[position{18, 9, 19, 10}] = true
+	//bodyPositionSet[position{0, 0, 1, 1}] = true
+	//bodyPositionSet[position{1, 0, 2, 1}] = true
+	//bodyPositionSet[position{19, 9, 20, 10}] = true
+	path := aStar(startPosition, goalPosition, bodyPositionSet, positionMatrix)
+	log.Println(len(path), path)
+}
 
-	//_ = generateHamiltonianCycle(positionMatrix, snekHead)
-	//log.Println(cycle)
-	/*directions := getPositionVertices(1,1,10,10)
-	directions2 := getPositionVertices(1,1,10,10)
-	log.Println(directions)
-	shuffleDirections(directions)
-	log.Println(directions)
-	log.Println(directions2)*/
-	//log.Println(calculateGameViewPosition(40,30))
-	//log.Println(calculatePositionDistance(position{0,0,0,0}, position{5,5,0,0}))
-	priorityNode1 := PriorityNode{
-		value:    position{1, 2, 3, 4},
-		priority: 3,
-		index:    0,
+func aStar(startPosition position, goalPosition position, bodyPositionSet map[position]bool, positionMatrix [][]position) []position {
+	openSet := make(PriorityQueue, 1)
+	openSet[0] = &PriorityNode{startPosition, 0 + distance(startPosition, goalPosition), 0}
+	heap.Init(&openSet)
+
+	cameFrom := make(map[position]position)
+
+	gScore := make(map[position]int)
+	gScore[startPosition] = 0
+
+	for openSet.Len() > 0 {
+		var current = heap.Pop(&openSet).(*PriorityNode)
+
+		if current.position == goalPosition {
+			return reconstructPath(cameFrom, current.position)
+		}
+		for _, neighbour := range getNeighbours(current.position, bodyPositionSet, positionMatrix) {
+			tentativeGScore := gScore[current.position] + 1
+			if tentativeGScore < getScore(gScore, neighbour) {
+				cameFrom[neighbour] = current.position
+				gScore[neighbour] = tentativeGScore
+				fScore := gScore[neighbour] + distance(neighbour, goalPosition)
+
+				if priorityNode, exist := openSet.Exist(neighbour); exist {
+					openSet.update(priorityNode, priorityNode.position, fScore)
+				} else {
+					heap.Push(&openSet,
+						&PriorityNode{
+							position: neighbour,
+							fScore:   fScore,
+						})
+				}
+			}
+		}
 	}
-	pq := make(PriorityQueue, 1)
-	pq[0] = &priorityNode1
-	heap.Init(&pq)
+	return nil
+}
 
-	priorityNode2 := PriorityNode{
-		value:    position{4, 3, 2, 1},
-		priority: 4,
+func getScore(gScore map[position]int, position position) int {
+	if score, exist := gScore[position]; exist {
+		return score
 	}
-	priorityNode3 := PriorityNode{
-		value:    position{4, 3, 2, 1},
-		priority: 1,
+	return math.MaxInt32
+}
+
+func getNeighbours(currentPosition position, bodyPositionSet map[position]bool, positionMatrix [][]position) []position {
+	positionCol := currentPosition.x0 / deltaX
+	positionRow := currentPosition.y0 / deltaY
+
+	var neighbours []position
+	if positionCol < len(positionMatrix)-1 {
+		neighbour := positionMatrix[positionCol+1][positionRow]
+		if !bodyPositionSet[neighbour] {
+			neighbours = append(neighbours, neighbour)
+		}
 	}
-	heap.Push(&pq, &priorityNode2)
-	heap.Push(&pq, &priorityNode3)
-	log.Println(pq.Exist(position{1, 2, 3, 4}))
-	log.Println("1:", heap.Pop(&pq))
-	log.Println(pq.Exist(position{1, 2, 3, 4}))
-	log.Println("2:", heap.Pop(&pq))
-	log.Println(pq.Exist(position{1, 2, 3, 4}))
-	//log.Println("3:", heap.Pop(&pq))
-
-	//cameFrom := make(map[position]position)
-	//cameFrom[position{2,2,2,2}] = position{3,3,3,3}
-	//cameFrom[position{1,1,1,1}] = position{2,2,2,2}
-	//position, exist := cameFrom[position{1,1,1,2}]
-
-	//log.Println(position,exist)
-	//log.Println(reconstructPath(cameFrom,position{1,1,1,1}))
+	if positionCol > 0 {
+		neighbour := positionMatrix[positionCol-1][positionRow]
+		if !bodyPositionSet[neighbour] {
+			neighbours = append(neighbours, neighbour)
+		}
+	}
+	if positionRow < len(positionMatrix[0])-1 {
+		neighbour := positionMatrix[positionCol][positionRow+1]
+		if !bodyPositionSet[neighbour] {
+			neighbours = append(neighbours, neighbour)
+		}
+	}
+	if positionRow > 0 {
+		neighbour := positionMatrix[positionCol][positionRow-1]
+		if !bodyPositionSet[neighbour] {
+			neighbours = append(neighbours, neighbour)
+		}
+	}
+	return neighbours
 }
 
 func reconstructPath(cameFrom map[position]position, current position) []position {
 	totalPath := []position{current}
-	for position, exist := cameFrom[current]; exist; {
-		totalPath = append(totalPath, position)
-		position, exist = cameFrom[position]
+	for currentPosition, exist := cameFrom[current]; exist; {
+		totalPath = prependArray(totalPath,currentPosition)//append([]position{currentPosition}, totalPath...)//append(totalPath, position)
+		currentPosition, exist = cameFrom[currentPosition]
 	}
+	//reverseArray(totalPath)
 	return totalPath
+}
+
+func reverseArray(positions []position)  {
+	for i, j := 0, len(positions)-1; i < j; i, j = i+1, j-1 {
+		positions[i], positions[j] = positions[j], positions[i]
+	}
+}
+
+func prependArray(positions []position, position position) []position {
+	positions = append(positions, position)
+	copy(positions[1:], positions)
+	positions[0] = position
+	return positions
+}
+
+func distance(position1 position, position2 position) int {
+	position1Col, position1Row := position1.x0/deltaX, position1.y0/deltaY
+	position2Col, position2Row := position2.x0/deltaX, position2.y0/deltaY
+
+	return int(math.Abs(float64(position1Col-position2Col)) + math.Abs(float64(position1Row-position2Row)))
 }
 
 func calculatePositionDistance(position1 position, position2 position) int {
@@ -318,8 +380,8 @@ func isNeighbours(position1 position, position2 position) bool {
 }
 
 type PriorityNode struct {
-	value    position
-	priority int
+	position position
+	fScore   int
 	index    int
 }
 
@@ -328,7 +390,7 @@ type PriorityQueue []*PriorityNode
 func (pq PriorityQueue) Len() int { return len(pq) }
 
 func (pq PriorityQueue) Less(i, j int) bool {
-	return pq[i].priority > pq[j].priority
+	return pq[i].fScore < pq[j].fScore
 }
 
 func (pq PriorityQueue) Swap(i, j int) {
@@ -339,7 +401,7 @@ func (pq PriorityQueue) Swap(i, j int) {
 
 func (pq PriorityQueue) Exist(value position) (*PriorityNode, bool) {
 	for _, priorityNode := range pq {
-		if priorityNode.value == value {
+		if priorityNode.position == value {
 			return priorityNode, true
 		}
 	}
@@ -364,7 +426,7 @@ func (pq *PriorityQueue) Pop() interface{} {
 }
 
 func (pq *PriorityQueue) update(item *PriorityNode, value position, priority int) {
-	item.value = value
-	item.priority = priority
+	item.position = value
+	item.fScore = priority
 	heap.Fix(pq, item.index)
 }
