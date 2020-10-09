@@ -30,6 +30,9 @@ func reset() error {
 	loadingView.Visible = false
 	gameFinished = false
 
+	foodPath = []node{}
+	pathIndex = -1
+
 	if err := updateStat(&restartStat, restartStat.value+1); err != nil {
 		return err
 	}

@@ -125,20 +125,20 @@ func manageGame(gui *gocui.Gui) error {
 func updateMovement() {
 	for {
 		time.Sleep(tickInterval)
-		initPositionMatrix(gameView.position)
-		if err := initHamiltonianCycle(gameView.position); err != nil {
+		/*if err := initHamiltonianCycle(gameView.position); err != nil {
 			log.Panicln(err)
-		}
+		}*/
 		if !running {
 			continue
 		}
-		if autoPilotEnabled {
-			err := autopilot2()
-			if err != nil {
-				log.Panicln(err)
-			}
-		}
 		gui.Update(func(gui *gocui.Gui) error {
+			initPositionMatrix(gameView.position)
+			if autoPilotEnabled {
+				err := autopilot3()
+				if err != nil {
+					log.Panicln(err)
+				}
+			}
 			if err := moveSnekHead(); err != nil {
 				log.Panicln(err)
 			}
