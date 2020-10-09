@@ -52,7 +52,7 @@ var (
 func main() {
 	positionMatrix := generatePositionMatrix(gameViewPosition)
 	startPosition := positionMatrix[0][0]
-	goalPosition := positionMatrix[19][9]
+	goalPosition := positionMatrix[3][3]
 	bodyPositionSet := make(map[position]bool)
 	bodyPositionSet[position{18, 9, 19, 10}] = true
 	//bodyPositionSet[position{0, 0, 1, 1}] = true
@@ -62,7 +62,7 @@ func main() {
 	log.Println(len(path), path)
 }
 
-func aStar(startPosition position, goalPosition position, bodyPositionSet map[position]bool, positionMatrix [][]position) []position {
+func aStar(startPosition position, goalPosition position, bodyPositionSet map[position]bool, positionMatrix [][]position) []node {
 	openSet := make(PriorityQueue, 1)
 	openSet[0] = &PriorityNode{startPosition, 0 + distance(startPosition, goalPosition), 0}
 	heap.Init(&openSet)
@@ -74,10 +74,10 @@ func aStar(startPosition position, goalPosition position, bodyPositionSet map[po
 
 	for openSet.Len() > 0 {
 		var current = heap.Pop(&openSet).(*PriorityNode)
-
 		if current.position == goalPosition {
 			return reconstructPath(cameFrom, current.position)
 		}
+
 		for _, neighbour := range getNeighbours(current.position, bodyPositionSet, positionMatrix) {
 			tentativeGScore := gScore[current.position] + 1
 			if tentativeGScore < getScore(gScore, neighbour) {
@@ -139,20 +139,33 @@ func getNeighbours(currentPosition position, bodyPositionSet map[position]bool, 
 	return neighbours
 }
 
-func reconstructPath(cameFrom map[position]position, current position) []position {
-	totalPath := []position{current}
-	for currentPosition, exist := cameFrom[current]; exist; {
-		totalPath = prependArray(totalPath,currentPosition)//append([]position{currentPosition}, totalPath...)//append(totalPath, position)
-		currentPosition, exist = cameFrom[currentPosition]
+func reconstructPath(cameFrom map[position]position, current position) []node {
+	//totalPath := []position{current}
+	totalPath2 := []node{{position: current}}
+
+	for position, exist := cameFrom[current]; exist; {
+		//totalPath = prependArray(totalPath, position)
+		totalPath2 = append(totalPath2, node{getDirection(position, totalPath2[len(totalPath2)-1].position), position})
+		position, exist = cameFrom[position]
 	}
-	//reverseArray(totalPath)
-	return totalPath
+	reverseArray(totalPath2)
+	return totalPath2
 }
 
-func reverseArray(positions []position)  {
-	for i, j := 0, len(positions)-1; i < j; i, j = i+1, j-1 {
-		positions[i], positions[j] = positions[j], positions[i]
+func getDirection(currentDirection position, nextDirection position) direction {
+	currentCol, currentRow := currentDirection.x0/deltaX, currentDirection.y0/deltaY
+	nextCol, nextRow := nextDirection.x0/deltaX, nextDirection.y0/deltaY
+
+	if currentCol < nextCol {
+		return directions.right
 	}
+	if currentCol > nextCol {
+		return directions.left
+	}
+	if currentRow < nextRow {
+		return directions.down
+	}
+	return directions.up
 }
 
 func prependArray(positions []position, position position) []position {
@@ -160,6 +173,12 @@ func prependArray(positions []position, position position) []position {
 	copy(positions[1:], positions)
 	positions[0] = position
 	return positions
+}
+
+func reverseArray(positions []node) {
+	for i, j := 0, len(positions)-1; i < j; i, j = i+1, j-1 {
+		positions[i], positions[j] = positions[j], positions[i]
+	}
 }
 
 func distance(position1 position, position2 position) int {

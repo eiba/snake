@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-func aStar(startPosition position, goalPosition position, bodyPositionSet map[position]bool, positionMatrix [][]position) []position {
+func aStar(startPosition position, goalPosition position, bodyPositionSet map[position]bool, positionMatrix [][]position) []node {
 	openSet := make(PriorityQueue, 1)
 	openSet[0] = &PriorityNode{startPosition, 0 + distance(startPosition, goalPosition), 0}
 	heap.Init(&openSet)
@@ -82,20 +82,36 @@ func getNeighbours(currentPosition position, bodyPositionSet map[position]bool, 
 	return neighbours
 }
 
-func reconstructPath(cameFrom map[position]position, current position) []position {
-	totalPath := []position{current}
+func reconstructPath(cameFrom map[position]position, current position) []node {
+	totalPath := []node{{position: current}}
 	for position, exist := cameFrom[current]; exist; {
-		totalPath = prependArray(totalPath, position)
+		totalPath = append(totalPath, node{getDirection(position, totalPath[len(totalPath)-1].position), position})
 		position, exist = cameFrom[position]
 	}
+	reverseArray(totalPath)
 	return totalPath
 }
 
-func prependArray(positions []position, position position) []position {
-	positions = append(positions, position)
-	copy(positions[1:], positions)
-	positions[0] = position
-	return positions
+func getDirection(currentDirection position, nextDirection position) direction {
+	currentCol, currentRow := currentDirection.x0/deltaX, currentDirection.y0/deltaY
+	nextCol, nextRow := nextDirection.x0/deltaX, nextDirection.y0/deltaY
+
+	if currentCol < nextCol {
+		return directions.right
+	}
+	if currentCol > nextCol {
+		return directions.left
+	}
+	if currentRow < nextRow {
+		return directions.down
+	}
+	return directions.up
+}
+
+func reverseArray(positions []node) {
+	for i, j := 0, len(positions)-1; i < j; i, j = i+1, j-1 {
+		positions[i], positions[j] = positions[j], positions[i]
+	}
 }
 
 func distance(position1 position, position2 position) int {
