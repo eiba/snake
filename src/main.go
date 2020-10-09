@@ -133,6 +133,9 @@ func updateMovement() {
 		}
 		gui.Update(func(gui *gocui.Gui) error {
 			initPositionMatrix(gameView.position)
+			if err := initHamiltonianCycle(gameView.position); err != nil {
+				log.Panicln(err)
+			}
 			if autoPilotEnabled {
 				err := autopilot3()
 				if err != nil {
