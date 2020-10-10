@@ -3,7 +3,6 @@ package main
 var (
 	foodPath  []node
 	pathIndex = -1
-	aStarPath = false
 )
 
 func autopilot3() error {
