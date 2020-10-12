@@ -3,7 +3,6 @@ package main
 var (
 	foodPath  []node
 	pathIndex = -1
-	aStarPath = false
 )
 
 func autopilot3() error {
@@ -67,17 +66,13 @@ func autopilot4() error {
 		headPosition := snekHead.position
 		headCycleIndex := cycleIndexMap[headPosition]
 		headCycleNode := hCycle[headCycleIndex]
-
 		if headCycleNode.direction != getOppositeDirection(snekHead.currentDirection) {
 			headDirection = headCycleNode.direction
 		}
-
 		foodPosition := foodView.position
 		foodCycleIndex := cycleIndexMap[foodPosition]
-
 		tailPosition := snekBodyParts[len(snekBodyParts)-1].position
 		tailCycleIndex := cycleIndexMap[tailPosition]
-
 		validNextPositions := getPositionOfDirection(snekHead.currentDirection, snekHead.position, positionMatrix)*/
 
 	/*for _, nextPosition := range validNextPositions {
