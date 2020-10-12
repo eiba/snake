@@ -125,9 +125,6 @@ func manageGame(gui *gocui.Gui) error {
 func updateMovement() {
 	for {
 		time.Sleep(tickInterval)
-		/*if err := initHamiltonianCycle(gameView.position); err != nil {
-			log.Panicln(err)
-		}*/
 		if !running {
 			continue
 		}

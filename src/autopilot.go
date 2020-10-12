@@ -6,7 +6,7 @@ type node struct {
 }
 
 var (
-	hCycle []node
+	hCycle        []node
 	cycleIndexMap map[position]int
 )
 
@@ -19,19 +19,19 @@ func initPositionMatrix(gameViewPosition position) {
 	positionMatrix = generatePositionMatrix(gameViewPosition)
 }
 
-func initHamiltonianCycle(gameViewPosition position) error  {
+func initHamiltonianCycle(gameViewPosition position) error {
 	gameViewCols := gameViewPosition.x1 / deltaX
 	gameViewRows := gameViewPosition.y1 / deltaY
 	if len(hCycle)-1 == gameViewCols*gameViewRows || !autoPilotEnabled {
 		return nil
 	}
 
-	if err := loading(true); err != nil{
+	if err := loading(true); err != nil {
 		return err
 	}
 	hCycle = generateHamiltonianCycle(positionMatrix)
 	cycleIndexMap = generateHamiltonianCycleIndexMap(hCycle)
-	if err := loading(false); err != nil{
+	if err := loading(false); err != nil {
 		return err
 	}
 	return nil
@@ -45,9 +45,9 @@ func generatePositionMatrix(gameViewPosition position) [][]position {
 	for col := range positionMatrix {
 		positionMatrix[col] = make([]position, totalRows)
 		for row := range positionMatrix[col] {
-			x0 := col*deltaX
-			y0 := row*deltaY
-			position := position{x0, y0, x0+deltaX, y0 + deltaY}
+			x0 := col * deltaX
+			y0 := row * deltaY
+			position := position{x0, y0, x0 + deltaX, y0 + deltaY}
 			positionMatrix[col][row] = position
 		}
 	}
@@ -58,7 +58,7 @@ func generateHamiltonianCycle(positionMatrix [][]position) []node {
 	vertexGraph := generateVertexGraph(positionMatrix)
 	numNodes := len(positionMatrix) * len(positionMatrix[0])
 	//log.Panicln(len(positionMatrix),len(positionMatrix[0]))
-	startCol, startRow := 0,0//snekHead.position.x0/deltaX, snekHead.position.y0/deltaY
+	startCol, startRow := 0, 0 //snekHead.position.x0/deltaX, snekHead.position.y0/deltaY
 	startPosition := positionMatrix[startCol][startRow]
 	directions := getPositionVertices(startCol, startRow, len(positionMatrix), len(positionMatrix[0]))
 	var tour []node
@@ -72,7 +72,7 @@ func generateHamiltonianCycle(positionMatrix [][]position) []node {
 	//}
 	return tour
 }
-func generateHamiltonianCycleIndexMap(hamiltonianCycle []node) map[position]int{
+func generateHamiltonianCycleIndexMap(hamiltonianCycle []node) map[position]int {
 	indexMap := make(map[position]int)
 	for i := 0; i < len(hamiltonianCycle)-1; i++ {
 		indexMap[hamiltonianCycle[i].position] = i
@@ -144,9 +144,9 @@ func getNextPosition(currentNode node) (int, int) {
 	return currentCol, currentRow
 }
 
-func copyPositionMapMap(positionMap map[position]bool) map[position]bool  {
+func copyPositionMapMap(positionMap map[position]bool) map[position]bool {
 	positionMapCopy := make(map[position]bool)
-	for key,value := range positionMap {
+	for key, value := range positionMap {
 		positionMapCopy[key] = value
 	}
 	return positionMapCopy
@@ -224,7 +224,7 @@ func getPositionVertices(col int, row int, cols int, rows int) []direction {
 	return []direction{directions.up, directions.right, directions.down, directions.left}
 }
 
-func autopilot2() error  {
+func autopilot2() error {
 	headPosition := snekHead.position
 	headCycleIndex := cycleIndexMap[headPosition]
 	headCycleNode := hCycle[headCycleIndex]
@@ -233,10 +233,10 @@ func autopilot2() error  {
 		headDirection = headCycleNode.direction
 	}
 
-	foodPosition  := foodView.position
+	foodPosition := foodView.position
 	foodCycleIndex := cycleIndexMap[foodPosition]
 
-	tailPosition  := snekBodyParts[len(snekBodyParts)-1].position
+	tailPosition := snekBodyParts[len(snekBodyParts)-1].position
 	tailCycleIndex := cycleIndexMap[tailPosition]
 
 	validNextPositions := getPositionOfDirection(snekHead.currentDirection, snekHead.position, positionMatrix)
@@ -244,45 +244,45 @@ func autopilot2() error  {
 	for _, nextPosition := range validNextPositions {
 		nextPositionCycleIndex := cycleIndexMap[nextPosition.position]
 		highestValidIndex := headCycleIndex
-		if nextPositionCycleIndex > headCycleIndex && nextPositionCycleIndex > tailCycleIndex && nextPositionCycleIndex > highestValidIndex  && nextPositionCycleIndex < foodCycleIndex{
+		if nextPositionCycleIndex > headCycleIndex && nextPositionCycleIndex > tailCycleIndex && nextPositionCycleIndex > highestValidIndex && nextPositionCycleIndex < foodCycleIndex {
 			highestValidIndex = nextPositionCycleIndex
 			headDirection = nextPosition.direction
-		}else if headCycleIndex > foodCycleIndex && nextPositionCycleIndex < foodCycleIndex && nextPositionCycleIndex < tailCycleIndex && validDirection(nextPosition.direction){
+		} else if headCycleIndex > foodCycleIndex && nextPositionCycleIndex < foodCycleIndex && nextPositionCycleIndex < tailCycleIndex && validDirection(nextPosition.direction) {
 			headDirection = nextPosition.direction
 			break
 		}
 	}
-	if !validDirection(headDirection){
+	if !validDirection(headDirection) {
 		headDirection = getRandomValidDirection(snekHead.currentDirection)
 	}
 
 	return nil
 }
 
-func getPositionOfDirection(currentDirection direction, currentPosition position, positionMatrix [][]position) []node  {
+func getPositionOfDirection(currentDirection direction, currentPosition position, positionMatrix [][]position) []node {
 	currentCol, currentRow := currentPosition.x0/deltaX, currentPosition.y0/deltaY
 
-	positionVetrices := getPositionVertices(currentCol,currentRow,len(positionMatrix),len(positionMatrix[0]))
+	positionVetrices := getPositionVertices(currentCol, currentRow, len(positionMatrix), len(positionMatrix[0]))
 
 	var possibleNextPositions []node
 	for _, possibleDirection := range positionVetrices {
 		if possibleDirection == getOppositeDirection(currentDirection) {
 			continue
 		}
-		nextCol, nextRow := currentCol,currentRow
+		nextCol, nextRow := currentCol, currentRow
 		switch possibleDirection {
 		case directions.up:
-			nextRow = currentRow-1
+			nextRow = currentRow - 1
 		case directions.right:
-			nextCol = currentCol+1
+			nextCol = currentCol + 1
 		case directions.down:
-			nextRow = currentRow+1
+			nextRow = currentRow + 1
 		case directions.left:
-			nextCol = currentCol-1
+			nextCol = currentCol - 1
 		}
 		possibleNextPositions = append(
 			possibleNextPositions,
-			node{possibleDirection,positionMatrix[nextCol][nextRow]})
+			node{possibleDirection, positionMatrix[nextCol][nextRow]})
 	}
 	return possibleNextPositions
 }
