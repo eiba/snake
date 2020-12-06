@@ -49,3 +49,27 @@ func autopilot4() error {
 	}
 	return nil
 }
+
+func validDirection(direction direction) bool {
+	positions := make([]position, len(snekBodyParts)-1)
+	for i := 1; i < len(snekBodyParts); i++ {
+		positions[i-1] = getPositionOfNextMove(snekBodyParts[i-1].currentDirection, snekBodyParts[i-1].position, false)
+	}
+
+	nextPosition := getPositionOfNextMove(direction, snekHead.position, true)
+	if positionsOverlap(nextPosition, positions) || mainViewCollision(nextPosition) {
+		return false
+	}
+	return true
+}
+
+func getRandomValidDirection(currentDirection direction) direction {
+	oppositeDirection := getOppositeDirection(currentDirection)
+
+	for {
+		direction := direction(r.Intn(4))
+		if direction != oppositeDirection && direction != headDirection {
+			return direction
+		}
+	}
+}
