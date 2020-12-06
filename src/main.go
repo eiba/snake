@@ -134,7 +134,7 @@ func updateMovement() {
 				log.Panicln(err)
 			}
 			if autoPilotEnabled {
-				err := autopilot4()
+				err := autopilot()
 				if err != nil {
 					log.Panicln(err)
 				}

@@ -26,7 +26,7 @@ func getNextPositionInAStarPath() bool {
 	return true
 }
 
-func autopilot4() error {
+func autopilot() error {
 	if getNextPositionInAStarPath() {
 		return nil
 	}
