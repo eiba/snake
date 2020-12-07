@@ -81,24 +81,24 @@ func trySetViewAtRandomEmptyPosition(name string, positionMatrix [][]position) (
 func tryGetRandomEmptyPosition(positionMatrix [][]position) (position, bool) {
 	randomCol := r.Intn(len(positionMatrix))
 	randomRow := r.Intn(len(positionMatrix[0]))
-	snekPositionSet := getSnekPositionSet(snekBodyParts)
-	emptyPosition, foundEmptyPosition := tryGetEmptyPosition(snekPositionSet, positionMatrix, randomCol, randomRow)
+	snakePositionSet := getsnakePositionSet(snakeBodyParts)
+	emptyPosition, foundEmptyPosition := tryGetEmptyPosition(snakePositionSet, positionMatrix, randomCol, randomRow)
 	return emptyPosition, foundEmptyPosition
 }
 
-func tryGetEmptyPosition(snekPositionSet map[position]bool, positionMatrix [][]position, randomCol int, randomRow int) (position, bool) {
-	position, foundEmptyPosition := lookForEmptyPosition(snekPositionSet, positionMatrix, randomCol, len(positionMatrix), randomRow, len(positionMatrix[0]))
+func tryGetEmptyPosition(snakePositionSet map[position]bool, positionMatrix [][]position, randomCol int, randomRow int) (position, bool) {
+	position, foundEmptyPosition := lookForEmptyPosition(snakePositionSet, positionMatrix, randomCol, len(positionMatrix), randomRow, len(positionMatrix[0]))
 	if !foundEmptyPosition {
-		position, foundEmptyPosition = lookForEmptyPosition(snekPositionSet, positionMatrix, 0, randomCol, 0, randomRow)
+		position, foundEmptyPosition = lookForEmptyPosition(snakePositionSet, positionMatrix, 0, randomCol, 0, randomRow)
 	}
 	return position, foundEmptyPosition
 }
 
-func lookForEmptyPosition(snekPositionSet map[position]bool, positionMatrix [][]position, startCol int, endCol int, startRow int, endRow int) (position, bool) {
+func lookForEmptyPosition(snakePositionSet map[position]bool, positionMatrix [][]position, startCol int, endCol int, startRow int, endRow int) (position, bool) {
 	for i := startCol; i < endCol; i++ {
 		for j := startRow; j < endRow; j++ {
 			position := positionMatrix[i][j]
-			if !snekPositionSet[position] {
+			if !snakePositionSet[position] {
 				return position, true
 			}
 		}

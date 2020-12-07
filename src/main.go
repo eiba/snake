@@ -14,7 +14,7 @@ var (
 	gameFinished     = false
 	autoPilotEnabled = false
 	tickInterval     = 50 * time.Millisecond
-	gameView         = viewProperties{"game", "Snek", "", position{}}
+	gameView         = viewProperties{"game", "snake", "", position{}}
 	positionMatrix   [][]position
 )
 
@@ -48,7 +48,7 @@ func initGameView(maxX int, maxY int) (position, error) {
 		if !gocui.IsUnknownView(err) {
 			return gameViewPosition, err
 		}
-		v.Title = "Snek"
+		v.Title = "snake"
 		if _, err := gui.SetViewOnBottom(gameView.name); err != nil {
 			return gameViewPosition, err
 		}
@@ -79,7 +79,7 @@ func calculateGameViewPosition(maxX int, maxY int) position {
 
 func initGame() error {
 	var err error
-	snekHead.position, err = setViewAtRandomPosition(snekHead.viewName, positionMatrix, true)
+	snakeHead.position, err = setViewAtRandomPosition(snakeHead.viewName, positionMatrix, true)
 	if err != nil {
 		return err
 	}
@@ -139,10 +139,10 @@ func updateMovement() {
 					log.Panicln(err)
 				}
 			}
-			if err := moveSnekHead(); err != nil {
+			if err := movesnakeHead(); err != nil {
 				log.Panicln(err)
 			}
-			if err := moveSnekBodyParts(); err != nil {
+			if err := movesnakeBodyParts(); err != nil {
 				log.Panicln(err)
 			}
 			return nil

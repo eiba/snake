@@ -7,12 +7,12 @@ import (
 func reset() error {
 	running = true
 
-	if err := deleteSnekBody(); err != nil {
+	if err := deletesnakeBody(); err != nil {
 		return err
 	}
 
 	var err error
-	snekHead.position, err = setViewAtRandomPosition(snekHead.viewName, positionMatrix, true)
+	snakeHead.position, err = setViewAtRandomPosition(snakeHead.viewName, positionMatrix, true)
 	if err != nil {
 		return err
 	}
@@ -22,8 +22,8 @@ func reset() error {
 	}
 
 	headDirection = direction(r.Intn(4))
-	snekHead.currentDirection = headDirection
-	snekBodyParts = []*snekBodyPart{snekHead}
+	snakeHead.currentDirection = headDirection
+	snakeBodyParts = []*snakeBodyPart{snakeHead}
 
 	gameOverView.Visible = false
 	pauseView.Visible = false
@@ -42,9 +42,9 @@ func reset() error {
 	return nil
 }
 
-func deleteSnekBody() error {
-	for i := 1; i < len(snekBodyParts); i++ {
-		if err := gui.DeleteView(snekBodyParts[i].viewName); err != nil && !gocui.IsUnknownView(err) {
+func deletesnakeBody() error {
+	for i := 1; i < len(snakeBodyParts); i++ {
+		if err := gui.DeleteView(snakeBodyParts[i].viewName); err != nil && !gocui.IsUnknownView(err) {
 			return err
 		}
 	}

@@ -3,7 +3,7 @@ package main
 var foodView = viewProperties{"food", "", "", position{}}
 
 func eatFood() error {
-	err := addBodyPartToEnd(*snekBodyParts[len(snekBodyParts)-1])
+	err := addBodyPartToEnd(*snakeBodyParts[len(snakeBodyParts)-1])
 	if err != nil {
 		return err
 	}

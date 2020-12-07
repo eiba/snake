@@ -5,7 +5,7 @@ import (
 	"github.com/awesome-gocui/gocui"
 )
 
-type snekBodyPart struct {
+type snakeBodyPart struct {
 	currentDirection  direction
 	previousDirection direction
 	viewName          string
@@ -35,30 +35,30 @@ const (
 var (
 	directions    = movementDirections{0, 1, 2, 3}
 	headDirection = direction(r.Intn(4))
-	snekHead      = &snekBodyPart{headDirection, headDirection, "s0", position{}}
-	snekBodyParts = []*snekBodyPart{snekHead}
+	snakeHead      = &snakeBodyPart{headDirection, headDirection, "s0", position{}}
+	snakeBodyParts = []*snakeBodyPart{snakeHead}
 )
 
-func addBodyPartToEnd(currentLastSnekBodyPart snekBodyPart) error {
-	offsetX, offsetY := calculateOffsets(currentLastSnekBodyPart.currentDirection, false)
+func addBodyPartToEnd(currentLastsnakeBodyPart snakeBodyPart) error {
+	offsetX, offsetY := calculateOffsets(currentLastsnakeBodyPart.currentDirection, false)
 
-	name := fmt.Sprintf("s%v", len(snekBodyParts))
+	name := fmt.Sprintf("s%v", len(snakeBodyParts))
 	position := position{
-		currentLastSnekBodyPart.position.x0 + offsetX,
-		currentLastSnekBodyPart.position.y0 + offsetY,
-		currentLastSnekBodyPart.position.x1 + offsetX,
-		currentLastSnekBodyPart.position.y1 + offsetY,
+		currentLastsnakeBodyPart.position.x0 + offsetX,
+		currentLastsnakeBodyPart.position.y0 + offsetY,
+		currentLastsnakeBodyPart.position.x1 + offsetX,
+		currentLastsnakeBodyPart.position.y1 + offsetY,
 	}
 
 	_, err := gui.SetView(name, position.x0, position.y0, position.x1, position.y1, 0)
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
 	}
-	snekBodyParts = append(
-		snekBodyParts,
-		&snekBodyPart{
-			currentLastSnekBodyPart.currentDirection,
-			currentLastSnekBodyPart.previousDirection,
+	snakeBodyParts = append(
+		snakeBodyParts,
+		&snakeBodyPart{
+			currentLastsnakeBodyPart.currentDirection,
+			currentLastsnakeBodyPart.previousDirection,
 			name,
 			position,
 		})
@@ -83,17 +83,17 @@ func positionOverlap(position1 position, position2 position) bool {
 	return false
 }
 
-func moveSnekHead() error {
-	err := moveHeadView(snekHead)
+func movesnakeHead() error {
+	err := moveHeadView(snakeHead)
 	if err != nil {
 		return err
 	}
 
-	if fatalCollision(snekHead.position) {
+	if fatalCollision(snakeHead.position) {
 		return gameOver("Game Over")
 	}
 
-	if positionOverlap(snekHead.position, foodView.position) {
+	if positionOverlap(snakeHead.position, foodView.position) {
 		return eatFood()
 	}
 	return nil
@@ -107,8 +107,8 @@ func fatalCollision(position position) bool {
 }
 
 func bodyCollision(position position) bool {
-	for i := 1; i < len(snekBodyParts); i++ {
-		collision := positionOverlap(position, snekBodyParts[i].position)
+	for i := 1; i < len(snakeBodyParts); i++ {
+		collision := positionOverlap(position, snakeBodyParts[i].position)
 		if collision {
 			return true
 		}
@@ -127,9 +127,9 @@ func mainViewCollision(position position) bool {
 	return true
 }
 
-func moveSnekBodyParts() error {
-	for i := 1; i < len(snekBodyParts); i++ {
-		err := moveSnekBodyPart(snekBodyParts[i-1], snekBodyParts[i])
+func movesnakeBodyParts() error {
+	for i := 1; i < len(snakeBodyParts); i++ {
+		err := movesnakeBodyPart(snakeBodyParts[i-1], snakeBodyParts[i])
 		if err != nil {
 			return err
 		}
@@ -137,35 +137,35 @@ func moveSnekBodyParts() error {
 	return nil
 }
 
-func moveSnekBodyPart(previousSnekBodyPart *snekBodyPart, currentSnekBodyPart *snekBodyPart) error {
-	currentSnekBodyPart.position = getPositionOfNextMove(previousSnekBodyPart.currentDirection, previousSnekBodyPart.position, false)
+func movesnakeBodyPart(previoussnakeBodyPart *snakeBodyPart, currentsnakeBodyPart *snakeBodyPart) error {
+	currentsnakeBodyPart.position = getPositionOfNextMove(previoussnakeBodyPart.currentDirection, previoussnakeBodyPart.position, false)
 	_, err := gui.SetView(
-		currentSnekBodyPart.viewName,
-		currentSnekBodyPart.position.x0,
-		currentSnekBodyPart.position.y0,
-		currentSnekBodyPart.position.x1,
-		currentSnekBodyPart.position.y1,
+		currentsnakeBodyPart.viewName,
+		currentsnakeBodyPart.position.x0,
+		currentsnakeBodyPart.position.y0,
+		currentsnakeBodyPart.position.x1,
+		currentsnakeBodyPart.position.y1,
 		0)
 	if err != nil {
 		return err
 	}
 
-	currentSnekBodyPart.previousDirection = currentSnekBodyPart.currentDirection
-	currentSnekBodyPart.currentDirection = previousSnekBodyPart.previousDirection
+	currentsnakeBodyPart.previousDirection = currentsnakeBodyPart.currentDirection
+	currentsnakeBodyPart.currentDirection = previoussnakeBodyPart.previousDirection
 	return nil
 }
 
-func moveHeadView(snekHead *snekBodyPart) error {
-	snekHead.previousDirection = snekHead.currentDirection
-	snekHead.currentDirection = headDirection
+func moveHeadView(snakeHead *snakeBodyPart) error {
+	snakeHead.previousDirection = snakeHead.currentDirection
+	snakeHead.currentDirection = headDirection
 
-	snekHead.position = getPositionOfNextMove(snekHead.currentDirection, snekHead.position, true)
+	snakeHead.position = getPositionOfNextMove(snakeHead.currentDirection, snakeHead.position, true)
 	_, err := gui.SetView(
-		snekHead.viewName,
-		snekHead.position.x0,
-		snekHead.position.y0,
-		snekHead.position.x1,
-		snekHead.position.y1,
+		snakeHead.viewName,
+		snakeHead.position.x0,
+		snakeHead.position.y0,
+		snakeHead.position.x1,
+		snakeHead.position.y1,
 		0)
 	if err != nil {
 		return err
@@ -200,12 +200,12 @@ func calculateOffsets(direction direction, isHead bool) (int, int) {
 	return modifier * offsetX, modifier * offsetY
 }
 
-func getSnekPositionSet(snek []*snekBodyPart) map[position]bool {
-	snekPositionSet := make(map[position]bool)
-	for _, bodyPart := range snek {
-		snekPositionSet[bodyPart.position] = true
+func getsnakePositionSet(snake []*snakeBodyPart) map[position]bool {
+	snakePositionSet := make(map[position]bool)
+	for _, bodyPart := range snake {
+		snakePositionSet[bodyPart.position] = true
 	}
-	return snekPositionSet
+	return snakePositionSet
 }
 
 func getOppositeDirection(direction direction) direction {
