@@ -1,4 +1,4 @@
-# Snek
+# Snake
 A little snake game made with [GOCUI](https://github.com/awesome-gocui/gocui) 
 that runs in your terminal.
 
