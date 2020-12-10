@@ -1,15 +1,16 @@
-package main
+package game
 
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
-	"github.com/eiba/snake/game"
+	"github.com/eiba/snake"
+	view2 "github.com/eiba/snake/game/view"
 	"time"
 )
 
 func initKeybindingsView() error {
-	maxX  := gameView.position.x1
-	if v, err := gui.SetView("keybindings", maxX+1, 0, maxX+26, 8, 0); err != nil {
+	maxX  := main.gameView.position.x1
+	if v, err := main.gui.SetView("keybindings", maxX+1, 0, maxX+26, 8, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}
@@ -51,7 +52,7 @@ func initKeybindings() error {
 }
 
 func initQuitKey() error {
-	if err := gui.SetKeybinding("", gocui.KeyEsc, gocui.ModNone,
+	if err := main.gui.SetKeybinding("", gocui.KeyEsc, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
 			return gocui.ErrQuit
 		}); err != nil {
@@ -61,28 +62,28 @@ func initQuitKey() error {
 }
 
 func initMovementKeys() error {
-	if err := initMovementKey(gocui.KeyArrowUp, game.directions.up); err != nil {
+	if err := initMovementKey(gocui.KeyArrowUp, directions.up); err != nil {
 		return err
 	}
-	if err := initMovementKey(gocui.KeyArrowRight, game.directions.right); err != nil {
+	if err := initMovementKey(gocui.KeyArrowRight, directions.right); err != nil {
 		return err
 	}
-	if err := initMovementKey(gocui.KeyArrowDown, game.directions.down); err != nil {
+	if err := initMovementKey(gocui.KeyArrowDown, directions.down); err != nil {
 		return err
 	}
-	if err := initMovementKey(gocui.KeyArrowLeft, game.directions.left); err != nil {
+	if err := initMovementKey(gocui.KeyArrowLeft, directions.left); err != nil {
 		return err
 	}
 	return nil
 }
 
-func initMovementKey(key gocui.Key, keyDirection game.direction) error {
-	if err := gui.SetKeybinding("", key, gocui.ModNone,
+func initMovementKey(key gocui.Key, keyDirection direction) error {
+	if err := main.gui.SetKeybinding("", key, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
-			if game.snakeHead.currentDirection == game.getOppositeDirection(keyDirection) {
+			if snakeHead.currentDirection == getOppositeDirection(keyDirection) {
 				return nil
 			}
-			game.headDirection = keyDirection
+			headDirection = keyDirection
 			return nil
 		}); err != nil {
 		return err
@@ -91,9 +92,9 @@ func initMovementKey(key gocui.Key, keyDirection game.direction) error {
 }
 
 func initTabKey() error {
-	if err := gui.SetKeybinding("", gocui.KeyTab, gocui.ModNone,
+	if err := main.gui.SetKeybinding("", gocui.KeyTab, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
-			err := game.addBodyPartToEnd(*game.snakeBodyParts[len(game.snakeBodyParts)-1])
+			err := addBodyPartToEnd(*snakeBodyParts[len(snakeBodyParts)-1])
 			if err != nil {
 				return err
 			}
@@ -105,7 +106,7 @@ func initTabKey() error {
 }
 
 func initSpaceKey() error {
-	if err := gui.SetKeybinding("", gocui.KeySpace, gocui.ModNone,
+	if err := main.gui.SetKeybinding("", gocui.KeySpace, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
 			return reset()
 		}); err != nil {
@@ -125,11 +126,11 @@ func initSpeedKeys() error {
 }
 
 func initSpeedKey(key rune, speedChange time.Duration) error {
-	if err := gui.SetKeybinding("", key, gocui.ModNone,
+	if err := main.gui.SetKeybinding("", key, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
-			tickInterval += speedChange * time.Millisecond
-			if tickInterval < time.Millisecond {
-				tickInterval = time.Millisecond
+			main.tickInterval += speedChange * time.Millisecond
+			if main.tickInterval < time.Millisecond {
+				main.tickInterval = time.Millisecond
 			}
 			return nil
 		}); err != nil {
@@ -139,9 +140,9 @@ func initSpeedKey(key rune, speedChange time.Duration) error {
 }
 
 func initPauseKey() error {
-	if err := gui.SetKeybinding("", 'p', gocui.ModNone,
+	if err := main.gui.SetKeybinding("", 'p', gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
-			return pause()
+			return view2.pause()
 		}); err != nil {
 		return err
 	}
@@ -149,9 +150,9 @@ func initPauseKey() error {
 }
 
 func initAutoPilotKey() error {
-	if err := gui.SetKeybinding("", 'a', gocui.ModNone,
+	if err := main.gui.SetKeybinding("", 'a', gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
-			autoPilotEnabled = !autoPilotEnabled
+			main.autoPilotEnabled = !main.autoPilotEnabled
 			return nil
 		}); err != nil {
 		return err

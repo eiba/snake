@@ -1,4 +1,4 @@
-package main
+package a_star
 
 import (
 	"container/heap"

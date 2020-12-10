@@ -1,17 +1,19 @@
-package main
+package autopilot
 
 import (
+	"github.com/eiba/snake"
 	"github.com/eiba/snake/a-star"
 	"github.com/eiba/snake/game"
+	"github.com/eiba/snake/hamiltonian-cycle"
 )
 
 var (
-	foodPath  []node
+	foodPath  []hamiltonian_cycle.node
 	pathIndex = -1
 )
 
-func initiateAStar(goal game.position) []node {
-	foodPath = a_star.AStar(game.snakeHead.position, goal, game.getsnakePositionSet(game.snakeBodyParts), positionMatrix)
+func initiateAStar(goal game.position) []hamiltonian_cycle.node {
+	foodPath = a_star.AStar(game.snakeHead.position, goal, game.getsnakePositionSet(game.snakeBodyParts), main.positionMatrix)
 	if len(foodPath) == 0 {
 		pathIndex = -1
 		return foodPath
@@ -38,8 +40,8 @@ func autopilot() error {
 	pathToFood := initiateAStar(game.foodView.position)
 	if len(pathToFood) == 0 {
 		headPosition := game.snakeHead.position
-		headCycleIndex := cycleIndexMap[headPosition]
-		headCycleNode := hCycle[headCycleIndex]
+		headCycleIndex := hamiltonian_cycle.cycleIndexMap[headPosition]
+		headCycleNode := hamiltonian_cycle.hCycle[headCycleIndex]
 
 		if headCycleNode.direction != game.getOppositeDirection(game.snakeHead.currentDirection) {
 			game.headDirection = headCycleNode.direction
@@ -72,7 +74,7 @@ func getRandomValidDirection(currentDirection game.direction) game.direction {
 	oppositeDirection := game.getOppositeDirection(currentDirection)
 
 	for {
-		direction := game.direction(r.Intn(4))
+		direction := game.direction(main.r.Intn(4))
 		if direction != oppositeDirection && direction != game.headDirection {
 			return direction
 		}

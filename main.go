@@ -2,8 +2,10 @@ package main
 
 import (
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake/autopilot"
 	"github.com/eiba/snake/game"
 	"github.com/eiba/snake/game/view"
+	"github.com/eiba/snake/hamiltonian-cycle"
 	"log"
 	"math/rand"
 	"time"
@@ -24,7 +26,7 @@ func main() {
 	gui = initGUI()
 	defer gui.Close()
 
-	if err := initKeybindings(); err != nil {
+	if err := game.initKeybindings(); err != nil {
 		log.Panicln(err)
 	}
 
@@ -54,7 +56,7 @@ func initGameView(maxX int, maxY int) (game.position, error) {
 		if _, err := gui.SetViewOnBottom(gameView.name); err != nil {
 			return gameViewPosition, err
 		}
-		initPositionMatrix(gameViewPosition)
+		game.initPositionMatrix(gameViewPosition)
 		return gameViewPosition, initGame()
 	}
 	return gameViewPosition, nil
@@ -102,23 +104,23 @@ func manageGame(gui *gocui.Gui) error {
 		log.Panicln(err)
 	}
 
-	if err := initKeybindingsView(); err != nil {
+	if err := game.initKeybindingsView(); err != nil {
 		log.Panicln(err)
 	}
 
-	if err := initStatsView(); err != nil {
+	if err := view.initStatsView(); err != nil {
 		log.Panicln(err)
 	}
 
-	if err := initLoadingView(); err != nil {
+	if err := view.initLoadingView(); err != nil {
 		log.Panicln(err)
 	}
 
-	if err := initPauseView(); err != nil {
+	if err := view.initPauseView(); err != nil {
 		log.Panicln(err)
 	}
 
-	if err := initGameOverView(); err != nil {
+	if err := view.initGameOverView(); err != nil {
 		log.Panicln(err)
 	}
 	return nil
@@ -131,12 +133,12 @@ func updateMovement() {
 			continue
 		}
 		gui.Update(func(gui *gocui.Gui) error {
-			initPositionMatrix(gameView.position)
-			if err := initHamiltonianCycle(gameView.position); err != nil {
+			game.initPositionMatrix(gameView.position)
+			if err := hamiltonian_cycle.initHamiltonianCycle(gameView.position); err != nil {
 				log.Panicln(err)
 			}
 			if autoPilotEnabled {
-				err := autopilot()
+				err := autopilot.autopilot()
 				if err != nil {
 					log.Panicln(err)
 				}

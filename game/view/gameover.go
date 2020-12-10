@@ -1,9 +1,9 @@
-package main
+package view
 
 import (
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake"
 	"github.com/eiba/snake/game"
-	"github.com/eiba/snake/game/view"
 )
 
 const gameOverViewName = "gameOver"
@@ -11,7 +11,7 @@ const gameOverViewName = "gameOver"
 var gameOverView *gocui.View
 
 func initGameOverView() error {
-	lenX, lenY, err := view.getLenXY(gameView.name)
+	lenX, lenY, err := getLenXY(main.gameView.name)
 	if err != nil {
 		return err
 	}
@@ -20,7 +20,7 @@ func initGameOverView() error {
 	viewLenX := 25
 	viewLenY := 4
 
-	gameOverViewProperties := view.viewProperties{
+	gameOverViewProperties := viewProperties{
 		gameOverViewName,
 		"",
 		"Press space to restart",
@@ -30,20 +30,20 @@ func initGameOverView() error {
 			viewPositionX + viewLenX,
 			viewPositionY + viewLenY}}
 
-	gameOverView, err = view.createView(gameOverViewProperties, false)
+	gameOverView, err = createView(gameOverViewProperties, false)
 	return err
 }
 
 func gameOver(title string) error {
 	gameOverView.Visible = true
 	gameOverView.Title = title
-	if _, err := gui.SetCurrentView(gameOverViewName); err != nil {
+	if _, err := main.gui.SetCurrentView(gameOverViewName); err != nil {
 		return err
 	}
-	if _, err := gui.SetViewOnTop(gameOverViewName); err != nil {
+	if _, err := main.gui.SetViewOnTop(gameOverViewName); err != nil {
 		return err
 	}
-	running = false
-	gameFinished = true
+	main.running = false
+	main.gameFinished = true
 	return nil
 }

@@ -1,6 +1,10 @@
-package main
+package hamiltonian_cycle
 
-import "github.com/eiba/snake/game"
+import (
+	"github.com/eiba/snake"
+	"github.com/eiba/snake/game"
+	"github.com/eiba/snake/game/view"
+)
 
 type node struct {
 	direction game.direction
@@ -15,16 +19,16 @@ var (
 func initHamiltonianCycle(gameViewPosition game.position) error {
 	gameViewCols := gameViewPosition.x1 / game.deltaX
 	gameViewRows := gameViewPosition.y1 / game.deltaY
-	if len(hCycle)-1 == gameViewCols*gameViewRows || !autoPilotEnabled {
+	if len(hCycle)-1 == gameViewCols*gameViewRows || !main.autoPilotEnabled {
 		return nil
 	}
 
-	if err := loading(true); err != nil {
+	if err := view.loading(true); err != nil {
 		return err
 	}
-	hCycle = generateHamiltonianCycle(positionMatrix)
+	hCycle = generateHamiltonianCycle(main.positionMatrix)
 	cycleIndexMap = generateHamiltonianCycleIndexMap(hCycle)
-	if err := loading(false); err != nil {
+	if err := view.loading(false); err != nil {
 		return err
 	}
 	return nil

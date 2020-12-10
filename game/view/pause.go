@@ -1,9 +1,9 @@
-package main
+package view
 
 import (
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake"
 	"github.com/eiba/snake/game"
-	"github.com/eiba/snake/game/view"
 )
 
 const pauseViewName = "pause"
@@ -11,7 +11,7 @@ const pauseViewName = "pause"
 var pauseView *gocui.View
 
 func initPauseView() error {
-	lenX, lenY, err := view.getLenXY(gameView.name)
+	lenX, lenY, err := getLenXY(main.gameView.name)
 	if err != nil {
 		return err
 	}
@@ -21,7 +21,7 @@ func initPauseView() error {
 	viewLenY := 4
 
 	pauseViewText := "Press P to resume"
-	pauseViewProps := view.viewProperties{
+	pauseViewProps := viewProperties{
 		pauseViewName,
 		"Pause",
 		pauseViewText,
@@ -30,26 +30,26 @@ func initPauseView() error {
 			viewPositionY,
 			viewPositionX + viewLenX,
 			viewPositionY + viewLenY}}
-	pauseView, err = view.createView(pauseViewProps, false)
+	pauseView, err = createView(pauseViewProps, false)
 	return err
 }
 
 func pause() error {
-	if gameFinished {
+	if main.gameFinished {
 		return nil
 	}
 
-	if running {
+	if main.running {
 		pauseView.Visible = true
-		if _, err := gui.SetCurrentView(pauseViewName); err != nil {
+		if _, err := main.gui.SetCurrentView(pauseViewName); err != nil {
 			return err
 		}
-		if _, err := gui.SetViewOnTop(pauseViewName); err != nil {
+		if _, err := main.gui.SetViewOnTop(pauseViewName); err != nil {
 			return err
 		}
 	} else {
 		pauseView.Visible = false
 	}
-	running = !running
+	main.running = !main.running
 	return nil
 }

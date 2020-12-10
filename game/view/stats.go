@@ -1,8 +1,9 @@
-package main
+package view
 
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake"
 )
 
 const statsViewName = "stats"
@@ -21,10 +22,10 @@ var (
 )
 
 func initStatsView() error {
-	maxX  := gameView.position.x1
+	maxX  := main.gameView.position.x1
 
 	var err error
-	statsView, err = gui.SetView(statsViewName, maxX+1, 9, maxX+26, 12, 0)
+	statsView, err = main.gui.SetView(statsViewName, maxX+1, 9, maxX+26, 12, 0)
 	if err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
