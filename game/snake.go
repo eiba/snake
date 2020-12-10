@@ -33,16 +33,16 @@ const (
 )
 
 var (
-	directions    = movementDirections{0, 1, 2, 3}
-	headDirection = direction(main.r.Intn(4))
+	directions     = movementDirections{0, 1, 2, 3}
+	headDirection  = direction(main.r.Intn(4))
 	snakeHead      = &snakeBodyPart{headDirection, headDirection, "s0", Position{}}
-	snakeBodyParts = []*snakeBodyPart{snakeHead}
+	SnakeBodyParts = []*snakeBodyPart{snakeHead}
 )
 
 func addBodyPartToEnd(currentLastsnakeBodyPart snakeBodyPart) error {
 	offsetX, offsetY := calculateOffsets(currentLastsnakeBodyPart.currentDirection, false)
 
-	name := fmt.Sprintf("s%v", len(snakeBodyParts))
+	name := fmt.Sprintf("s%v", len(SnakeBodyParts))
 	position := Position{
 		currentLastsnakeBodyPart.position.x0 + offsetX,
 		currentLastsnakeBodyPart.position.y0 + offsetY,
@@ -54,8 +54,8 @@ func addBodyPartToEnd(currentLastsnakeBodyPart snakeBodyPart) error {
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
 	}
-	snakeBodyParts = append(
-		snakeBodyParts,
+	SnakeBodyParts = append(
+		SnakeBodyParts,
 		&snakeBodyPart{
 			currentLastsnakeBodyPart.currentDirection,
 			currentLastsnakeBodyPart.previousDirection,
@@ -107,8 +107,8 @@ func fatalCollision(position Position) bool {
 }
 
 func bodyCollision(position Position) bool {
-	for i := 1; i < len(snakeBodyParts); i++ {
-		collision := positionOverlap(position, snakeBodyParts[i].position)
+	for i := 1; i < len(SnakeBodyParts); i++ {
+		collision := positionOverlap(position, SnakeBodyParts[i].position)
 		if collision {
 			return true
 		}
@@ -128,8 +128,8 @@ func mainViewCollision(position Position) bool {
 }
 
 func movesnakeBodyParts() error {
-	for i := 1; i < len(snakeBodyParts); i++ {
-		err := movesnakeBodyPart(snakeBodyParts[i-1], snakeBodyParts[i])
+	for i := 1; i < len(SnakeBodyParts); i++ {
+		err := movesnakeBodyPart(SnakeBodyParts[i-1], SnakeBodyParts[i])
 		if err != nil {
 			return err
 		}
@@ -200,7 +200,7 @@ func calculateOffsets(direction direction, isHead bool) (int, int) {
 	return modifier * offsetX, modifier * offsetY
 }
 
-func getsnakePositionSet(snake []*snakeBodyPart) map[Position]bool {
+func GetsnakePositionSet(snake []*snakeBodyPart) map[Position]bool {
 	snakePositionSet := make(map[Position]bool)
 	for _, bodyPart := range snake {
 		snakePositionSet[bodyPart.position] = true

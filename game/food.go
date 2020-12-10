@@ -5,7 +5,7 @@ import "github.com/eiba/snake/game/view"
 var foodView = view.Properties{"food", "", "", Position{}}
 
 func eatFood() error {
-	err := addBodyPartToEnd(*snakeBodyParts[len(snakeBodyParts)-1])
+	err := addBodyPartToEnd(*SnakeBodyParts[len(SnakeBodyParts)-1])
 	if err != nil {
 		return err
 	}

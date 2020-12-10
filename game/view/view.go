@@ -3,9 +3,11 @@ package view
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
-	"github.com/eiba/snake"
 	"github.com/eiba/snake/game"
+	"math/rand"
+	"time"
 )
+var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 type Properties struct {
 	Name     string
@@ -22,73 +24,73 @@ func getLenXY(gui *gocui.Gui, viewName string) (int, int, error) {
 	return x1 - x0, y1 - y0, nil
 }
 
-func createView(viewProperties Properties, visible bool) (*gocui.View, error) {
-	view, err := main.gui.SetView(viewProperties.Name, viewProperties.Position.x0, viewProperties.position.y0, viewProperties.position.x1, viewProperties.position.y1, 0)
+func createView(gui *gocui.Gui, viewProperties Properties, visible bool) (*gocui.View, error) {
+	view, err := gui.SetView(viewProperties.Name, viewProperties.Position.X0, viewProperties.Position.Y0, viewProperties.Position.X1, viewProperties.Position.Y1, 0)
 	if err != nil {
 		if !gocui.IsUnknownView(err) {
 			return nil, err
 		}
 
-		view.Title = viewProperties.title
+		view.Title = viewProperties.Title
 		view.Visible = visible
-		fmt.Fprintln(view, "\n", viewProperties.text)
+		fmt.Fprintln(view, "\n", viewProperties.Text)
 	}
 	return view, nil
 }
 
-func setViewPosition(name string, position game.position) error {
-	_, err := main.gui.SetView(name, position.x0, position.y0, position.x1, position.y1, 0)
+func setViewPosition(gui *gocui.Gui, name string, position game.Position) error {
+	_, err := gui.SetView(name, position.X0, position.Y0, position.X1, position.Y1, 0)
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
 	}
 	return nil
 }
 
-func setCurrentView(name string) error {
-	if _, err := main.gui.SetCurrentView(name); err != nil {
+func setCurrentView(gui *gocui.Gui,name string) error {
+	if _, err := gui.SetCurrentView(name); err != nil {
 		return err
 	}
 	return nil
 }
 
-func setViewAtRandomPosition(name string, positionMatrix [][]game.position, setCurrent bool) (game.position, error) {
+func setViewAtRandomPosition(gui *gocui.Gui, name string, positionMatrix [][]game.Position, setCurrent bool) (game.Position, error) {
 	randomPosition := getRandomPosition(positionMatrix)
-	if err := setViewPosition(name, randomPosition); err != nil {
-		return game.position{}, err
+	if err := setViewPosition(gui, name, randomPosition); err != nil {
+		return game.Position{}, err
 	}
 
 	if setCurrent {
-		if err := setCurrentView(name); err != nil {
-			return game.position{}, err
+		if err := setCurrentView(gui, name); err != nil {
+			return game.Position{}, err
 		}
 	}
 	return randomPosition, nil
 }
 
-func getRandomPosition(positionMatrix [][]game.position) game.position {
-	return positionMatrix[main.r.Intn(len(positionMatrix))][main.r.Intn(len(positionMatrix[0]))]
+func getRandomPosition(positionMatrix [][]game.Position) game.Position {
+	return positionMatrix[r.Intn(len(positionMatrix))][r.Intn(len(positionMatrix[0]))]
 }
 
-func trySetViewAtRandomEmptyPosition(name string, positionMatrix [][]game.position) (game.position, bool, error) {
+func trySetViewAtRandomEmptyPosition(gui *gocui.Gui, name string, positionMatrix [][]game.Position) (game.Position, bool, error) {
 	randomPosition, foundEmptyPosition := tryGetRandomEmptyPosition(positionMatrix)
 	if !foundEmptyPosition {
 		return randomPosition, foundEmptyPosition, nil
 	}
-	if err := setViewPosition(name, randomPosition); err != nil {
-		return game.position{}, foundEmptyPosition, err
+	if err := setViewPosition(gui, name, randomPosition); err != nil {
+		return game.Position{}, foundEmptyPosition, err
 	}
 	return randomPosition, foundEmptyPosition, nil
 }
 
-func tryGetRandomEmptyPosition(positionMatrix [][]game.position) (game.position, bool) {
-	randomCol := main.r.Intn(len(positionMatrix))
-	randomRow := main.r.Intn(len(positionMatrix[0]))
-	snakePositionSet := game.getsnakePositionSet(game.snakeBodyParts)
+func tryGetRandomEmptyPosition(positionMatrix [][]game.Position) (game.Position, bool) {
+	randomCol := r.Intn(len(positionMatrix))
+	randomRow := r.Intn(len(positionMatrix[0]))
+	snakePositionSet := game.GetsnakePositionSet(game.SnakeBodyParts)
 	emptyPosition, foundEmptyPosition := tryGetEmptyPosition(snakePositionSet, positionMatrix, randomCol, randomRow)
 	return emptyPosition, foundEmptyPosition
 }
 
-func tryGetEmptyPosition(snakePositionSet map[game.position]bool, positionMatrix [][]game.position, randomCol int, randomRow int) (game.position, bool) {
+func tryGetEmptyPosition(snakePositionSet map[game.Position]bool, positionMatrix [][]game.Position, randomCol int, randomRow int) (game.Position, bool) {
 	position, foundEmptyPosition := lookForEmptyPosition(snakePositionSet, positionMatrix, randomCol, len(positionMatrix), randomRow, len(positionMatrix[0]))
 	if !foundEmptyPosition {
 		position, foundEmptyPosition = lookForEmptyPosition(snakePositionSet, positionMatrix, 0, randomCol, 0, randomRow)
@@ -96,7 +98,7 @@ func tryGetEmptyPosition(snakePositionSet map[game.position]bool, positionMatrix
 	return position, foundEmptyPosition
 }
 
-func lookForEmptyPosition(snakePositionSet map[game.position]bool, positionMatrix [][]game.position, startCol int, endCol int, startRow int, endRow int) (game.position, bool) {
+func lookForEmptyPosition(snakePositionSet map[game.Position]bool, positionMatrix [][]game.Position, startCol int, endCol int, startRow int, endRow int) (game.Position, bool) {
 	for i := startCol; i < endCol; i++ {
 		for j := startRow; j < endRow; j++ {
 			position := positionMatrix[i][j]
@@ -105,5 +107,5 @@ func lookForEmptyPosition(snakePositionSet map[game.position]bool, positionMatri
 			}
 		}
 	}
-	return game.position{}, false
+	return game.Position{}, false
 }
