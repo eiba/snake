@@ -34,7 +34,7 @@ func initLoadingView() error {
 	return err
 }
 
-func loading(loading bool) error {
+func Loading(loading bool) error {
 	if main.gameFinished && !main.running {
 		return nil
 	}

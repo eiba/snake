@@ -6,8 +6,8 @@ import (
 )
 
 type snakeBodyPart struct {
-	currentDirection  direction
-	previousDirection direction
+	currentDirection  Direction
+	previousDirection Direction
 	viewName          string
 	position          Position
 }
@@ -19,22 +19,22 @@ type Position struct {
 	Y1 int
 }
 
-type direction int
+type Direction int
 type movementDirections struct {
-	up    direction
-	right direction
-	down  direction
-	left  direction
+	Up    Direction
+	Right Direction
+	Down  Direction
+	Left  Direction
 }
 
 const (
-	deltaX = 2
-	deltaY = 1
+	DeltaX = 2
+	DeltaY = 1
 )
 
 var (
-	directions     = movementDirections{0, 1, 2, 3}
-	headDirection  = direction(main.r.Intn(4))
+	Directions     = movementDirections{0, 1, 2, 3}
+	headDirection  = Direction(main.r.Intn(4))
 	snakeHead      = &snakeBodyPart{headDirection, headDirection, "s0", Position{}}
 	SnakeBodyParts = []*snakeBodyPart{snakeHead}
 )
@@ -173,28 +173,28 @@ func moveHeadView(snakeHead *snakeBodyPart) error {
 	return nil
 }
 
-func getPositionOfNextMove(currentDirection direction, currentPosition Position, isHead bool) Position {
+func getPositionOfNextMove(currentDirection Direction, currentPosition Position, isHead bool) Position {
 	offsetX, offsetY := calculateOffsets(currentDirection, isHead)
 	return Position{currentPosition.x0 + offsetX, currentPosition.y0 + offsetY, currentPosition.x1 + offsetX, currentPosition.y1 + offsetY}
 }
 
-func calculateOffsets(direction direction, isHead bool) (int, int) {
+func calculateOffsets(direction Direction, isHead bool) (int, int) {
 	modifier := 1
 	if isHead {
 		modifier = -1
 	}
 
 	offsetX := 0
-	offsetY := deltaY
+	offsetY := DeltaY
 	switch direction {
-	case directions.right:
-		offsetX = -deltaX
+	case Directions.Right:
+		offsetX = -DeltaX
 		offsetY = 0
-	case directions.down:
+	case Directions.Down:
 		offsetX = 0
-		offsetY = -deltaY
-	case directions.left:
-		offsetX = deltaX
+		offsetY = -DeltaY
+	case Directions.Left:
+		offsetX = DeltaX
 		offsetY = 0
 	}
 	return modifier * offsetX, modifier * offsetY
@@ -208,10 +208,10 @@ func GetsnakePositionSet(snake []*snakeBodyPart) map[Position]bool {
 	return snakePositionSet
 }
 
-func getOppositeDirection(direction direction) direction {
+func GetOppositeDirection(direction Direction) Direction {
 	return (direction + 2) % 4
 }
 
-func getValidDirections(currentDirection direction) []direction {
-	return []direction{currentDirection, (currentDirection + 1) % 4, (currentDirection + 3) % 4}
+func getValidDirections(currentDirection Direction) []Direction {
+	return []Direction{currentDirection, (currentDirection + 1) % 4, (currentDirection + 3) % 4}
 }

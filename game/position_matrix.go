@@ -3,8 +3,8 @@ package game
 import "github.com/eiba/snake"
 
 func initPositionMatrix(gameViewPosition position) {
-	gameViewCols := gameViewPosition.x1 / deltaX
-	gameViewRows := gameViewPosition.y1 / deltaY
+	gameViewCols := gameViewPosition.x1 / DeltaX
+	gameViewRows := gameViewPosition.y1 / DeltaY
 	if len(main.positionMatrix) == gameViewCols && len(main.positionMatrix[0]) == gameViewRows {
 		return
 	}
@@ -12,16 +12,16 @@ func initPositionMatrix(gameViewPosition position) {
 }
 
 func generatePositionMatrix(gameViewPosition position) [][]position {
-	totalCols := gameViewPosition.x1 / deltaX
-	totalRows := gameViewPosition.y1 / deltaY
+	totalCols := gameViewPosition.x1 / DeltaX
+	totalRows := gameViewPosition.y1 / DeltaY
 	positionMatrix := make([][]position, totalCols)
 
 	for col := range positionMatrix {
 		positionMatrix[col] = make([]position, totalRows)
 		for row := range positionMatrix[col] {
-			x0 := col * deltaX
-			y0 := row * deltaY
-			position := position{x0, y0, x0 + deltaX, y0 + deltaY}
+			x0 := col * DeltaX
+			y0 := row * DeltaY
+			position := position{x0, y0, x0 + DeltaX, y0 + DeltaY}
 			positionMatrix[col][row] = position
 		}
 	}

@@ -62,25 +62,25 @@ func initQuitKey() error {
 }
 
 func initMovementKeys() error {
-	if err := initMovementKey(gocui.KeyArrowUp, directions.up); err != nil {
+	if err := initMovementKey(gocui.KeyArrowUp, Directions.Up); err != nil {
 		return err
 	}
-	if err := initMovementKey(gocui.KeyArrowRight, directions.right); err != nil {
+	if err := initMovementKey(gocui.KeyArrowRight, Directions.Right); err != nil {
 		return err
 	}
-	if err := initMovementKey(gocui.KeyArrowDown, directions.down); err != nil {
+	if err := initMovementKey(gocui.KeyArrowDown, Directions.Down); err != nil {
 		return err
 	}
-	if err := initMovementKey(gocui.KeyArrowLeft, directions.left); err != nil {
+	if err := initMovementKey(gocui.KeyArrowLeft, Directions.Left); err != nil {
 		return err
 	}
 	return nil
 }
 
-func initMovementKey(key gocui.Key, keyDirection direction) error {
+func initMovementKey(key gocui.Key, keyDirection Direction) error {
 	if err := main.gui.SetKeybinding("", key, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
-			if snakeHead.currentDirection == getOppositeDirection(keyDirection) {
+			if snakeHead.currentDirection == GetOppositeDirection(keyDirection) {
 				return nil
 			}
 			headDirection = keyDirection

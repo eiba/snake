@@ -23,7 +23,7 @@ func reset() error {
 		return err
 	}
 
-	headDirection = direction(main.r.Intn(4))
+	headDirection = Direction(main.r.Intn(4))
 	snakeHead.currentDirection = headDirection
 	snakeBodyParts = []*snakeBodyPart{snakeHead}
 

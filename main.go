@@ -16,7 +16,7 @@ var (
 	r                = rand.New(rand.NewSource(time.Now().UnixNano()))
 	running          = true
 	gameFinished     = false
-	autoPilotEnabled = false
+	AutoPilotEnabled = false
 	tickInterval     = 50 * time.Millisecond
 	gameView         = view.Properties{"game", "snake", "", game.Position{}}
 	positionMatrix   [][]game.Position
@@ -137,7 +137,7 @@ func updateMovement() {
 			if err := hamiltonian_cycle.initHamiltonianCycle(gameView.position); err != nil {
 				log.Panicln(err)
 			}
-			if autoPilotEnabled {
+			if AutoPilotEnabled {
 				err := autopilot.autopilot()
 				if err != nil {
 					log.Panicln(err)
