@@ -35,7 +35,7 @@ func autopilot() error {
 	if getNextPositionInAStarPath() {
 		return nil
 	}
-	pathToFood := initiateAStar(foodView.position)
+	pathToFood := initiateAStar(game.foodView.position)
 	if len(pathToFood) == 0 {
 		headPosition := game.snakeHead.position
 		headCycleIndex := cycleIndexMap[headPosition]

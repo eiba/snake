@@ -1,19 +1,20 @@
-package main
+package view
 
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake"
 	"github.com/eiba/snake/game"
 )
 
-type viewProperties struct {
-	name     string
-	title    string
-	text     string
-	position game.position
+type Properties struct {
+	Name     string
+	Title    string
+	Text     string
+	Position game.Position
 }
 
-func getLenXY(viewName string) (int, int, error) {
+func getLenXY(gui *gocui.Gui, viewName string) (int, int, error) {
 	x0, y0, x1, y1, err := gui.ViewPosition(viewName)
 	if err != nil {
 		return 0, 0, err
@@ -21,8 +22,8 @@ func getLenXY(viewName string) (int, int, error) {
 	return x1 - x0, y1 - y0, nil
 }
 
-func createView(viewProperties viewProperties, visible bool) (*gocui.View, error) {
-	view, err := gui.SetView(viewProperties.name, viewProperties.position.x0, viewProperties.position.y0, viewProperties.position.x1, viewProperties.position.y1, 0)
+func createView(viewProperties Properties, visible bool) (*gocui.View, error) {
+	view, err := main.gui.SetView(viewProperties.Name, viewProperties.Position.x0, viewProperties.position.y0, viewProperties.position.x1, viewProperties.position.y1, 0)
 	if err != nil {
 		if !gocui.IsUnknownView(err) {
 			return nil, err
@@ -36,7 +37,7 @@ func createView(viewProperties viewProperties, visible bool) (*gocui.View, error
 }
 
 func setViewPosition(name string, position game.position) error {
-	_, err := gui.SetView(name, position.x0, position.y0, position.x1, position.y1, 0)
+	_, err := main.gui.SetView(name, position.x0, position.y0, position.x1, position.y1, 0)
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
 	}
@@ -44,7 +45,7 @@ func setViewPosition(name string, position game.position) error {
 }
 
 func setCurrentView(name string) error {
-	if _, err := gui.SetCurrentView(name); err != nil {
+	if _, err := main.gui.SetCurrentView(name); err != nil {
 		return err
 	}
 	return nil
@@ -65,7 +66,7 @@ func setViewAtRandomPosition(name string, positionMatrix [][]game.position, setC
 }
 
 func getRandomPosition(positionMatrix [][]game.position) game.position {
-	return positionMatrix[r.Intn(len(positionMatrix))][r.Intn(len(positionMatrix[0]))]
+	return positionMatrix[main.r.Intn(len(positionMatrix))][main.r.Intn(len(positionMatrix[0]))]
 }
 
 func trySetViewAtRandomEmptyPosition(name string, positionMatrix [][]game.position) (game.position, bool, error) {
@@ -80,8 +81,8 @@ func trySetViewAtRandomEmptyPosition(name string, positionMatrix [][]game.positi
 }
 
 func tryGetRandomEmptyPosition(positionMatrix [][]game.position) (game.position, bool) {
-	randomCol := r.Intn(len(positionMatrix))
-	randomRow := r.Intn(len(positionMatrix[0]))
+	randomCol := main.r.Intn(len(positionMatrix))
+	randomRow := main.r.Intn(len(positionMatrix[0]))
 	snakePositionSet := game.getsnakePositionSet(game.snakeBodyParts)
 	emptyPosition, foundEmptyPosition := tryGetEmptyPosition(snakePositionSet, positionMatrix, randomCol, randomRow)
 	return emptyPosition, foundEmptyPosition

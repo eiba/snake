@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/awesome-gocui/gocui"
 	"github.com/eiba/snake/game"
+	"github.com/eiba/snake/game/view"
 )
 
 const gameOverViewName = "gameOver"
@@ -10,7 +11,7 @@ const gameOverViewName = "gameOver"
 var gameOverView *gocui.View
 
 func initGameOverView() error {
-	lenX, lenY, err := getLenXY(gameView.name)
+	lenX, lenY, err := view.getLenXY(gameView.name)
 	if err != nil {
 		return err
 	}
@@ -19,7 +20,7 @@ func initGameOverView() error {
 	viewLenX := 25
 	viewLenY := 4
 
-	gameOverViewProperties := viewProperties{
+	gameOverViewProperties := view.viewProperties{
 		gameOverViewName,
 		"",
 		"Press space to restart",
@@ -29,7 +30,7 @@ func initGameOverView() error {
 			viewPositionX + viewLenX,
 			viewPositionY + viewLenY}}
 
-	gameOverView, err = createView(gameOverViewProperties, false)
+	gameOverView, err = view.createView(gameOverViewProperties, false)
 	return err
 }
 

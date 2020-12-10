@@ -3,7 +3,6 @@ package game
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
-	"github.com/eiba/snake"
 )
 
 type snakeBodyPart struct {
@@ -14,10 +13,10 @@ type snakeBodyPart struct {
 }
 
 type Position struct {
-	x0 int
-	y0 int
-	x1 int
-	y1 int
+	X0 int
+	Y0 int
+	X1 int
+	Y1 int
 }
 
 type direction int

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/awesome-gocui/gocui"
 	"github.com/eiba/snake/game"
+	"github.com/eiba/snake/game/view"
 )
 
 const pauseViewName = "pause"
@@ -10,7 +11,7 @@ const pauseViewName = "pause"
 var pauseView *gocui.View
 
 func initPauseView() error {
-	lenX, lenY, err := getLenXY(gameView.name)
+	lenX, lenY, err := view.getLenXY(gameView.name)
 	if err != nil {
 		return err
 	}
@@ -20,7 +21,7 @@ func initPauseView() error {
 	viewLenY := 4
 
 	pauseViewText := "Press P to resume"
-	pauseViewProps := viewProperties{
+	pauseViewProps := view.viewProperties{
 		pauseViewName,
 		"Pause",
 		pauseViewText,
@@ -29,7 +30,7 @@ func initPauseView() error {
 			viewPositionY,
 			viewPositionX + viewLenX,
 			viewPositionY + viewLenY}}
-	pauseView, err = createView(pauseViewProps, false)
+	pauseView, err = view.createView(pauseViewProps, false)
 	return err
 }
 

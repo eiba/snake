@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/awesome-gocui/gocui"
 	"github.com/eiba/snake/game"
+	"github.com/eiba/snake/game/view"
 )
 
 func reset() error {
@@ -13,11 +14,11 @@ func reset() error {
 	}
 
 	var err error
-	game.snakeHead.position, err = setViewAtRandomPosition(game.snakeHead.viewName, positionMatrix, true)
+	game.snakeHead.position, err = view.setViewAtRandomPosition(game.snakeHead.viewName, positionMatrix, true)
 	if err != nil {
 		return err
 	}
-	foodView.position, err = setViewAtRandomPosition(foodView.name, positionMatrix, false)
+	game.foodView.position, err = view.setViewAtRandomPosition(game.foodView.name, positionMatrix, false)
 	if err != nil {
 		return err
 	}

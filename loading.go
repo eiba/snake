@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/awesome-gocui/gocui"
 	"github.com/eiba/snake/game"
+	"github.com/eiba/snake/game/view"
 )
 
 const loadingViewName = "loading"
@@ -10,7 +11,7 @@ const loadingViewName = "loading"
 var loadingView *gocui.View
 
 func initLoadingView() error {
-	lenX, lenY, err := getLenXY(gameView.name)
+	lenX, lenY, err := view.getLenXY(gameView.name)
 	if err != nil {
 		return err
 	}
@@ -20,7 +21,7 @@ func initLoadingView() error {
 	viewLenY := 4
 
 	loadingViewText := "Initiating autopilot..."
-	loadingViewProps := viewProperties{
+	loadingViewProps := view.viewProperties{
 		loadingViewName,
 		"Loading",
 		loadingViewText,
@@ -29,7 +30,7 @@ func initLoadingView() error {
 			viewPositionY,
 			viewPositionX + viewLenX,
 			viewPositionY + viewLenY}}
-	loadingView, err = createView(loadingViewProps, false)
+	loadingView, err = view.createView(loadingViewProps, false)
 	return err
 }
 

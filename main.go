@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/awesome-gocui/gocui"
 	"github.com/eiba/snake/game"
+	"github.com/eiba/snake/game/view"
 	"log"
 	"math/rand"
 	"time"
@@ -15,8 +16,8 @@ var (
 	gameFinished     = false
 	autoPilotEnabled = false
 	tickInterval     = 50 * time.Millisecond
-	gameView         = viewProperties{"game", "snake", "", game.position{}}
-	positionMatrix   [][]game.position
+	gameView         = view.Properties{"game", "snake", "", game.Position{}}
+	positionMatrix   [][]game.Position
 )
 
 func main() {
@@ -80,11 +81,11 @@ func calculateGameViewPosition(maxX int, maxY int) game.position {
 
 func initGame() error {
 	var err error
-	game.snakeHead.position, err = setViewAtRandomPosition(game.snakeHead.viewName, positionMatrix, true)
+	game.snakeHead.position, err = view.setViewAtRandomPosition(game.snakeHead.viewName, positionMatrix, true)
 	if err != nil {
 		return err
 	}
-	foodView.position, err = setViewAtRandomPosition(foodView.name, positionMatrix, false)
+	game.foodView.position, err = view.setViewAtRandomPosition(game.foodView.name, positionMatrix, false)
 	if err != nil {
 		return err
 	}
