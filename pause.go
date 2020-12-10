@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake/game"
 )
 
 const pauseViewName = "pause"
@@ -23,7 +24,7 @@ func initPauseView() error {
 		pauseViewName,
 		"Pause",
 		pauseViewText,
-		position{
+		game.position{
 			viewPositionX,
 			viewPositionY,
 			viewPositionX + viewLenX,

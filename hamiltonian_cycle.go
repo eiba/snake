@@ -1,18 +1,20 @@
 package main
 
+import "github.com/eiba/snake/game"
+
 type node struct {
-	direction direction
-	position  position
+	direction game.direction
+	position  game.position
 }
 
 var (
 	hCycle        []node
-	cycleIndexMap map[position]int
+	cycleIndexMap map[game.position]int
 )
 
-func initHamiltonianCycle(gameViewPosition position) error {
-	gameViewCols := gameViewPosition.x1 / deltaX
-	gameViewRows := gameViewPosition.y1 / deltaY
+func initHamiltonianCycle(gameViewPosition game.position) error {
+	gameViewCols := gameViewPosition.x1 / game.deltaX
+	gameViewRows := gameViewPosition.y1 / game.deltaY
 	if len(hCycle)-1 == gameViewCols*gameViewRows || !autoPilotEnabled {
 		return nil
 	}
@@ -28,7 +30,7 @@ func initHamiltonianCycle(gameViewPosition position) error {
 	return nil
 }
 
-func generateHamiltonianCycle(positionMatrix [][]position) []node {
+func generateHamiltonianCycle(positionMatrix [][]game.position) []node {
 	numNodes := len(positionMatrix) * len(positionMatrix[0])
 
 	startCol, startRow := 0, 0
@@ -40,14 +42,14 @@ func generateHamiltonianCycle(positionMatrix [][]position) []node {
 	tour[0] = node{directions[0], startPosition}
 	tour[numNodes] = tour[0]
 
-	usedPositions := make(map[position]bool)
+	usedPositions := make(map[game.position]bool)
 	usedPositions[startPosition] = true
 
 	tour = hamiltonianCycle(usedPositions, tour, 1, numNodes, generateVertexGraph(positionMatrix), positionMatrix)
 	return tour
 }
 
-func hamiltonianCycle(usedPositions map[position]bool, tour []node, moveNumber int, totalMoves int, vertexGraph [][][]direction, positionMatrix [][]position) []node {
+func hamiltonianCycle(usedPositions map[game.position]bool, tour []node, moveNumber int, totalMoves int, vertexGraph [][][]game.direction, positionMatrix [][]game.position) []node {
 	previousNode := tour[moveNumber-1]
 	nextCol, nextRow := getNextPosition(previousNode)
 	nextPosition := positionMatrix[nextCol][nextRow]
@@ -61,7 +63,7 @@ func hamiltonianCycle(usedPositions map[position]bool, tour []node, moveNumber i
 	validVertices := vertexGraph[nextCol][nextRow]
 
 	for _, nextDirection := range validVertices {
-		if nextDirection == getOppositeDirection(previousNode.direction) {
+		if nextDirection == game.getOppositeDirection(previousNode.direction) {
 			continue
 		}
 		if isNeighbours(tour[totalMoves-1].position, tour[0].position) {
@@ -75,13 +77,13 @@ func hamiltonianCycle(usedPositions map[position]bool, tour []node, moveNumber i
 	return tour
 }
 
-func generateVertexGraph(positionMatrix [][]position) [][][]direction {
+func generateVertexGraph(positionMatrix [][]game.position) [][][]game.direction {
 	cols := len(positionMatrix)
 	rows := len(positionMatrix[0])
-	vertexGraph := make([][][]direction, cols)
+	vertexGraph := make([][][]game.direction, cols)
 
 	for col := range positionMatrix {
-		vertexGraph[col] = make([][]direction, rows)
+		vertexGraph[col] = make([][]game.direction, rows)
 		for row := range vertexGraph[col] {
 			vertexGraph[col][row] = getPositionVertices(col, row, cols, rows)
 		}
@@ -89,80 +91,80 @@ func generateVertexGraph(positionMatrix [][]position) [][][]direction {
 	return vertexGraph
 }
 
-func getPositionVertices(col int, row int, cols int, rows int) []direction {
+func getPositionVertices(col int, row int, cols int, rows int) []game.direction {
 	if col == 0 && row == 0 {
-		return []direction{directions.right, directions.down}
+		return []game.direction{game.directions.right, game.directions.down}
 	}
 	if col == 0 && row == rows-1 {
-		return []direction{directions.up, directions.right}
+		return []game.direction{game.directions.up, game.directions.right}
 	}
 	if col == cols-1 && row == 0 {
-		return []direction{directions.down, directions.left}
+		return []game.direction{game.directions.down, game.directions.left}
 	}
 	if col == cols-1 && row == rows-1 {
-		return []direction{directions.up, directions.left}
+		return []game.direction{game.directions.up, game.directions.left}
 	}
 	if col == 0 {
-		return []direction{directions.up, directions.right, directions.down}
+		return []game.direction{game.directions.up, game.directions.right, game.directions.down}
 	}
 	if col == cols-1 {
-		return []direction{directions.up, directions.down, directions.left}
+		return []game.direction{game.directions.up, game.directions.down, game.directions.left}
 	}
 	if row == 0 {
-		return []direction{directions.right, directions.down, directions.left}
+		return []game.direction{game.directions.right, game.directions.down, game.directions.left}
 	}
 	if row == rows-1 {
-		return []direction{directions.up, directions.right, directions.left}
+		return []game.direction{game.directions.up, game.directions.right, game.directions.left}
 	}
-	return []direction{directions.up, directions.right, directions.down, directions.left}
+	return []game.direction{game.directions.up, game.directions.right, game.directions.down, game.directions.left}
 }
 
 func getNextPosition(currentNode node) (int, int) {
-	currentCol, currentRow := currentNode.position.x0/deltaX, currentNode.position.y0/deltaY
+	currentCol, currentRow := currentNode.position.x0/game.deltaX, currentNode.position.y0/game.deltaY
 
 	switch currentNode.direction {
-	case directions.up:
+	case game.directions.up:
 		currentRow--
-	case directions.right:
+	case game.directions.right:
 		currentCol++
-	case directions.down:
+	case game.directions.down:
 		currentRow++
-	case directions.left:
+	case game.directions.left:
 		currentCol--
 	}
 	return currentCol, currentRow
 }
 
-func copyPositionMap(positionMap map[position]bool) map[position]bool {
-	positionMapCopy := make(map[position]bool)
+func copyPositionMap(positionMap map[game.position]bool) map[game.position]bool {
+	positionMapCopy := make(map[game.position]bool)
 	for key, value := range positionMap {
 		positionMapCopy[key] = value
 	}
 	return positionMapCopy
 }
 
-func isNeighbours(position1 position, position2 position) bool {
-	emptyPosition := position{}
+func isNeighbours(position1 game.position, position2 game.position) bool {
+	emptyPosition := game.position{}
 	if position1 == emptyPosition || position2 == emptyPosition {
 		return false
 	}
-	if position1.y0+deltaY == position2.y0 && position1.x0 == position2.x0 {
+	if position1.y0+game.deltaY == position2.y0 && position1.x0 == position2.x0 {
 		return true
 	}
-	if position1.y0-deltaY == position2.y0 && position1.x0 == position2.x0 {
+	if position1.y0-game.deltaY == position2.y0 && position1.x0 == position2.x0 {
 		return true
 	}
-	if position1.x0+deltaX == position2.x0 && position1.y0 == position2.y0 {
+	if position1.x0+game.deltaX == position2.x0 && position1.y0 == position2.y0 {
 		return true
 	}
-	if position1.x0-deltaX == position2.x0 && position1.y0 == position2.y0 {
+	if position1.x0-game.deltaX == position2.x0 && position1.y0 == position2.y0 {
 		return true
 	}
 	return false
 }
 
-func generateHamiltonianCycleIndexMap(hamiltonianCycle []node) map[position]int {
-	indexMap := make(map[position]int)
+func generateHamiltonianCycleIndexMap(hamiltonianCycle []node) map[game.position]int {
+	indexMap := make(map[game.position]int)
 	for i := 0; i < len(hamiltonianCycle)-1; i++ {
 		indexMap[hamiltonianCycle[i].position] = i
 	}

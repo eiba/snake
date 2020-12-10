@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake/game"
 	"time"
 )
 
@@ -60,28 +61,28 @@ func initQuitKey() error {
 }
 
 func initMovementKeys() error {
-	if err := initMovementKey(gocui.KeyArrowUp, directions.up); err != nil {
+	if err := initMovementKey(gocui.KeyArrowUp, game.directions.up); err != nil {
 		return err
 	}
-	if err := initMovementKey(gocui.KeyArrowRight, directions.right); err != nil {
+	if err := initMovementKey(gocui.KeyArrowRight, game.directions.right); err != nil {
 		return err
 	}
-	if err := initMovementKey(gocui.KeyArrowDown, directions.down); err != nil {
+	if err := initMovementKey(gocui.KeyArrowDown, game.directions.down); err != nil {
 		return err
 	}
-	if err := initMovementKey(gocui.KeyArrowLeft, directions.left); err != nil {
+	if err := initMovementKey(gocui.KeyArrowLeft, game.directions.left); err != nil {
 		return err
 	}
 	return nil
 }
 
-func initMovementKey(key gocui.Key, keyDirection direction) error {
+func initMovementKey(key gocui.Key, keyDirection game.direction) error {
 	if err := gui.SetKeybinding("", key, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
-			if snakeHead.currentDirection == getOppositeDirection(keyDirection) {
+			if game.snakeHead.currentDirection == game.getOppositeDirection(keyDirection) {
 				return nil
 			}
-			headDirection = keyDirection
+			game.headDirection = keyDirection
 			return nil
 		}); err != nil {
 		return err
@@ -92,7 +93,7 @@ func initMovementKey(key gocui.Key, keyDirection direction) error {
 func initTabKey() error {
 	if err := gui.SetKeybinding("", gocui.KeyTab, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
-			err := addBodyPartToEnd(*snakeBodyParts[len(snakeBodyParts)-1])
+			err := game.addBodyPartToEnd(*game.snakeBodyParts[len(game.snakeBodyParts)-1])
 			if err != nil {
 				return err
 			}

@@ -1,9 +1,11 @@
 package main
 
-var foodView = viewProperties{"food", "", "", position{}}
+import "github.com/eiba/snake/game"
+
+var foodView = viewProperties{"food", "", "", game.position{}}
 
 func eatFood() error {
-	err := addBodyPartToEnd(*snakeBodyParts[len(snakeBodyParts)-1])
+	err := game.addBodyPartToEnd(*game.snakeBodyParts[len(game.snakeBodyParts)-1])
 	if err != nil {
 		return err
 	}

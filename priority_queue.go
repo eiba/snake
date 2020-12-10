@@ -1,9 +1,12 @@
 package main
 
-import "container/heap"
+import (
+	"container/heap"
+	"github.com/eiba/snake/game"
+)
 
 type PriorityNode struct {
-	position position
+	position game.position
 	fScore   int
 	index    int
 }
@@ -22,7 +25,7 @@ func (pq PriorityQueue) Swap(i, j int) {
 	pq[j].index = j
 }
 
-func (pq PriorityQueue) Exist(value position) (*PriorityNode, bool) {
+func (pq PriorityQueue) Exist(value game.position) (*PriorityNode, bool) {
 	for _, priorityNode := range pq {
 		if priorityNode.position == value {
 			return priorityNode, true
@@ -48,7 +51,7 @@ func (pq *PriorityQueue) Pop() interface{} {
 	return item
 }
 
-func (pq *PriorityQueue) update(item *PriorityNode, value position, priority int) {
+func (pq *PriorityQueue) update(item *PriorityNode, value game.position, priority int) {
 	item.position = value
 	item.fScore = priority
 	heap.Fix(pq, item.index)

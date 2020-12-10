@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake/game"
 )
 
 type viewProperties struct {
 	name     string
 	title    string
 	text     string
-	position position
+	position game.position
 }
 
 func getLenXY(viewName string) (int, int, error) {
@@ -34,7 +35,7 @@ func createView(viewProperties viewProperties, visible bool) (*gocui.View, error
 	return view, nil
 }
 
-func setViewPosition(name string, position position) error {
+func setViewPosition(name string, position game.position) error {
 	_, err := gui.SetView(name, position.x0, position.y0, position.x1, position.y1, 0)
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
@@ -49,44 +50,44 @@ func setCurrentView(name string) error {
 	return nil
 }
 
-func setViewAtRandomPosition(name string, positionMatrix [][]position, setCurrent bool) (position, error) {
+func setViewAtRandomPosition(name string, positionMatrix [][]game.position, setCurrent bool) (game.position, error) {
 	randomPosition := getRandomPosition(positionMatrix)
 	if err := setViewPosition(name, randomPosition); err != nil {
-		return position{}, err
+		return game.position{}, err
 	}
 
 	if setCurrent {
 		if err := setCurrentView(name); err != nil {
-			return position{}, err
+			return game.position{}, err
 		}
 	}
 	return randomPosition, nil
 }
 
-func getRandomPosition(positionMatrix [][]position) position {
+func getRandomPosition(positionMatrix [][]game.position) game.position {
 	return positionMatrix[r.Intn(len(positionMatrix))][r.Intn(len(positionMatrix[0]))]
 }
 
-func trySetViewAtRandomEmptyPosition(name string, positionMatrix [][]position) (position, bool, error) {
+func trySetViewAtRandomEmptyPosition(name string, positionMatrix [][]game.position) (game.position, bool, error) {
 	randomPosition, foundEmptyPosition := tryGetRandomEmptyPosition(positionMatrix)
 	if !foundEmptyPosition {
 		return randomPosition, foundEmptyPosition, nil
 	}
 	if err := setViewPosition(name, randomPosition); err != nil {
-		return position{}, foundEmptyPosition, err
+		return game.position{}, foundEmptyPosition, err
 	}
 	return randomPosition, foundEmptyPosition, nil
 }
 
-func tryGetRandomEmptyPosition(positionMatrix [][]position) (position, bool) {
+func tryGetRandomEmptyPosition(positionMatrix [][]game.position) (game.position, bool) {
 	randomCol := r.Intn(len(positionMatrix))
 	randomRow := r.Intn(len(positionMatrix[0]))
-	snakePositionSet := getsnakePositionSet(snakeBodyParts)
+	snakePositionSet := game.getsnakePositionSet(game.snakeBodyParts)
 	emptyPosition, foundEmptyPosition := tryGetEmptyPosition(snakePositionSet, positionMatrix, randomCol, randomRow)
 	return emptyPosition, foundEmptyPosition
 }
 
-func tryGetEmptyPosition(snakePositionSet map[position]bool, positionMatrix [][]position, randomCol int, randomRow int) (position, bool) {
+func tryGetEmptyPosition(snakePositionSet map[game.position]bool, positionMatrix [][]game.position, randomCol int, randomRow int) (game.position, bool) {
 	position, foundEmptyPosition := lookForEmptyPosition(snakePositionSet, positionMatrix, randomCol, len(positionMatrix), randomRow, len(positionMatrix[0]))
 	if !foundEmptyPosition {
 		position, foundEmptyPosition = lookForEmptyPosition(snakePositionSet, positionMatrix, 0, randomCol, 0, randomRow)
@@ -94,7 +95,7 @@ func tryGetEmptyPosition(snakePositionSet map[position]bool, positionMatrix [][]
 	return position, foundEmptyPosition
 }
 
-func lookForEmptyPosition(snakePositionSet map[position]bool, positionMatrix [][]position, startCol int, endCol int, startRow int, endRow int) (position, bool) {
+func lookForEmptyPosition(snakePositionSet map[game.position]bool, positionMatrix [][]game.position, startCol int, endCol int, startRow int, endRow int) (game.position, bool) {
 	for i := startCol; i < endCol; i++ {
 		for j := startRow; j < endRow; j++ {
 			position := positionMatrix[i][j]
@@ -103,5 +104,5 @@ func lookForEmptyPosition(snakePositionSet map[position]bool, positionMatrix [][
 			}
 		}
 	}
-	return position{}, false
+	return game.position{}, false
 }

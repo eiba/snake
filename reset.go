@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake/game"
 )
 
 func reset() error {
@@ -12,7 +13,7 @@ func reset() error {
 	}
 
 	var err error
-	snakeHead.position, err = setViewAtRandomPosition(snakeHead.viewName, positionMatrix, true)
+	game.snakeHead.position, err = setViewAtRandomPosition(game.snakeHead.viewName, positionMatrix, true)
 	if err != nil {
 		return err
 	}
@@ -21,9 +22,9 @@ func reset() error {
 		return err
 	}
 
-	headDirection = direction(r.Intn(4))
-	snakeHead.currentDirection = headDirection
-	snakeBodyParts = []*snakeBodyPart{snakeHead}
+	game.headDirection = game.direction(r.Intn(4))
+	game.snakeHead.currentDirection = game.headDirection
+	game.snakeBodyParts = []*game.snakeBodyPart{game.snakeHead}
 
 	gameOverView.Visible = false
 	pauseView.Visible = false
@@ -43,8 +44,8 @@ func reset() error {
 }
 
 func deletesnakeBody() error {
-	for i := 1; i < len(snakeBodyParts); i++ {
-		if err := gui.DeleteView(snakeBodyParts[i].viewName); err != nil && !gocui.IsUnknownView(err) {
+	for i := 1; i < len(game.snakeBodyParts); i++ {
+		if err := gui.DeleteView(game.snakeBodyParts[i].viewName); err != nil && !gocui.IsUnknownView(err) {
 			return err
 		}
 	}

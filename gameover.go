@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake/game"
 )
 
 const gameOverViewName = "gameOver"
@@ -22,7 +23,7 @@ func initGameOverView() error {
 		gameOverViewName,
 		"",
 		"Press space to restart",
-		position{
+		game.position{
 			viewPositionX,
 			viewPositionY,
 			viewPositionX + viewLenX,

@@ -1,18 +1,19 @@
-package main
+package game
 
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake"
 )
 
 type snakeBodyPart struct {
 	currentDirection  direction
 	previousDirection direction
 	viewName          string
-	position          position
+	position          Position
 }
 
-type position struct {
+type Position struct {
 	x0 int
 	y0 int
 	x1 int
@@ -34,8 +35,8 @@ const (
 
 var (
 	directions    = movementDirections{0, 1, 2, 3}
-	headDirection = direction(r.Intn(4))
-	snakeHead      = &snakeBodyPart{headDirection, headDirection, "s0", position{}}
+	headDirection = direction(main.r.Intn(4))
+	snakeHead      = &snakeBodyPart{headDirection, headDirection, "s0", Position{}}
 	snakeBodyParts = []*snakeBodyPart{snakeHead}
 )
 
@@ -43,14 +44,14 @@ func addBodyPartToEnd(currentLastsnakeBodyPart snakeBodyPart) error {
 	offsetX, offsetY := calculateOffsets(currentLastsnakeBodyPart.currentDirection, false)
 
 	name := fmt.Sprintf("s%v", len(snakeBodyParts))
-	position := position{
+	position := Position{
 		currentLastsnakeBodyPart.position.x0 + offsetX,
 		currentLastsnakeBodyPart.position.y0 + offsetY,
 		currentLastsnakeBodyPart.position.x1 + offsetX,
 		currentLastsnakeBodyPart.position.y1 + offsetY,
 	}
 
-	_, err := gui.SetView(name, position.x0, position.y0, position.x1, position.y1, 0)
+	_, err := main.gui.SetView(name, position.x0, position.y0, position.x1, position.y1, 0)
 	if err != nil && !gocui.IsUnknownView(err) {
 		return err
 	}
@@ -62,11 +63,11 @@ func addBodyPartToEnd(currentLastsnakeBodyPart snakeBodyPart) error {
 			name,
 			position,
 		})
-	return updateStat(&lengthStat, lengthStat.value+1)
+	return main.updateStat(&main.lengthStat, main.lengthStat.value+1)
 }
 
-//Checks if there is a collision between position and all positions in positions
-func positionsOverlap(position position, positions []position) bool {
+//Checks if there is a collision between Position and all positions in positions
+func positionsOverlap(position Position, positions []Position) bool {
 	for i := 0; i < len(positions); i++ {
 		if positionOverlap(position, positions[i]) {
 			return true
@@ -76,7 +77,7 @@ func positionsOverlap(position position, positions []position) bool {
 }
 
 //Checks collision between position1 and position2, returning true for collision and false otherwise.
-func positionOverlap(position1 position, position2 position) bool {
+func positionOverlap(position1 Position, position2 Position) bool {
 	if position1 == position2 {
 		return true
 	}
@@ -90,23 +91,23 @@ func movesnakeHead() error {
 	}
 
 	if fatalCollision(snakeHead.position) {
-		return gameOver("Game Over")
+		return main.gameOver("Game Over")
 	}
 
-	if positionOverlap(snakeHead.position, foodView.position) {
-		return eatFood()
+	if positionOverlap(snakeHead.position, main.foodView.position) {
+		return main.eatFood()
 	}
 	return nil
 }
 
-func fatalCollision(position position) bool {
+func fatalCollision(position Position) bool {
 	if mainViewCollision(position) || bodyCollision(position) {
 		return true
 	}
 	return false
 }
 
-func bodyCollision(position position) bool {
+func bodyCollision(position Position) bool {
 	for i := 1; i < len(snakeBodyParts); i++ {
 		collision := positionOverlap(position, snakeBodyParts[i].position)
 		if collision {
@@ -116,8 +117,8 @@ func bodyCollision(position position) bool {
 	return false
 }
 
-func mainViewCollision(position position) bool {
-	xG0, yG0, xG1, yG1 := gameView.position.x0, gameView.position.y0, gameView.position.x1, gameView.position.y1
+func mainViewCollision(position Position) bool {
+	xG0, yG0, xG1, yG1 := main.gameView.position.x0, main.gameView.position.y0, main.gameView.position.x1, main.gameView.position.y1
 	xH0, yH0, xH1, yH1 := position.x0, position.y0, position.x1, position.y1
 
 	maxX, maxY, minX, minY := xG1-xG0, yG1-yG0, 0, 0
@@ -139,7 +140,7 @@ func movesnakeBodyParts() error {
 
 func movesnakeBodyPart(previoussnakeBodyPart *snakeBodyPart, currentsnakeBodyPart *snakeBodyPart) error {
 	currentsnakeBodyPart.position = getPositionOfNextMove(previoussnakeBodyPart.currentDirection, previoussnakeBodyPart.position, false)
-	_, err := gui.SetView(
+	_, err := main.gui.SetView(
 		currentsnakeBodyPart.viewName,
 		currentsnakeBodyPart.position.x0,
 		currentsnakeBodyPart.position.y0,
@@ -160,7 +161,7 @@ func moveHeadView(snakeHead *snakeBodyPart) error {
 	snakeHead.currentDirection = headDirection
 
 	snakeHead.position = getPositionOfNextMove(snakeHead.currentDirection, snakeHead.position, true)
-	_, err := gui.SetView(
+	_, err := main.gui.SetView(
 		snakeHead.viewName,
 		snakeHead.position.x0,
 		snakeHead.position.y0,
@@ -173,9 +174,9 @@ func moveHeadView(snakeHead *snakeBodyPart) error {
 	return nil
 }
 
-func getPositionOfNextMove(currentDirection direction, currentPosition position, isHead bool) position {
+func getPositionOfNextMove(currentDirection direction, currentPosition Position, isHead bool) Position {
 	offsetX, offsetY := calculateOffsets(currentDirection, isHead)
-	return position{currentPosition.x0 + offsetX, currentPosition.y0 + offsetY, currentPosition.x1 + offsetX, currentPosition.y1 + offsetY}
+	return Position{currentPosition.x0 + offsetX, currentPosition.y0 + offsetY, currentPosition.x1 + offsetX, currentPosition.y1 + offsetY}
 }
 
 func calculateOffsets(direction direction, isHead bool) (int, int) {
@@ -200,8 +201,8 @@ func calculateOffsets(direction direction, isHead bool) (int, int) {
 	return modifier * offsetX, modifier * offsetY
 }
 
-func getsnakePositionSet(snake []*snakeBodyPart) map[position]bool {
-	snakePositionSet := make(map[position]bool)
+func getsnakePositionSet(snake []*snakeBodyPart) map[Position]bool {
+	snakePositionSet := make(map[Position]bool)
 	for _, bodyPart := range snake {
 		snakePositionSet[bodyPart.position] = true
 	}

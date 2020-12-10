@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake/game"
 )
 
 const loadingViewName = "loading"
@@ -23,7 +24,7 @@ func initLoadingView() error {
 		loadingViewName,
 		"Loading",
 		loadingViewText,
-		position{
+		game.position{
 			viewPositionX,
 			viewPositionY,
 			viewPositionX + viewLenX,

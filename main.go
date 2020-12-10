@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake/game"
 	"log"
 	"math/rand"
 	"time"
@@ -14,8 +15,8 @@ var (
 	gameFinished     = false
 	autoPilotEnabled = false
 	tickInterval     = 50 * time.Millisecond
-	gameView         = viewProperties{"game", "snake", "", position{}}
-	positionMatrix   [][]position
+	gameView         = viewProperties{"game", "snake", "", game.position{}}
+	positionMatrix   [][]game.position
 )
 
 func main() {
@@ -42,7 +43,7 @@ func initGUI() *gocui.Gui {
 	return gui
 }
 
-func initGameView(maxX int, maxY int) (position, error) {
+func initGameView(maxX int, maxY int) (game.position, error) {
 	gameViewPosition := calculateGameViewPosition(maxX, maxY)
 	if v, err := gui.SetView(gameView.name, gameViewPosition.x0, gameViewPosition.x0, gameViewPosition.x1, gameViewPosition.y1, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
@@ -58,28 +59,28 @@ func initGameView(maxX int, maxY int) (position, error) {
 	return gameViewPosition, nil
 }
 
-func calculateGameViewPosition(maxX int, maxY int) position {
-	defaultPosition := position{0, 0, maxX - 25, maxY - 1}
+func calculateGameViewPosition(maxX int, maxY int) game.position {
+	defaultPosition := game.position{0, 0, maxX - 25, maxY - 1}
 
 	if defaultPosition.x1%2 != 0 {
 		defaultPosition.x1--
 	}
-	if (defaultPosition.x1/deltaX)%2 != 0 {
-		defaultPosition.x1 = defaultPosition.x1 - deltaX
+	if (defaultPosition.x1/game.deltaX)%2 != 0 {
+		defaultPosition.x1 = defaultPosition.x1 - game.deltaX
 	}
 
 	if defaultPosition.y1%2 != 0 {
 		defaultPosition.y1--
 	}
-	if (defaultPosition.y1/deltaY)%2 != 0 {
-		defaultPosition.y1 = defaultPosition.y1 - deltaY
+	if (defaultPosition.y1/game.deltaY)%2 != 0 {
+		defaultPosition.y1 = defaultPosition.y1 - game.deltaY
 	}
 	return defaultPosition
 }
 
 func initGame() error {
 	var err error
-	snakeHead.position, err = setViewAtRandomPosition(snakeHead.viewName, positionMatrix, true)
+	game.snakeHead.position, err = setViewAtRandomPosition(game.snakeHead.viewName, positionMatrix, true)
 	if err != nil {
 		return err
 	}
@@ -139,10 +140,10 @@ func updateMovement() {
 					log.Panicln(err)
 				}
 			}
-			if err := movesnakeHead(); err != nil {
+			if err := game.movesnakeHead(); err != nil {
 				log.Panicln(err)
 			}
-			if err := movesnakeBodyParts(); err != nil {
+			if err := game.movesnakeBodyParts(); err != nil {
 				log.Panicln(err)
 			}
 			return nil
