@@ -2,7 +2,6 @@ package view
 
 import (
 	"github.com/awesome-gocui/gocui"
-	"github.com/eiba/snake"
 	"github.com/eiba/snake/game"
 )
 
@@ -10,8 +9,8 @@ const loadingViewName = "loading"
 
 var loadingView *gocui.View
 
-func initLoadingView() error {
-	lenX, lenY, err := getLenXY(main.gameView.name)
+func initLoadingView(gui *gocui.Gui, gameView Properties) error {
+	lenX, lenY, err := getLenXY(gui, gameView.Name)
 	if err != nil {
 		return err
 	}
@@ -21,29 +20,29 @@ func initLoadingView() error {
 	viewLenY := 4
 
 	loadingViewText := "Initiating autopilot..."
-	loadingViewProps := viewProperties{
-		loadingViewName,
-		"Loading",
-		loadingViewText,
-		game.position{
+	loadingViewProps := Properties{
+		Name:  loadingViewName,
+		Title: "Loading",
+		Text:  loadingViewText,
+		Position: game.Position{
 			viewPositionX,
 			viewPositionY,
 			viewPositionX + viewLenX,
 			viewPositionY + viewLenY}}
-	loadingView, err = createView(loadingViewProps, false)
+	loadingView, err = createView(gui, loadingViewProps, false)
 	return err
 }
 
-func Loading(loading bool) error {
-	if main.gameFinished && !main.running {
+func Loading(gui *gocui.Gui, gameFinished bool, running bool, loading bool) error {
+	if gameFinished && !running {
 		return nil
 	}
 	loadingView.Visible = loading
 	if loading {
-		if _, err := main.gui.SetCurrentView(loadingViewName); err != nil {
+		if _, err := gui.SetCurrentView(loadingViewName); err != nil {
 			return err
 		}
-		if _, err := main.gui.SetViewOnTop(loadingViewName); err != nil {
+		if _, err := gui.SetViewOnTop(loadingViewName); err != nil {
 			return err
 		}
 	}
