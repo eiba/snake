@@ -53,7 +53,7 @@ func setCurrentView(gui *gocui.Gui,name string) error {
 	return nil
 }
 
-func setViewAtRandomPosition(gui *gocui.Gui, name string, positionMatrix [][]game.Position, setCurrent bool) (game.Position, error) {
+func SetViewAtRandomPosition(gui *gocui.Gui, name string, positionMatrix [][]game.Position, setCurrent bool) (game.Position, error) {
 	randomPosition := getRandomPosition(positionMatrix)
 	if err := setViewPosition(gui, name, randomPosition); err != nil {
 		return game.Position{}, err
