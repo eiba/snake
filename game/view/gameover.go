@@ -32,16 +32,14 @@ func initGameOverView(gui *gocui.Gui, gameView Properties) error {
 	return err
 }
 
-func gameOver(gui *gocui.Gui, gameFinished bool, running bool, title string) (error, bool, bool) {
+func GameOver(gui *gocui.Gui, title string) error {
 	gameOverView.Visible = true
 	gameOverView.Title = title
-	running = false
-	gameFinished = true
 	if _, err := gui.SetCurrentView(gameOverViewName); err != nil {
-		return err, gameFinished, running
+		return err
 	}
 	if _, err := gui.SetViewOnTop(gameOverViewName); err != nil {
-		return err, gameFinished, running
+		return err
 	}
-	return nil, gameFinished, running
+	return nil
 }

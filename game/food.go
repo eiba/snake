@@ -1,19 +1,22 @@
 package game
 
-import "github.com/eiba/snake/game/view"
+import (
+	"github.com/awesome-gocui/gocui"
+	"github.com/eiba/snake/game/view"
+)
 
 var foodView = view.Properties{"food", "", "", Position{}}
 
-func eatFood() error {
+func eatFood(gui *gocui.Gui, positionMatrix [][]Position) (error, bool) {
 	err := addBodyPartToEnd(*SnakeBodyParts[len(SnakeBodyParts)-1])
 	if err != nil {
-		return err
+		return err, false
 	}
 
 	var foundEmptyPosition bool
-	foodView.position, foundEmptyPosition, err = main.trySetViewAtRandomEmptyPosition(foodView.name, main.positionMatrix)
+	foodView.Position, foundEmptyPosition, err = view.TrySetViewAtRandomEmptyPosition(gui, foodView.Name, positionMatrix)
 	if !foundEmptyPosition {
-		return main.gameOver("Game Won!")
+		return view.GameOver(gui, "Game Won!"), false
 	}
-	return err
+	return err, true
 }

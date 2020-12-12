@@ -71,7 +71,7 @@ func getRandomPosition(positionMatrix [][]game.Position) game.Position {
 	return positionMatrix[r.Intn(len(positionMatrix))][r.Intn(len(positionMatrix[0]))]
 }
 
-func trySetViewAtRandomEmptyPosition(gui *gocui.Gui, name string, positionMatrix [][]game.Position) (game.Position, bool, error) {
+func TrySetViewAtRandomEmptyPosition(gui *gocui.Gui, name string, positionMatrix [][]game.Position) (game.Position, bool, error) {
 	randomPosition, foundEmptyPosition := tryGetRandomEmptyPosition(positionMatrix)
 	if !foundEmptyPosition {
 		return randomPosition, foundEmptyPosition, nil
