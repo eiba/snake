@@ -3,14 +3,13 @@ package game
 import (
 	"fmt"
 	"github.com/awesome-gocui/gocui"
-	"github.com/eiba/snake"
-	view2 "github.com/eiba/snake/game/view"
+	snakeView "github.com/eiba/snake/game/view"
 	"time"
 )
 
-func initKeybindingsView() error {
-	maxX  := main.gameView.position.x1
-	if v, err := main.gui.SetView("keybindings", maxX+1, 0, maxX+26, 8, 0); err != nil {
+func initKeybindingsView(gui *gocui.Gui, gameView snakeView.Properties) error {
+	maxX  := gameView.Position.X1
+	if v, err := gui.SetView("keybindings", maxX+1, 0, maxX+26, 8, 0); err != nil {
 		if !gocui.IsUnknownView(err) {
 			return err
 		}
@@ -26,33 +25,33 @@ func initKeybindingsView() error {
 	return nil
 }
 
-func initKeybindings() error {
-	if err := initQuitKey(); err != nil {
+/*func initKeybindings(gui *gocui.Gui, snakeBodyParts []*snakeBodyPart, positionMatrix [][]Position, tickInterval *time.Duration, gameFinished bool, running bool, autoPilotEnabled bool) error {
+	if err := initQuitKey(gui); err != nil {
 		return err
 	}
-	if err := initSpaceKey(); err != nil {
+	if err := initSpaceKey(gui,snakeBodyParts, positionMatrix); err != nil {
 		return err
 	}
-	if err := initMovementKeys(); err != nil {
+	if err := initMovementKeys(gui); err != nil {
 		return err
 	}
-	if err := initTabKey(); err != nil {
+	if err := initTabKey(gui, snakeBodyParts); err != nil {
 		return err
 	}
-	if err := initSpeedKeys(); err != nil {
+	if err := initSpeedKeys(gui, tickInterval); err != nil {
 		return err
 	}
-	if err := initPauseKey(); err != nil {
+	if err := initPauseKey(gui, gameFinished, running); err != nil {
 		return err
 	}
-	if err := initAutoPilotKey(); err != nil {
+	if err := initAutoPilotKey(gui, autoPilotEnabled); err != nil {
 		return err
 	}
 	return nil
-}
+}*/
 
-func initQuitKey() error {
-	if err := main.gui.SetKeybinding("", gocui.KeyEsc, gocui.ModNone,
+func initQuitKey(gui *gocui.Gui) error {
+	if err := gui.SetKeybinding("", gocui.KeyEsc, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
 			return gocui.ErrQuit
 		}); err != nil {
@@ -61,24 +60,24 @@ func initQuitKey() error {
 	return nil
 }
 
-func initMovementKeys() error {
-	if err := initMovementKey(gocui.KeyArrowUp, Directions.Up); err != nil {
+func initMovementKeys(gui *gocui.Gui) error {
+	if err := initMovementKey(gui, gocui.KeyArrowUp, Directions.Up); err != nil {
 		return err
 	}
-	if err := initMovementKey(gocui.KeyArrowRight, Directions.Right); err != nil {
+	if err := initMovementKey(gui, gocui.KeyArrowRight, Directions.Right); err != nil {
 		return err
 	}
-	if err := initMovementKey(gocui.KeyArrowDown, Directions.Down); err != nil {
+	if err := initMovementKey(gui, gocui.KeyArrowDown, Directions.Down); err != nil {
 		return err
 	}
-	if err := initMovementKey(gocui.KeyArrowLeft, Directions.Left); err != nil {
+	if err := initMovementKey(gui, gocui.KeyArrowLeft, Directions.Left); err != nil {
 		return err
 	}
 	return nil
 }
 
-func initMovementKey(key gocui.Key, keyDirection Direction) error {
-	if err := main.gui.SetKeybinding("", key, gocui.ModNone,
+func initMovementKey(gui *gocui.Gui, key gocui.Key, keyDirection Direction) error {
+	if err := gui.SetKeybinding("", key, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
 			if snakeHead.currentDirection == GetOppositeDirection(keyDirection) {
 				return nil
@@ -91,8 +90,8 @@ func initMovementKey(key gocui.Key, keyDirection Direction) error {
 	return nil
 }
 
-func initTabKey() error {
-	if err := main.gui.SetKeybinding("", gocui.KeyTab, gocui.ModNone,
+func initTabKey(gui *gocui.Gui, snakeBodyParts []*snakeBodyPart) error {
+	if err := gui.SetKeybinding("", gocui.KeyTab, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
 			err := addBodyPartToEnd(*snakeBodyParts[len(snakeBodyParts)-1])
 			if err != nil {
@@ -105,32 +104,32 @@ func initTabKey() error {
 	return nil
 }
 
-func initSpaceKey() error {
-	if err := main.gui.SetKeybinding("", gocui.KeySpace, gocui.ModNone,
+func initSpaceKey(gui *gocui.Gui, snakeBodyParts []*snakeBodyPart, positionMatrix [][]Position) error {
+	if err := gui.SetKeybinding("", gocui.KeySpace, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
-			return reset()
+			return reset(gui, snakeBodyParts, positionMatrix)
 		}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func initSpeedKeys() error {
-	if err := initSpeedKey('w', -10); err != nil {
+func initSpeedKeys(gui *gocui.Gui, tickInterval *time.Duration) error {
+	if err := initSpeedKey(gui, 'w', tickInterval, -10); err != nil {
 		return err
 	}
-	if err := initSpeedKey('s', 10); err != nil {
+	if err := initSpeedKey(gui, 's', tickInterval, 10); err != nil {
 		return err
 	}
 	return nil
 }
 
-func initSpeedKey(key rune, speedChange time.Duration) error {
-	if err := main.gui.SetKeybinding("", key, gocui.ModNone,
+func initSpeedKey(gui *gocui.Gui, key rune, tickInterval *time.Duration, speedChange time.Duration) error {
+	if err := gui.SetKeybinding("", key, gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
-			main.tickInterval += speedChange * time.Millisecond
-			if main.tickInterval < time.Millisecond {
-				main.tickInterval = time.Millisecond
+			*tickInterval += speedChange * time.Millisecond
+			if *tickInterval < time.Millisecond {
+				*tickInterval = time.Millisecond
 			}
 			return nil
 		}); err != nil {
@@ -139,23 +138,23 @@ func initSpeedKey(key rune, speedChange time.Duration) error {
 	return nil
 }
 
-func initPauseKey() error {
-	if err := main.gui.SetKeybinding("", 'p', gocui.ModNone,
+func initPauseKey(gui *gocui.Gui, gameFinished bool, running bool) (error, bool) {
+	if err := gui.SetKeybinding("", 'p', gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
-			return view2.pause()
+			return snakeView.Pause(gui, gameFinished, running)
 		}); err != nil {
-		return err
+		return err, false
 	}
-	return nil
+	return nil, !running
 }
 
-func initAutoPilotKey() error {
-	if err := main.gui.SetKeybinding("", 'a', gocui.ModNone,
+func initAutoPilotKey(gui *gocui.Gui, autoPilotEnabled bool) (error, bool) {
+	if err := gui.SetKeybinding("", 'a', gocui.ModNone,
 		func(gui *gocui.Gui, view *gocui.View) error {
-			main.autoPilotEnabled = !main.autoPilotEnabled
+			autoPilotEnabled = !autoPilotEnabled
 			return nil
 		}); err != nil {
-		return err
+		return err, false
 	}
-	return nil
+	return nil, autoPilotEnabled
 }

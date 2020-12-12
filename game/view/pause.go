@@ -33,21 +33,21 @@ func initPauseView(gui *gocui.Gui, gameView Properties) error {
 	return err
 }
 
-func pause(gui *gocui.Gui, gameFinished bool, running bool) (error, bool) {
+func Pause(gui *gocui.Gui, gameFinished bool, running bool) error {
 	if gameFinished {
-		return nil, false
+		return nil
 	}
 
 	if running {
 		pauseView.Visible = true
 		if _, err := gui.SetCurrentView(pauseViewName); err != nil {
-			return err, false
+			return err
 		}
 		if _, err := gui.SetViewOnTop(pauseViewName); err != nil {
-			return err, false
+			return err
 		}
 	} else {
 		pauseView.Visible = false
 	}
-	return nil, !running
+	return nil
 }
