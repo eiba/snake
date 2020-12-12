@@ -25,10 +25,10 @@ func initLoadingView(gui *gocui.Gui, gameView Properties) error {
 		Title: "Loading",
 		Text:  loadingViewText,
 		Position: game.Position{
-			viewPositionX,
-			viewPositionY,
-			viewPositionX + viewLenX,
-			viewPositionY + viewLenY}}
+			X0: viewPositionX,
+			Y0: viewPositionY,
+			X1: viewPositionX + viewLenX,
+			Y1: viewPositionY + viewLenY}}
 	loadingView, err = createView(gui, loadingViewProps, false)
 	return err
 }
