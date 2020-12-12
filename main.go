@@ -14,8 +14,8 @@ import (
 var (
 	gui              *gocui.Gui
 	r                = rand.New(rand.NewSource(time.Now().UnixNano()))
-	running          = true
-	gameFinished     = false
+	Running          = true
+	GameFinished     = false
 	AutoPilotEnabled = false
 	tickInterval     = 50 * time.Millisecond
 	gameView         = view.Properties{"game", "snake", "", game.Position{}}
@@ -129,7 +129,7 @@ func manageGame(gui *gocui.Gui) error {
 func updateMovement() {
 	for {
 		time.Sleep(tickInterval)
-		if !running {
+		if !Running {
 			continue
 		}
 		gui.Update(func(gui *gocui.Gui) error {
